@@ -99,7 +99,7 @@ module "servicebus" {
 
   customer_managed_key = {
     infrastructure_encryption_enabled  = true
-    key_name                           = "customermanagedkey"
+    key_name                           = null
     key_version                        = "03c89971825b4a0d84905c3597512260"
     key_vault_resource_id              = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.KeyVault/vaults/brytest"
     user_assigned_identity_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"
@@ -107,12 +107,12 @@ module "servicebus" {
 
   role_assignments = {
     "key" = {
-      role_definition_id_or_name = "Contributor"
-      description                = "This is a test role assignment"
-      # condition                  = ""
-      # condition_version          = ""
-      # skip_service_principal_aad_check = false
-      principal_id = "eb5260bd-41f3-4019-9e03-606a617aec13"
+      role_definition_id_or_name       = "Contributor"
+      description                      = "This is a test role assignment"
+      condition                        = "@resource.name == 'bry-sb-module'"
+      condition_version                = "2.0"
+      skip_service_principal_aad_check = false
+      principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
     }
   }
 

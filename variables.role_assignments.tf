@@ -22,7 +22,7 @@ variable "role_assignments" {
         description                            = Optional - Defaults to null. The description of the role assignment.
         condition                              = Optional - Defaults to null. The condition which will be used to scope the role assignment.
         condition_version                      = Optional - Defaults to null. The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
-        delegated_managed_identity_resource_id = optional(string)
+        delegated_managed_identity_resource_id = Optional - Defaults to null. The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created.
         skip_service_principal_aad_check       = Optional - Defaults to false. If the principal_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal_id is a Service Principal identity. 
       })
     )
@@ -33,14 +33,29 @@ variable "role_assignments" {
     ```terraform
     role_assignments = {
       "key" = {
-        role_definition_id_or_name       = "Contributor"
-        description                      = "This is a test role assignment"
-        condition                        = ""
         condition_version                = "2.0"
         skip_service_principal_aad_check = false
+        role_definition_id_or_name       = "Contributor"
+        description                      = "This is a test role assignment"
         principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
+        condition                        = "@resource.name == 'sb-namespace'"
       }
     }
     ```
   DESCRIPTION
+
+  validation {
+    condition     = alltrue([for k, v in var.role_assignments : role_definition_id_or_name != null ])
+    error_message = "principal_id must be a valid GUID"
+  }
+
+  validation {
+    condition     = alltrue([for k, v in var.role_assignments : can(regex("^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$", v.principal_id)) ])
+    error_message = "principal_id must be a valid GUID"
+  }
+
+  validation {
+    condition = alltrue([for k, v in var.role_assignments : contains(["2.0", null], v.condition_version)])
+    error_message = "condition_version must be '2.0' or null"
+  }
 }

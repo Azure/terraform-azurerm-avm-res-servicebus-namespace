@@ -1,5 +1,6 @@
 variable "name" {
   type        = string
+  nullable    = false
   description = <<DESCRIPTION
     Specifies the name of the ServiceBus Namespace resource. 
     Changing this forces a new resource to be created. 
@@ -27,6 +28,7 @@ variable "name" {
 
 variable "resource_group_name" {
   type        = string
+  nullable    = false
   description = <<DESCRIPTION
     The name of the resource group in which to create this resource. 
     Changing this forces a new resource to be created.
@@ -211,6 +213,11 @@ variable "customer_managed_key" {
   validation {
     condition     = var.customer_managed_key == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.KeyVault/vaults/.+$", var.customer_managed_key.key_vault_resource_id))
     error_message = "Key vault resource IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
+  }
+
+  validation {
+    condition = var.customer_managed_key == null || var.customer_managed_key.key_name != null
+    error_message = "key_name must be a valid value"
   }
 }
 
