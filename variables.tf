@@ -67,7 +67,7 @@ variable "sku" {
   nullable    = false
   default     = "Standard"
   description = <<DESCRIPTION
-    Defaults to Standard. Defines which tier to use. Options are Basic, Standard or Premium. 
+    Defaults to `Standard`. Defines which tier to use. Options are Basic, Standard or Premium. 
     Please note that setting this field to Premium will force the creation of a new resource.
   DESCRIPTION
 
@@ -81,7 +81,7 @@ variable "capacity" {
   type        = number
   default     = null
   description = <<DESCRIPTION
-    Ignored for Standard and Basic. Defaults to 1 for Premium. Specifies the capacity. 
+    Ignored for Standard and Basic. Defaults to `1` for Premium. Specifies the capacity. 
     When sku is Premium, capacity can be 1, 2, 4, 8 or 16.
   DESCRIPTION
 
@@ -95,7 +95,7 @@ variable "premium_messaging_partitions" {
   type        = number
   default     = null
   description = <<DESCRIPTION
-    Ignored for Standard and Basic. Defaults to 1 for Premium. Specifies the number messaging partitions. 
+    Ignored for Standard and Basic. Defaults to `1` for Premium. Specifies the number messaging partitions. 
     Only valid when sku is Premium and the minimum number is 1. 
     Possible values include 1, 2, and 4. Changing this forces a new resource to be created.
   DESCRIPTION
@@ -110,7 +110,7 @@ variable "zone_redundant" {
   type        = bool
   default     = null
   description = <<DESCRIPTION
-    Ignored for Standard and Basic. Defaults to true for Premium. Whether or not this resource is zone redundant. 
+    Ignored for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant. 
     sku needs to be Premium. Changing this forces a new resource to be created.
   DESCRIPTION
 }
@@ -119,21 +119,21 @@ variable "local_auth_enabled" {
   type        = bool
   nullable    = false
   default     = true
-  description = "Defaults to true. Whether or not SAS authentication is enabled for the Service Bus namespace."
+  description = "Defaults to `true`. Whether or not SAS authentication is enabled for the Service Bus namespace."
 }
 
 variable "public_network_access_enabled" {
   type        = bool
   nullable    = false
   default     = true
-  description = "Defaults to true. Is public network access enabled for the Service Bus Namespace?"
+  description = "Defaults to `true`. Is public network access enabled for the Service Bus Namespace?"
 }
 
 variable "minimum_tls_version" {
   type        = string
   nullable    = false
   default     = "1.2"
-  description = "Defaults to 1.2. The minimum supported TLS version for this Service Bus Namespace. Valid values are: 1.0, 1.1 and 1.2."
+  description = "Defaults to `1.2`. The minimum supported TLS version for this Service Bus Namespace. Valid values are: 1.0, 1.1 and 1.2."
   
   validation {
     condition     = var.minimum_tls_version == null || can(index(["1.0", "1.1", "1.2"], var.minimum_tls_version))
@@ -152,8 +152,8 @@ variable "managed_identities" {
     Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
     object({
-      system_assigned            = (Optional) - Defaults to false. Specifies if the System Assigned Managed Identity should be enabled.
-      user_assigned_resource_ids = (Optional) - Defaults to []. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
+      system_assigned            = (Optional) - Defaults to `false`. Specifies if the System Assigned Managed Identity should be enabled.
+      user_assigned_resource_ids = (Optional) - Defaults to `[]`. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
     })
 
     Example Inputs:
@@ -166,7 +166,10 @@ variable "managed_identities" {
   DESCRIPTION
 
   validation {
-    condition     = alltrue([for mi_id in var.managed_identities.user_assigned_resource_ids : can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$", mi_id))])
+    condition     = alltrue([
+      for mi_id in var.managed_identities.user_assigned_resource_ids : 
+      can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$", mi_id))
+    ])
     error_message = "Managed identity resource IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
   }
 }
@@ -187,8 +190,8 @@ variable "customer_managed_key" {
       key_name                           = (Required) - The key name for the customer managed key in the key vault.
       user_assigned_identity_resource_id = (Required) - The user assigned identity to use when access the key vault
       key_vault_resource_id              = (Required) - The full Azure Resource ID of the key_vault where the customer managed key will be referenced from.
-      key_version                        = (Optional) - Defaults to null. The version of the key to use
-      infrastructure_encryption_enabled  = (Optional) - Defaults to true. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
+      key_version                        = (Optional) - Defaults to `null`. The version of the key to use
+      infrastructure_encryption_enabled  = (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
     })
 
     > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
@@ -217,7 +220,7 @@ variable "customer_managed_key" {
 
   validation {
     condition = var.customer_managed_key == null || var.customer_managed_key.key_name != null
-    error_message = "key_name must be a valid value"
+    error_message = "key_name must have a value"
   }
 }
 
@@ -239,12 +242,12 @@ variable "network_rule_config" {
 
     object({
       trusted_services_allowed = (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration? 
-      cidr_or_ip_rules         = (Optional) - Defaults to []. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
-      default_action           = (Optional) - Defaults to Allow. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
+      cidr_or_ip_rules         = (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
+      default_action           = (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
 
       network_rules = set(object({
         subnet_id                            = (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
-        ignore_missing_vnet_service_endpoint = (Optional) - Defaults to false. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
+        ignore_missing_vnet_service_endpoint = (Optional) - Defaults to `false`. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
       }))
     })
 
@@ -271,17 +274,26 @@ variable "network_rule_config" {
   }
 
   validation {
-    condition     = alltrue([for value in var.network_rule_config.network_rules : can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.Network/virtualNetworks/.+/subnets/.+$", value.subnet_id))]) 
+    condition     = alltrue([
+      for value in var.network_rule_config.network_rules : 
+      can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.Network/virtualNetworks/.+/subnets/.+$", value.subnet_id))
+    ]) 
     error_message = "Subnet IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
   }
 
   validation {
-    condition     = alltrue([for value in var.network_rule_config.cidr_or_ip_rules : strcontains(value, "/") == false || can(cidrhost(value, 0))])
+    condition     = alltrue([
+      for value in var.network_rule_config.cidr_or_ip_rules : 
+      strcontains(value, "/") == false || can(cidrhost(value, 0))
+    ])
     error_message = "Allowed Ips must be valid IPv4 CIDR."
   }
   
   validation {
-    condition     = alltrue([for value in var.network_rule_config.cidr_or_ip_rules : strcontains(value, "/") || can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", value))])
+    condition     = alltrue([
+      for value in var.network_rule_config.cidr_or_ip_rules : 
+      strcontains(value, "/") || can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", value))
+    ])
     error_message = "Allowed IPs must be valid IPv4."
   }
 }
