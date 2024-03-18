@@ -21,7 +21,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
   }
 
   dynamic "enabled_log" {
-    for_each = each.value.log_groups
+    for_each = length(each.value.log_categories) == 0 ? each.value.log_groups : []
 
     content {
       category_group = enabled_log.value

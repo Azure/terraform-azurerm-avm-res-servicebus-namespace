@@ -87,19 +87,15 @@ module "servicebus" {
 
       metric_groups               = ["AllMetrics"]
       workspace_resource_id       = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.OperationalInsights/workspaces/brytesting"
-      storage_account_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Storage/storageAccounts/brytest"
     }
 
     diagnostic2 = {
       name                                     = "diagtest2"
-      event_hub_name                           = "brytesthub"
-      event_hub_authorization_rule_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.EventHub/namespaces/brytest/authorizationRules/RootManageSharedAccessKey"
       log_analytics_destination_type           = "Dedicated"
 
       log_categories              = ["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"]
 
       metric_groups               = ["AllMetrics"]
-      workspace_resource_id       = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.OperationalInsights/workspaces/brytesting"
       storage_account_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Storage/storageAccounts/brytest"
     }
   }
