@@ -3,12 +3,14 @@ variable "name" {
   description = <<DESCRIPTION
     Specifies the name of the ServiceBus Namespace resource. 
     Changing this forces a new resource to be created. 
-    Name must only contain letters, numbers, and hyphens and be between 6 and 50 characteres long.
-    name variable must not start or end with a hyphen.
+    Name must only contain letters, numbers, and hyphens and be between 6 and 50 characteres long. Also, it must not start or end with a hyphen.
+
+    Example Inputs: sb-sharepoint-prod-westus-001
+    See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicebus
   DESCRIPTION
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9-]+$", var.name)) && length(var.name) <= 50 && length(var.name) >= 6 && substr(var.name, 0, 1) != "-" && substr(var.name, length(var.name)-1, 1) != "-"
+    condition     = can(regex("^[a-zA-Z0-9-]+$", var.name))
     error_message = "The name variable must only contain letters, numbers, and hyphens."
   }
 
@@ -29,6 +31,9 @@ variable "resource_group_name" {
     The name of the resource group in which to create this resource. 
     Changing this forces a new resource to be created.
     Name must be less than 90 characters long and must only contain underscores, hyphens, periods, parentheses, letters, or digits.
+
+    Example Inputs: rg-sharepoint-prod-westus-001
+    See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftresources
   DESCRIPTION
 
   validation {
@@ -44,7 +49,15 @@ variable "resource_group_name" {
 
 variable "location" {
   type        = string
-  description = "Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created."
+  default     = null
+  description = <<DESCRIPTION
+    Azure region where the resource should be deployed.
+    If null, the location will be inferred from the resource group location.
+    Changing this forces a new resource to be created.
+    
+    Example Inputs: eastus
+    See more in CLI: az account list-locations -o table --query "[].name"
+  DESCRIPTION
 }
 
 variable "sku" {
@@ -136,20 +149,69 @@ variable "managed_identities" {
   description = <<DESCRIPTION
     Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
-    - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
-    - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+    object({
+      system_assigned            = (Optional) - Defaults to false. Specifies if the System Assigned Managed Identity should be enabled.
+      user_assigned_resource_ids = (Optional) - Defaults to []. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
+    })
+
+    Example Inputs:
+    ```terraform
+    managed_identities = {
+      system_assigned            = true
+      user_assigned_resource_ids = ["/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"]
+    }
+    ```
   DESCRIPTION
+
+  validation {
+    condition     = alltrue([for mi_id in var.managed_identities.user_assigned_resource_ids : can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$", mi_id))])
+    error_message = "Managed identity resource IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
+  }
 }
 
 variable "customer_managed_key" {
   type = object({
-    key_vault_key_id                  = string
-    user_mi_id_to_access_key          = string
-    infrastructure_encryption_enabled = optional(bool, true)
+    key_vault_resource_id              = string
+    key_name                           = string
+    user_assigned_identity_resource_id = string
+    infrastructure_encryption_enabled  = optional(bool, true)
+    key_version                        = optional(string, null)
   })
-
   default     = null
-  description = "Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection"
+  description = <<DESCRIPTION
+    Defines a customer managed key to use for encryption.
+
+    object({
+      key_name                           = (Required) - The key name for the customer managed key in the key vault.
+      user_assigned_identity_resource_id = (Required) - The user assigned identity to use when access the key vault
+      key_vault_resource_id              = (Required) - The full Azure Resource ID of the key_vault where the customer managed key will be referenced from.
+      key_version                        = (Optional) - Defaults to null. The version of the key to use
+      infrastructure_encryption_enabled  = (Optional) - Defaults to true. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
+    })
+
+    > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
+
+    Example Inputs:
+    ```terraform
+    customer_managed_key = {
+      infrastructure_encryption_enabled  = true
+      key_name                           = "sample-customer-key"
+      key_version                        = 03c89971825b4a0d84905c3597512260
+      key_vault_resource_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
+      user_assigned_identity_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
+    }
+    ```
+   DESCRIPTION
+
+  validation {
+    condition     = var.customer_managed_key == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$", var.customer_managed_key.user_assigned_identity_resource_id))
+    error_message = "Managed identity resource IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
+  }
+
+  validation {
+    condition     = var.customer_managed_key == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.KeyVault/vaults/.+$", var.customer_managed_key.key_vault_resource_id))
+    error_message = "Key vault resource IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
+  }
 }
 
 variable "network_rule_config" {
@@ -163,14 +225,72 @@ variable "network_rule_config" {
       ignore_missing_vnet_service_endpoint = optional(bool, false)
     })), [])
   })
-
   nullable    = false
   default     = {}
-  description = ""
+  description = <<DESCRIPTION
+    Defines the network rules configuration for the resource.
+
+    object({
+      trusted_services_allowed = (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration? 
+      cidr_or_ip_rules         = (Optional) - Defaults to []. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
+      default_action           = (Optional) - Defaults to Allow. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
+
+      network_rules = set(object({
+        subnet_id                            = (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
+        ignore_missing_vnet_service_endpoint = (Optional) - Defaults to false. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
+      }))
+    })
+
+    Example Inputs:
+    ```terraform
+    network_rule_config = {
+      trusted_services_allowed = true
+      default_action           = "Allow"
+      cidr_or_ip_rules         = ["79.0.0.0", "80.0.0.0/24"]
+
+      network_rules = [
+        {
+          ignore_missing_vnet_service_endpoint = false
+          subnet_id                            = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
+        }
+      ]
+    }
+    ```
+   DESCRIPTION
+
+  validation {
+    condition     = contains(["Allow", "Deny"], var.network_rule_config.default_action)
+    error_message = "Default action can only be Allow or Deny"
+  }
+
+  validation {
+    condition     = alltrue([for value in var.network_rule_config.network_rules : can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.Network/virtualNetworks/.+/subnets/.+$", value.subnet_id))]) 
+    error_message = "Subnet IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
+  }
+
+  validation {
+    condition     = alltrue([for value in var.network_rule_config.cidr_or_ip_rules : strcontains(value, "/") == false || can(cidrhost(value, 0))])
+    error_message = "Allowed Ips must be valid IPv4 CIDR."
+  }
+  
+  validation {
+    condition     = alltrue([for value in var.network_rule_config.cidr_or_ip_rules : strcontains(value, "/") || can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", value))])
+    error_message = "Allowed IPs must be valid IPv4."
+  }
 }
 
 variable "tags" {
   type     = map(string)
   default  = {}
   nullable = false
+  description = <<DESCRIPTION
+    A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
+
+    Example Inputs:
+    ```terraform
+    tags = {
+      environment = "testing"
+    }
+    ```
+  DESCRIPTION
 }

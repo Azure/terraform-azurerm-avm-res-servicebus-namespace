@@ -19,9 +19,13 @@ locals {
     } : {}
   }
 
+  normalized_location  = var.location != null ? var.location : data.azurerm_resource_group.rg.location
+
   normalized_capacity = var.sku != "Premium" ? 0 : var.sku == "Premium" && var.capacity == null ? 1 : var.capacity
 
   normalized_premium_messaging_partitions = var.sku != "Premium" ? 0 : var.sku == "Premium" && var.capacity == null ? 1 : var.capacity
 
   normalized_zone_redundant = var.sku != "Premium" ? false : var.sku == "Premium" && var.zone_redundant == null ? true : var.zone_redundant
+
+  customer_managed_key_keyvault_name = var.customer_managed_key != null ? element(split("/", var.customer_managed_key.key_vault_resource_id), 8) : null
 }

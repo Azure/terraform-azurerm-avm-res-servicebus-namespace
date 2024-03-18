@@ -1,3 +1,7 @@
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
+}
+
 resource "azurerm_servicebus_namespace" "this" {
   name                          = var.name
   
@@ -26,9 +30,9 @@ resource "azurerm_servicebus_namespace" "this" {
     for_each = var.customer_managed_key != null ? [1] : []
 
      content {
-      key_vault_key_id                  = var.customer_managed_key.key_vault_key_id
-      identity_id                       = var.customer_managed_key.user_mi_id_to_access_key
       infrastructure_encryption_enabled = var.customer_managed_key.infrastructure_encryption_enabled
+      identity_id                       = var.customer_managed_key.user_assigned_identity_resource_id
+      key_vault_key_id                  = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${coalesce(var.customer_managed_key.key_version, "")}"
     }
   }
 
