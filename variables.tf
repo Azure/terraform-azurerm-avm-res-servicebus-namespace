@@ -1,201 +1,176 @@
 variable "name" {
   type        = string
-  description = "The name of the this resource."
+  description = <<DESCRIPTION
+    Specifies the name of the ServiceBus Namespace resource. 
+    Changing this forces a new resource to be created. 
+    Name must only contain letters, numbers, and hyphens and be between 6 and 50 characteres long.
+    name variable must not start or end with a hyphen.
+  DESCRIPTION
 
   validation {
-    condition     = can(regex("TODO", var.name))
-    error_message = "The name must be TODO." # TODO remove the example below once complete:
-    #condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
-    #error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
+    condition     = can(regex("^[a-zA-Z0-9-]+$", var.name)) && length(var.name) <= 50 && length(var.name) >= 6 && substr(var.name, 0, 1) != "-" && substr(var.name, length(var.name)-1, 1) != "-"
+    error_message = "The name variable must only contain letters, numbers, and hyphens."
+  }
+
+  validation {
+    condition     = length(var.name) <= 50 && length(var.name) >= 6
+    error_message = "The name variable must be between 6 and 50 characters long"
+  }
+
+  validation {
+    condition     = substr(var.name, 0, 1) != "-" && substr(var.name, length(var.name)-1, 1) != "-"
+    error_message = "The name variable must not start or end with a hyphen."
   }
 }
 
-# This is required for most resource modules
 variable "resource_group_name" {
   type        = string
-  description = "The resource group where the resources will be deployed."
-}
-
-# required AVM interfaces
-# remove only if not supported by the resource
-# tflint-ignore: terraform_unused_declarations
-variable "customer_managed_key" {
-  type = object({
-    key_vault_resource_id              = optional(string)
-    key_name                           = optional(string)
-    key_version                        = optional(string, null)
-    user_assigned_identity_resource_id = optional(string, null)
-  })
-  default     = {}
-  description = "Customer managed keys that should be associated with the resource."
-}
-
-variable "diagnostic_settings" {
-  type = map(object({
-    name                                     = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
-    log_analytics_destination_type           = optional(string, "Dedicated")
-    workspace_resource_id                    = optional(string, null)
-    storage_account_resource_id              = optional(string, null)
-    event_hub_authorization_rule_resource_id = optional(string, null)
-    event_hub_name                           = optional(string, null)
-    marketplace_partner_resource_id          = optional(string, null)
-  }))
-  default     = {}
   description = <<DESCRIPTION
-A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
-DESCRIPTION
-  nullable    = false
+    The name of the resource group in which to create this resource. 
+    Changing this forces a new resource to be created.
+    Name must be less than 90 characters long and must only contain underscores, hyphens, periods, parentheses, letters, or digits.
+  DESCRIPTION
 
   validation {
-    condition     = alltrue([for _, v in var.diagnostic_settings : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
-    error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
+    condition     = length(var.resource_group_name) <= 90
+    error_message = "The resource_group_name variable must be less than 90 characters long."
   }
-  validation {
-    condition = alltrue(
-      [
-        for _, v in var.diagnostic_settings :
-        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
-      ]
-    )
-    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
-  }
-}
 
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see <https://aka.ms/avm/telemetryinfo>.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
+  validation {
+    condition     = can(regex("^[().a-zA-Z0-9_-]+$", var.resource_group_name))
+    error_message = "The resource_group_name variable must only contain underscores, hyphens, periods, parentheses, letters, or digits."
+  }
 }
 
 variable "location" {
   type        = string
-  default     = null
-  description = "Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location."
+  description = "Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created."
 }
 
-variable "lock" {
-  type = object({
-    name = optional(string, null)
-    kind = optional(string, "None")
-  })
-  default     = {}
-  description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
+variable "sku" {
+  type        = string
   nullable    = false
+  default     = "Standard"
+  description = <<DESCRIPTION
+    Defaults to Standard. Defines which tier to use. Options are Basic, Standard or Premium. 
+    Please note that setting this field to Premium will force the creation of a new resource.
+  DESCRIPTION
 
   validation {
-    condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock.kind)
-    error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
+    condition     = can(index(["Basic", "Standard", "Premium"], var.sku))
+    error_message = "The sku variable must be either Basic, Standard, or Premium."
   }
 }
 
-# tflint-ignore: terraform_unused_declarations
+variable "capacity" {
+  type        = number
+  default     = null
+  description = <<DESCRIPTION
+    Ignored for Standard and Basic. Defaults to 1 for Premium. Specifies the capacity. 
+    When sku is Premium, capacity can be 1, 2, 4, 8 or 16.
+  DESCRIPTION
+
+  validation {
+    condition     = var.capacity == null || can(index([1, 2, 4, 8, 16], var.capacity))
+    error_message = "The capacity variable must be 1, 2, 4, 8, or 16 when sku is Premium."
+  }
+}
+
+variable "premium_messaging_partitions" {
+  type        = number
+  default     = null
+  description = <<DESCRIPTION
+    Ignored for Standard and Basic. Defaults to 1 for Premium. Specifies the number messaging partitions. 
+    Only valid when sku is Premium and the minimum number is 1. 
+    Possible values include 1, 2, and 4. Changing this forces a new resource to be created.
+  DESCRIPTION
+
+  validation {
+    condition     = var.premium_messaging_partitions == null || can(index([1, 2, 4], var.premium_messaging_partitions))
+    error_message = "The premium_messaging_partitions variable must be 1, 2, or 4 when sku is Premium."
+  }
+}
+
+variable "zone_redundant" {
+  type        = bool
+  default     = null
+  description = <<DESCRIPTION
+    Ignored for Standard and Basic. Defaults to true for Premium. Whether or not this resource is zone redundant. 
+    sku needs to be Premium. Changing this forces a new resource to be created.
+  DESCRIPTION
+}
+
+variable "local_auth_enabled" {
+  type        = bool
+  nullable    = false
+  default     = true
+  description = "Defaults to true. Whether or not SAS authentication is enabled for the Service Bus namespace."
+}
+
+variable "public_network_access_enabled" {
+  type        = bool
+  nullable    = false
+  default     = true
+  description = "Defaults to true. Is public network access enabled for the Service Bus Namespace?"
+}
+
+variable "minimum_tls_version" {
+  type        = string
+  nullable    = false
+  default     = "1.2"
+  description = "Defaults to 1.2. The minimum supported TLS version for this Service Bus Namespace. Valid values are: 1.0, 1.1 and 1.2."
+  
+  validation {
+    condition     = var.minimum_tls_version == null || can(index(["1.0", "1.1", "1.2"], var.minimum_tls_version))
+    error_message = "The minimum_tls_version variable must be 1.0, 1.1 or 1.2."
+  }
+}
+
 variable "managed_identities" {
   type = object({
     system_assigned            = optional(bool, false)
     user_assigned_resource_ids = optional(set(string), [])
   })
   default     = {}
-  description = "Managed identities to be created for the resource."
-}
-
-variable "private_endpoints" {
-  type = map(object({
-    name = optional(string, null)
-    role_assignments = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      condition                              = optional(string, null)
-      condition_version                      = optional(string, null)
-      delegated_managed_identity_resource_id = optional(string, null)
-    })), {})
-    lock = optional(object({
-      name = optional(string, null)
-      kind = optional(string, "None")
-    }), {})
-    tags                                    = optional(map(any), null)
-    subnet_resource_id                      = string
-    private_dns_zone_group_name             = optional(string, "default")
-    private_dns_zone_resource_ids           = optional(set(string), [])
-    application_security_group_associations = optional(map(string), {})
-    private_service_connection_name         = optional(string, null)
-    network_interface_name                  = optional(string, null)
-    location                                = optional(string, null)
-    resource_group_name                     = optional(string, null)
-    ip_configurations = optional(map(object({
-      name               = string
-      private_ip_address = string
-    })), {})
-  }))
-  default     = {}
+  nullable    = false
   description = <<DESCRIPTION
-A map of private endpoints to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+    Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
-- `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of this resource.
-- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `name` - The name of the IP configuration.
-  - `private_ip_address` - The private IP address of the IP configuration.
-DESCRIPTION
+    - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
+    - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+  DESCRIPTION
 }
 
-variable "role_assignments" {
-  type = map(object({
-    role_definition_id_or_name             = string
-    principal_id                           = string
-    description                            = optional(string, null)
-    skip_service_principal_aad_check       = optional(bool, false)
-    condition                              = optional(string, null)
-    condition_version                      = optional(string, null)
-    delegated_managed_identity_resource_id = optional(string, null)
-  }))
+variable "customer_managed_key" {
+  type = object({
+    key_vault_key_id                  = string
+    user_mi_id_to_access_key          = string
+    infrastructure_encryption_enabled = optional(bool, true)
+  })
+
+  default     = null
+  description = "Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection"
+}
+
+variable "network_rule_config" {
+  type = object({
+    trusted_services_allowed      = optional(bool, false)
+    cidr_or_ip_rules              = optional(set(string), [])
+    default_action                = optional(string, "Allow")
+
+    network_rules = optional(set(object({
+      subnet_id                            = string
+      ignore_missing_vnet_service_endpoint = optional(bool, false)
+    })), [])
+  })
+
+  nullable    = false
   default     = {}
-  description = <<DESCRIPTION
-A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-- `principal_id` - The ID of the principal to assign the role to.
-- `description` - The description of the role assignment.
-- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-- `condition` - The condition which will be used to scope the role assignment.
-- `condition_version` - The version of the condition syntax. Valid values are '2.0'.
-
-> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
-DESCRIPTION
+  description = ""
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "tags" {
-  type        = map(any)
-  default     = {}
-  description = "The map of tags to be applied to the resource"
+  type     = map(string)
+  default  = {}
+  nullable = false
 }
