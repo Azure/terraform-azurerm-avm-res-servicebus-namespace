@@ -52,6 +52,7 @@ resource "azurerm_servicebus_namespace" "this" {
     } 
   }
 
+  # These cases are handled in the normalized_xxx variables. Serves as unit testing in case of future changes to those variables
   lifecycle {
     precondition {
       condition     = var.sku != "Premium" ? local.normalized_zone_redundant == false : true

@@ -35,7 +35,8 @@ module "naming" {
 
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
-  location = module.regions.regions[random_integer.region_index.result].name
+  #location = module.regions.regions[random_integer.region_index.result].name
+  location  = "uksouth"
 }
 
 module "servicebus" {
@@ -105,12 +106,10 @@ module "servicebus" {
   }
 
   role_assignments = {
-    "key" = {
+    key = {
+      skip_service_principal_aad_check = false
       role_definition_id_or_name       = "Contributor"
       description                      = "This is a test role assignment"
-      condition                        = "@resource.name == 'bry-sb-module'"
-      condition_version                = "2.0"
-      skip_service_principal_aad_check = false
       principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
     }
   }
@@ -122,7 +121,7 @@ module "servicebus" {
 
   queues = {
     forwardQueue = {
-
+      
     }
 
     testQueue = {
@@ -140,10 +139,10 @@ module "servicebus" {
       max_message_size_in_kilobytes           = 1024
       max_size_in_megabytes                   = 1024
       status                                  = "Active"
-      forward_to                              = "forwardQueue"
-      forward_dead_lettered_messages_to       = "forwardQueue"
+      # forward_to                              = "forwardQueue"
+      # forward_dead_lettered_messages_to       = "forwardQueue"
       authorization_rules = {
-        "testRule" = {
+        testRule = {
           send   = true
           listen = true
           manage = true

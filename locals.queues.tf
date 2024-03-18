@@ -14,5 +14,6 @@ locals {
   queue_rules = { 
     for map_object in local.flatten_queue_rules : 
     keys(map_object)[0] => values(map_object)[0] 
+    if length(keys(map_object)) > 0
   }
 }

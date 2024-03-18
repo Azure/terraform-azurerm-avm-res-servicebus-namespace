@@ -219,7 +219,7 @@ variable "customer_managed_key" {
   }
 
   validation {
-    condition = var.customer_managed_key == null || var.customer_managed_key.key_name != null
+    condition = var.customer_managed_key == null ? true : var.customer_managed_key.key_name != null
     error_message = "key_name must have a value"
   }
 }
@@ -284,7 +284,7 @@ variable "network_rule_config" {
   validation {
     condition     = alltrue([
       for value in var.network_rule_config.cidr_or_ip_rules : 
-      strcontains(value, "/") == false || can(cidrhost(value, 0))
+      value == null ? false : strcontains(value, "/") == false || can(cidrhost(value, 0))
     ])
     error_message = "Allowed Ips must be valid IPv4 CIDR."
   }
@@ -292,7 +292,7 @@ variable "network_rule_config" {
   validation {
     condition     = alltrue([
       for value in var.network_rule_config.cidr_or_ip_rules : 
-      strcontains(value, "/") || can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", value))
+      value == null ? false : strcontains(value, "/") || can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", value))
     ])
     error_message = "Allowed IPs must be valid IPv4."
   }

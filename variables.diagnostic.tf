@@ -58,11 +58,33 @@ variable "diagnostic_settings" {
     condition     = alltrue([
       for _, v in var.diagnostic_settings : 
       alltrue([
+        for c in v.metric_groups : 
+        c == null ? false : contains(["AllMetrics"], c)
+      ])
+    ])
+    error_message = "The metric_groups parameter if specified can only be `AllMetrics`."
+  }
+
+  validation {
+    condition     = alltrue([
+      for _, v in var.diagnostic_settings : 
+      alltrue([
+        for c in v.log_groups : 
+        c == null ? false : contains(["allLogs"], c)
+      ])
+    ])
+    error_message = "The log_groups parameter if specified can only be `allLogs`."
+  }
+
+  validation {
+    condition     = alltrue([
+      for _, v in var.diagnostic_settings : 
+      alltrue([
         for c in v.log_categories : 
         contains(["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"], c)
       ])
     ])
-    error_message = "The log_categories if specified can only be `ApplicationMetricsLogs`, `RuntimeAuditLogs`, `VNetAndIPFilteringLogs` or `OperationalLogs`."
+    error_message = "The log_categories parameter if specified can only be `ApplicationMetricsLogs`, `RuntimeAuditLogs`, `VNetAndIPFilteringLogs` or `OperationalLogs`."
   }
 
   validation {
@@ -77,10 +99,10 @@ variable "diagnostic_settings" {
     condition = alltrue(
       [
         for _, v in var.diagnostic_settings :
-        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+        v.workspace_resource_id != null || v.storage_account_resource_id != null || (v.event_hub_name != null && v.event_hub_authorization_rule_resource_id != null) || v.marketplace_partner_resource_id != null
       ]
     )
-    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id` and `event_hub_name` together, must be set."
   }
 
   validation {
