@@ -34,9 +34,9 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
+  name = module.naming.resource_group.name_unique
   #location = module.regions.regions[random_integer.region_index.result].name
-  location  = "uksouth"
+  location = "uksouth"
 }
 
 module "servicebus" {
@@ -78,25 +78,31 @@ module "servicebus" {
 
   diagnostic_settings = {
     diagnostic1 = {
-      name                                     = "diagtest1"
-      event_hub_name                           = "brytesthub"
-      event_hub_authorization_rule_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.EventHub/namespaces/brytest/authorizationRules/RootManageSharedAccessKey"
-      log_analytics_destination_type           = "Dedicated"
+      log_groups    = ["allLogs"]
+      metric_groups = ["AllMetrics"]
 
-      log_groups                  = ["allLogs"]
-
-      metric_groups               = ["AllMetrics"]
-      workspace_resource_id       = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.OperationalInsights/workspaces/brytesting"
+      name                           = "diagtest1"
+      log_analytics_destination_type = "Dedicated"
+      workspace_resource_id          = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.OperationalInsights/workspaces/brytesting"
     }
 
     diagnostic2 = {
+      log_groups    = ["audit"]
+      metric_groups = ["AllMetrics"]
+
       name                                     = "diagtest2"
       log_analytics_destination_type           = "Dedicated"
+      event_hub_name                           = "brytesthub"
+      event_hub_authorization_rule_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.EventHub/namespaces/brytest/authorizationRules/RootManageSharedAccessKey"
+    }
 
-      log_categories              = ["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"]
+    diagnostic3 = {
+      log_categories = ["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"]
+      metric_groups  = ["AllMetrics"]
 
-      metric_groups               = ["AllMetrics"]
-      storage_account_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Storage/storageAccounts/brytest"
+      name                           = "diagtest3"
+      log_analytics_destination_type = "Dedicated"
+      storage_account_resource_id    = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Storage/storageAccounts/brytest"
     }
   }
 
@@ -129,7 +135,7 @@ module "servicebus" {
 
   queues = {
     forwardQueue = {
-      
+
     }
 
     testQueue = {
