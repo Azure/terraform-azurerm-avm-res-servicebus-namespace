@@ -1,6 +1,6 @@
 # The PE resource when we are managing the private_dns_zone_group block:
 resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
-  for_each = var.private_endpoints_manage_dns_zone_group ? { for k, v in var.private_endpoints : k => v } : {}
+  for_each = var.sku == "Premium" && var.private_endpoints_manage_dns_zone_group ? var.private_endpoints : {}
 
   name                          = coalesce(each.value.name, "pep-${var.name}")
 
@@ -41,7 +41,7 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
 
 # The PE resource when we are managing **not** the private_dns_zone_group block:
 resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
-  for_each = var.private_endpoints_manage_dns_zone_group == false ? { for k, v in var.private_endpoints : k => v } : {}
+  for_each = var.sku == "Premium" && var.private_endpoints_manage_dns_zone_group == false ? var.private_endpoints : {}
 
   name                          = coalesce(each.value.name, "pep-${var.name}")
 

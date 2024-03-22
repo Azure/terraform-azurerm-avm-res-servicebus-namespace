@@ -95,9 +95,8 @@ variable "premium_messaging_partitions" {
   type        = number
   default     = null
   description = <<DESCRIPTION
-    Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the number messaging partitions. 
-    Only valid when sku is Premium and the minimum number is 1. 
-    Possible values include 1, 2, and 4. Changing this forces a new resource to be created.
+    Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the number of messaging partitions. 
+    Possible values when Premium are 1, 2, and 4. Changing this forces a new resource to be created.
   DESCRIPTION
 
   validation {
@@ -111,7 +110,7 @@ variable "zone_redundant" {
   default     = null
   description = <<DESCRIPTION
     Always set to `false` for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant. 
-    sku needs to be Premium. Changing this forces a new resource to be created.
+    Changing this forces a new resource to be created.
   DESCRIPTION
 }
 
@@ -184,7 +183,7 @@ variable "customer_managed_key" {
   })
   default     = null
   description = <<DESCRIPTION
-    Optional. Defaults to `null`. Defines a customer managed key to use for encryption.
+    Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
 
     object({
       key_name                           = (Required) - The key name for the customer managed key in the key vault.
@@ -238,7 +237,7 @@ variable "network_rule_config" {
   nullable    = false
   default     = {}
   description = <<DESCRIPTION
-    Defaults to `{}`. Defines the network rules configuration for the resource.
+    Defaults to `{}`. Ignored for Basic and Standard. Defines the network rules configuration for the resource.
 
     object({
       trusted_services_allowed = (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration? 

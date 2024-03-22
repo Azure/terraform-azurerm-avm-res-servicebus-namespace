@@ -25,6 +25,8 @@ locals {
   event_hub_namespace     = "brytest2"
   storage_account_name    = "brytest2"
   customer_managed_key_id = "b975a2e3f7a84290a31c9362c99627f7"
+
+  skus = ["Basic", "Standard", "Premium"]
 }
 
 module "regions" {
@@ -50,13 +52,16 @@ resource "azurerm_resource_group" "this" {
 
 module "servicebus" {
   source = "../../"
+
+  for_each = toset(local.skus)
+
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
 
   resource_group_name = azurerm_resource_group.this.name
 
-  sku                           = "Premium"
   location                      = "uksouth"
-  name                          = "bry-sb-module"
+  sku                           = each.value
+  name                          = "${module.naming.servicebus_namespace.name_unique}-${each.value}"
   capacity                      = 2
   local_auth_enabled            = true
   minimum_tls_version           = "1.1"
@@ -137,14 +142,19 @@ module "servicebus" {
     }
   }
 
-  lock = {
-    kind = "CanNotDelete"
-    name = "Testing name CanNotDelete"
-  }
+  # lock = {
+  #   kind = "CanNotDelete"
+  #   name = "Testing name CanNotDelete"
+  # }
 
   queues = {
     forwardQueue = {
 
+    }
+
+    enableExpress = {
+      enable_express               = true
+      requires_duplicate_detection = false
     }
 
     testQueue = {
@@ -164,7 +174,31 @@ module "servicebus" {
       status                                  = "Active"
       # forward_to                              = "forwardQueue"
       # forward_dead_lettered_messages_to       = "forwardQueue"
-      
+
+      authorization_rules = {
+        testRule = {
+          send   = true
+          listen = true
+          manage = true
+        }
+      }
+    }
+  }
+
+  topics = {
+    testTopic = {
+      auto_delete_on_idle                     = "PT50M"
+      default_message_ttl                     = "PT5M"
+      duplicate_detection_history_time_window = "PT5M"
+      enable_batched_operations               = true
+      enable_express                          = false
+      enable_partitioning                     = true
+      requires_duplicate_detection            = true
+      max_message_size_in_kilobytes           = 1024
+      max_size_in_megabytes                   = 1024
+      status                                  = "Active"
+      support_ordering                        = true
+
       authorization_rules = {
         testRule = {
           send   = true
@@ -177,6 +211,9 @@ module "servicebus" {
 
   private_endpoints = {
     pe1 = {
+      name                        = "pep1"
+      private_dns_zone_group_name = "pep1_group"
+
       role_assignments = {
         key = {
           role_definition_id_or_name = "Contributor"
@@ -212,49 +249,6 @@ module "servicebus" {
       #     private_ip_address = "10.0.0.7"
       #   }
       # }
-    }
-  }
-}
-
-module "servicebus2" {
-  source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-
-  resource_group_name = azurerm_resource_group.this.name
-
-  sku                           = "Standard"
-  location                      = "uksouth"
-  name                          = "bry-sb-module2"
-
-  queues = {
-    forwardQueue = {
-
-    }
-
-    testQueue = {
-      dead_lettering_on_message_expiration    = true
-      auto_delete_on_idle                     = "P10675198D"
-      default_message_ttl                     = "P10675198D"
-      duplicate_detection_history_time_window = "P7D"
-      enable_batched_operations               = true
-      enable_express                          = false
-      enable_partitioning                     = true
-      lock_duration                           = "PT1M"
-      requires_duplicate_detection            = true
-      requires_session                        = true
-      max_delivery_count                      = 2147483647
-      max_size_in_megabytes                   = 2048
-      status                                  = "Active"
-      # forward_to                              = "forwardQueue"
-      # forward_dead_lettered_messages_to       = "forwardQueue"
-      
-      authorization_rules = {
-        testRule = {
-          send   = true
-          listen = true
-          manage = true
-        }
-      }
     }
   }
 }

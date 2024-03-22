@@ -31,18 +31,18 @@ variable "queues" {
       object({
         lock_duration                            = (Optional) - Its minimum and defaults value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
         max_message_size_in_kilobytes            = (Optional) - Always set to `256` for Standard and Basic by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the queue.
-        max_size_in_megabytes                    = (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the queue. For supported values see the "Queue or topic size" section of Service Bus Quotas.
-        requires_duplicate_detection             = (Optional) - Defaults to `false`. Boolean flag which controls whether the Queue requires duplicate detection. Changing this forces a new resource to be created.
-        requires_session                         = (Optional) - Defaults to `false`. Boolean flag which controls whether the Queue requires sessions. This will allow ordered handling of unbounded sequences of related messages. With sessions enabled a queue can guarantee first-in-first-out delivery of messages. Changing this forces a new resource to be created.
-        default_message_ttl                      = (Optional) - Defaults to `null` which is never. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). The ISO 8601 timespan duration of the TTL of messages sent to this queue. This is the default value used when TTL is not set on message itself.
+        max_size_in_megabytes                    = (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the queue.
+        requires_duplicate_detection             = (Optional) - Always set to `false` for Basic by Azure. Defaults to `false`. Boolean flag which controls whether the Queue requires duplicate detection. Changing this forces a new resource to be created.
+        requires_session                         = (Optional) - Always set to `false` for Basic by Azure. Defaults to `false`. Boolean flag which controls whether the Queue requires sessions. This will allow ordered handling of unbounded sequences of related messages. With sessions enabled a queue can guarantee first-in-first-out delivery of messages. Changing this forces a new resource to be created.
+        default_message_ttl                      = (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this queue. This is the default value used when TTL is not set on message itself.
         dead_lettering_on_message_expiration     = (Optional) - Defaults to `false`. Boolean flag which controls whether the Queue has dead letter support when a message expires.
         duplicate_detection_history_time_window  = (Optional) - Defaults to `PT10M` (10 minutes). Minimun of `PT20S` (seconds) and Maximun of `P7D` (7 days). The ISO 8601 timespan duration during which duplicates can be detected.
         max_delivery_count                       = (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.
         status                                   = (Optional) - Defaults to `Active`. The status of the Queue. Possible values are Active, Creating, Deleting, Disabled, ReceiveDisabled, Renaming, SendDisabled, Unknown.
         enable_batched_operations                = (Optional) - Defaults to `true`. Boolean flag which controls whether server-side batched operations are enabled.
-        auto_delete_on_idle                      = (Optional) - Defaults to `null` which is never. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). The ISO 8601 timespan duration of the idle interval after which the Queue is automatically deleted.
+        auto_delete_on_idle                      = (Optional) - Always set to `null` when Basic. It Defaults to `null` for the rest of skus. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.
         enable_partitioning                      = (Optional) - Defaults to `false` for Basic and Standard. For Premium if premium_messaging_partitions is greater than `1` it will always be set to true if not it will be set to `false`. Boolean flag which controls whether to enable the queue to be partitioned across multiple message brokers. Changing this forces a new resource to be created. 
-        enable_express                           = (Optional) - Defaults to `false` for Basic and Standard. Always set to `false` for Premium. Boolean flag which controls whether Express Entities are enabled. An express queue holds a message in memory temporarily before writing it to persistent storage.
+        enable_express                           = (Optional) - Always set to `false` for Premium and Basic by Azure. Defaults to `false` for Standard. Boolean flag which controls whether Express Entities are enabled. An express queue holds a message in memory temporarily before writing it to persistent storage. It requires requires_duplicate_detection to be set to `false`
         forward_to                               = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward messages to.
         forward_dead_lettered_messages_to        = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
 
@@ -67,7 +67,7 @@ variable "queues" {
         default_message_ttl                     = "PT5M"
         duplicate_detection_history_time_window = "PT5M"
         enable_batched_operations               = true
-        enable_express                          = false
+        enable_express                          = true
         enable_partitioning                     = true
         lock_duration                           = "PT5M"
         requires_duplicate_detection            = true

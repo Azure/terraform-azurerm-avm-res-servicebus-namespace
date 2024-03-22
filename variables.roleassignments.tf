@@ -11,7 +11,7 @@ variable "role_assignments" {
   nullable    = false
   
   description = <<DESCRIPTION
-    Optional. Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+    Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
     map(
       object({

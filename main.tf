@@ -27,7 +27,7 @@ resource "azurerm_servicebus_namespace" "this" {
   }
 
   dynamic "customer_managed_key" {
-    for_each = var.customer_managed_key != null ? [1] : []
+    for_each = var.sku == "Premium" && var.customer_managed_key != null ? [1] : []
 
      content {
       infrastructure_encryption_enabled = var.customer_managed_key.infrastructure_encryption_enabled
@@ -36,20 +36,24 @@ resource "azurerm_servicebus_namespace" "this" {
     }
   }
 
-  network_rule_set {
-    public_network_access_enabled = var.public_network_access_enabled
-    default_action                = var.network_rule_config.default_action
-    ip_rules                      = var.network_rule_config.cidr_or_ip_rules
-    trusted_services_allowed      = var.network_rule_config.trusted_services_allowed
-
-    dynamic "network_rules" {
-      for_each = var.network_rule_config.network_rules
+  dynamic "network_rule_set" {
+    for_each = var.sku == "Premium" ? [1] : []
 
       content {
-        subnet_id                            = network_rules.value.subnet_id
-        ignore_missing_vnet_service_endpoint = network_rules.value.ignore_missing_vnet_service_endpoint
-      }
-    } 
+        public_network_access_enabled = var.public_network_access_enabled
+        default_action                = var.network_rule_config.default_action
+        ip_rules                      = var.network_rule_config.cidr_or_ip_rules
+        trusted_services_allowed      = var.network_rule_config.trusted_services_allowed
+
+        dynamic "network_rules" {
+          for_each = var.network_rule_config.network_rules
+
+          content {
+            subnet_id                            = network_rules.value.subnet_id
+            ignore_missing_vnet_service_endpoint = network_rules.value.ignore_missing_vnet_service_endpoint
+          }
+        } 
+    }
   }
 
   # These cases are handled in the normalized_xxx variables. Serves as unit testing in case of future changes to those variables
