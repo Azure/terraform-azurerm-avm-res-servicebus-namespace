@@ -19,8 +19,8 @@ resource "azurerm_servicebus_queue" "this" {
   dead_lettering_on_message_expiration    = each.value.dead_lettering_on_message_expiration
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
   enable_express                          = var.sku == "Premium" ? false : each.value.enable_express
-  enable_partitioning                     = local.normalized_premium_messaging_partitions > 1 && var.sku == "Premium" ? true : each.value.enable_partitioning
-  max_message_size_in_kilobytes           = var.sku != "Premium" ? null : each.value.max_message_size_in_kilobytes == null && var.sku == "Premium" ? 1024 : each.value.max_message_size_in_kilobytes
+  max_message_size_in_kilobytes           = var.sku != "Premium" ? null : coalesce(each.value.max_message_size_in_kilobytes, 1024)
+  enable_partitioning                     = var.sku != "Premium" ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
 
   lifecycle {
     precondition {
