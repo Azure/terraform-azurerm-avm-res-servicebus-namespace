@@ -148,7 +148,7 @@ module "servicebus" {
     }
 
     testQueue = {
-      auto_delete_on_idle                     = "PT5M"
+      auto_delete_on_idle                     = "PT50M"
       dead_lettering_on_message_expiration    = true
       default_message_ttl                     = "PT5M"
       duplicate_detection_history_time_window = "PT5M"
@@ -232,7 +232,7 @@ module "servicebus2" {
     }
 
     testQueue = {
-      auto_delete_on_idle                     = "PT5M"
+      auto_delete_on_idle                     = "PT50M"
       dead_lettering_on_message_expiration    = true
       default_message_ttl                     = "P15D"
       duplicate_detection_history_time_window = "P7D"

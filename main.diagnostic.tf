@@ -1,7 +1,7 @@
 resource "azurerm_monitor_diagnostic_setting" "this" {
   for_each                       = var.diagnostic_settings
 
-  name                           = each.value.name != null ? each.value.name : "diag-${var.name}"
+  name                           = coalesce(each.value.name, "diag-${var.name}")
 
   target_resource_id             = azurerm_servicebus_namespace.this.id
 
