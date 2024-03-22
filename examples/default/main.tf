@@ -18,6 +18,15 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_client_config" "current" {}
+
+locals {
+  key_vault_name          = "brytest2"
+  event_hub_namespace     = "brytest2"
+  storage_account_name    = "brytest2"
+  customer_managed_key_id = "b975a2e3f7a84290a31c9362c99627f7"
+}
+
 module "regions" {
   source  = "Azure/regions/azurerm"
   version = ">= 0.3.0"
@@ -49,7 +58,7 @@ module "servicebus" {
   location                      = "uksouth"
   name                          = "bry-sb-module"
   capacity                      = 2
-  local_auth_enabled            = false
+  local_auth_enabled            = true
   minimum_tls_version           = "1.1"
   public_network_access_enabled = false
   premium_messaging_partitions  = 2
@@ -60,7 +69,7 @@ module "servicebus" {
 
   tags = {
     environment = "testing"
-    owner       = "bryan"
+    department  = "engineering"
   }
 
   network_rule_config = {
@@ -71,7 +80,7 @@ module "servicebus" {
     network_rules = [
       {
         ignore_missing_vnet_service_endpoint = false
-        subnet_id                            = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Network/virtualNetworks/brytest/subnets/default"
+        subnet_id                            = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Network/virtualNetworks/brytest/subnets/default"
       }
     ]
   }
@@ -83,7 +92,7 @@ module "servicebus" {
 
       name                           = "diagtest1"
       log_analytics_destination_type = "Dedicated"
-      workspace_resource_id          = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.OperationalInsights/workspaces/brytesting"
+      workspace_resource_id          = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.OperationalInsights/workspaces/brytesting"
     }
 
     diagnostic2 = {
@@ -93,7 +102,7 @@ module "servicebus" {
       name                                     = "diagtest2"
       log_analytics_destination_type           = "Dedicated"
       event_hub_name                           = "brytesthub"
-      event_hub_authorization_rule_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.EventHub/namespaces/brytest/authorizationRules/RootManageSharedAccessKey"
+      event_hub_authorization_rule_resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.EventHub/namespaces/${local.event_hub_namespace}/authorizationRules/RootManageSharedAccessKey"
     }
 
     diagnostic3 = {
@@ -102,21 +111,21 @@ module "servicebus" {
 
       name                           = "diagtest3"
       log_analytics_destination_type = "Dedicated"
-      storage_account_resource_id    = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Storage/storageAccounts/brytest"
+      storage_account_resource_id    = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Storage/storageAccounts/${local.storage_account_name}"
     }
   }
 
   managed_identities = {
     system_assigned            = true
-    user_assigned_resource_ids = ["/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"]
+    user_assigned_resource_ids = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"]
   }
 
   customer_managed_key = {
     infrastructure_encryption_enabled  = true
     key_name                           = "customermanagedkey"
-    key_version                        = "03c89971825b4a0d84905c3597512260"
-    key_vault_resource_id              = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.KeyVault/vaults/brytest"
-    user_assigned_identity_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"
+    key_version                        = "${local.customer_managed_key_id}"
+    key_vault_resource_id              = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.KeyVault/vaults/${local.key_vault_name}"
+    user_assigned_identity_resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"
   }
 
   role_assignments = {
@@ -124,7 +133,7 @@ module "servicebus" {
       skip_service_principal_aad_check = false
       role_definition_id_or_name       = "Contributor"
       description                      = "This is a test role assignment"
-      principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
+      principal_id                     = data.azurerm_client_config.current.object_id
     }
   }
 
@@ -146,7 +155,7 @@ module "servicebus" {
       enable_batched_operations               = true
       enable_express                          = false
       enable_partitioning                     = true
-      lock_duration                           = "PT5M"
+      lock_duration                           = "PT1M"
       requires_duplicate_detection            = true
       requires_session                        = true
       max_delivery_count                      = 10
@@ -155,6 +164,7 @@ module "servicebus" {
       status                                  = "Active"
       # forward_to                              = "forwardQueue"
       # forward_dead_lettered_messages_to       = "forwardQueue"
+      
       authorization_rules = {
         testRule = {
           send   = true
@@ -171,7 +181,7 @@ module "servicebus" {
         key = {
           role_definition_id_or_name = "Contributor"
           description                = "This is a test role assignment"
-          principal_id               = "eb5260bd-41f3-4019-9e03-606a617aec13"
+          principal_id               = data.azurerm_client_config.current.object_id
         }
       }
 
@@ -182,15 +192,15 @@ module "servicebus" {
 
       tags = {
         environment = "testing"
-        owner       = "bryan"
+        department  = "engineering"
       }
 
-      subnet_resource_id = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Network/virtualNetworks/brytest/subnets/default"
+      subnet_resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Network/virtualNetworks/brytest/subnets/default"
       private_dns_zone_resource_ids = [
-        "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Network/privateDnsZones/privatelink.servicebus.windows.net"
+        "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Network/privateDnsZones/privatelink.servicebus.windows.net"
       ]
       application_security_group_associations = {
-        asg1 = "/subscriptions/3fdce3cb-f4a5-4c17-99a2-bce02bb0f0c9/resourceGroups/module-dependencies/providers/Microsoft.Network/applicationSecurityGroups/brytest"
+        asg1 = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Network/applicationSecurityGroups/brytest"
       }
 
       network_interface_name = "nic1"
@@ -202,6 +212,49 @@ module "servicebus" {
       #     private_ip_address = "10.0.0.7"
       #   }
       # }
+    }
+  }
+}
+
+module "servicebus2" {
+  source = "../../"
+  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
+
+  resource_group_name = azurerm_resource_group.this.name
+
+  sku                           = "Premium"
+  location                      = "uksouth"
+  name                          = "bry-sb-module2"
+
+  queues = {
+    forwardQueue = {
+
+    }
+
+    testQueue = {
+      auto_delete_on_idle                     = "PT5M"
+      dead_lettering_on_message_expiration    = true
+      default_message_ttl                     = "P15D"
+      duplicate_detection_history_time_window = "P7D"
+      enable_batched_operations               = true
+      enable_express                          = false
+      enable_partitioning                     = true
+      lock_duration                           = "PT1M"
+      requires_duplicate_detection            = true
+      requires_session                        = true
+      max_delivery_count                      = 2147483647
+      max_size_in_megabytes                   = 2048
+      status                                  = "Active"
+      # forward_to                              = "forwardQueue"
+      # forward_dead_lettered_messages_to       = "forwardQueue"
+      
+      authorization_rules = {
+        testRule = {
+          send   = true
+          listen = true
+          manage = true
+        }
+      }
     }
   }
 }

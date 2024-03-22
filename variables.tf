@@ -81,7 +81,7 @@ variable "capacity" {
   type        = number
   default     = null
   description = <<DESCRIPTION
-    Ignored for Standard and Basic. Defaults to `1` for Premium. Specifies the capacity. 
+    Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the capacity. 
     When sku is Premium, capacity can be 1, 2, 4, 8 or 16.
   DESCRIPTION
 
@@ -95,7 +95,7 @@ variable "premium_messaging_partitions" {
   type        = number
   default     = null
   description = <<DESCRIPTION
-    Ignored for Standard and Basic. Defaults to `1` for Premium. Specifies the number messaging partitions. 
+    Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the number messaging partitions. 
     Only valid when sku is Premium and the minimum number is 1. 
     Possible values include 1, 2, and 4. Changing this forces a new resource to be created.
   DESCRIPTION
@@ -110,7 +110,7 @@ variable "zone_redundant" {
   type        = bool
   default     = null
   description = <<DESCRIPTION
-    Ignored for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant. 
+    Always set to `false` for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant. 
     sku needs to be Premium. Changing this forces a new resource to be created.
   DESCRIPTION
 }
@@ -149,7 +149,7 @@ variable "managed_identities" {
   default     = {}
   nullable    = false
   description = <<DESCRIPTION
-    Controls the Managed Identity configuration on this resource. The following properties can be specified:
+    Defaults to `{}`. Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
     object({
       system_assigned            = (Optional) - Defaults to `false`. Specifies if the System Assigned Managed Identity should be enabled.
@@ -184,7 +184,7 @@ variable "customer_managed_key" {
   })
   default     = null
   description = <<DESCRIPTION
-    Defines a customer managed key to use for encryption.
+    Optional. Defaults to `null`. Defines a customer managed key to use for encryption.
 
     object({
       key_name                           = (Required) - The key name for the customer managed key in the key vault.
@@ -238,7 +238,7 @@ variable "network_rule_config" {
   nullable    = false
   default     = {}
   description = <<DESCRIPTION
-    Defines the network rules configuration for the resource.
+    Defaults to `{}`. Defines the network rules configuration for the resource.
 
     object({
       trusted_services_allowed = (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration? 
@@ -250,6 +250,8 @@ variable "network_rule_config" {
         ignore_missing_vnet_service_endpoint = (Optional) - Defaults to `false`. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
       }))
     })
+
+    > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore_missing_vnet_service_endpoint is set to `false`.
 
     Example Inputs:
     ```terraform
@@ -303,7 +305,7 @@ variable "tags" {
   default  = {}
   nullable = false
   description = <<DESCRIPTION
-    A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
+    Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 
     Example Inputs:
     ```terraform
