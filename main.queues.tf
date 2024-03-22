@@ -33,6 +33,8 @@ resource "azurerm_servicebus_queue" "this" {
       error_message = "The requires_duplicate_detection parameter must be false when enable_express is true for Standard"
     }
   }
+
+  # depends_on = [ azurerm_servicebus_namespace_disaster_recovery_config.this ]
 }
 
 resource "azurerm_servicebus_queue_authorization_rule" "this" {

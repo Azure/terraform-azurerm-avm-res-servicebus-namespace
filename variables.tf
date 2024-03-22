@@ -173,6 +173,66 @@ variable "managed_identities" {
   }
 }
 
+# Commented as it is currently bugged. https://github.com/hashicorp/terraform-provider-azurerm/issues/22287
+# variable "disaster_recovery_config" {
+#   type = object({
+#     dns_alias_name              = string
+#     partner_namespace_id        = string
+#     alias_authorization_rule_id = optional(string, null)
+#   })
+#   default = null
+#   description = <<DESCRIPTION
+#     Defaults to `null`. Ignored for Basic and Standard. Controls if two service bus namespaces should be configured in a disaster recovery way. The following properties can be specified:
+
+#     object({
+#       dns_alias_name              = (Required) - Specifies the name of the Disaster Recovery Config. This is the alias DNS name that will be created. Changing this forces a new resource to be created.
+#       partner_namespace_id        = (Required) - Second service bus namespace id to pair with this namespace. This will be treated as a secondary replica
+#       alias_authorization_rule_id = (Optional) - Defaults to `null`. The Shared access policies used to access the connection string for the alias.
+#     })
+
+#     > Note: Primary and secondary namespace cannot be in the same region and both should have either private endpoints or none. 
+#       If primary namespace has configured a customer managed key the identity of the secondary namespace must be able to access the key
+
+#     Example Inputs:
+#     ```terraform
+#     disaster_recovery_config = {
+#       dns_alias_name              = "global-alias-name"
+#       partner_namespace_id        = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{serviceBusNamespaceName}"
+#       alias_authorization_rule_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{serviceBusNamespaceName}/authorizationrules/{authorizationRuleName}"
+#     }
+#     ```
+#   DESCRIPTION
+# }
+
+variable "authorization_rules" {
+  type = map(object({
+    send   = optional(bool, false)
+    listen = optional(bool, false)
+    manage = optional(bool, false)
+  }))
+  default = {}
+  description = <<DESCRIPTION
+    Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. Map key is used as the name of the authorizaton rule. The following properties can be specified:
+
+    authorization_rules = map(object({
+      send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
+      listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace? 
+      manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
+    }))
+
+    Example Inputs:
+    ```terraform
+    authorization_rules = {
+      testRule = {
+        send   = true
+        listen = true
+        manage = true
+      }
+    }
+    ```
+  DESCRIPTION
+}
+
 variable "customer_managed_key" {
   type = object({
     key_vault_resource_id              = string

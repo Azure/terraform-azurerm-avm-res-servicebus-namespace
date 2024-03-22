@@ -26,6 +26,8 @@ resource "azurerm_servicebus_topic" "this" {
       error_message = "The max_message_size_in_kilobytes parameter if specified must be between 1024 and 102400 for Premium"
     }
   }
+
+  # depends_on = [ azurerm_servicebus_namespace_disaster_recovery_config.this ]
 }
 
 resource "azurerm_servicebus_topic_authorization_rule" "this" {

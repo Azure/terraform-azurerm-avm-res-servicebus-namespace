@@ -46,7 +46,8 @@ variable "queues" {
         forward_to                               = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward messages to.
         forward_dead_lettered_messages_to        = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
 
-        authorization_rules = map(object({
+        Map key is used as the name of the authorizaton rule.
+        authorization_rules = map(object({ 
           send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Queue?
           listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Queue? 
           manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Queue?

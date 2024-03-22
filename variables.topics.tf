@@ -36,6 +36,7 @@ variable "topics" {
         enable_express                           = (Optional) - Defaults to `false` for Basic and Standard. Always set to `false` for Premium. Boolean flag which controls whether Express Entities are enabled. An express topic holds a message in memory temporarily before writing it to persistent storage.
         support_ordering                         = (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic supports ordering.
 
+        Map key is used as the name of the authorizaton rule.
         authorization_rules = map(object({
           send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Topic?
           listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Topic? 

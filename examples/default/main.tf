@@ -72,6 +72,14 @@ module "servicebus" {
 
   private_endpoints_manage_dns_zone_group = true
 
+  authorization_rules = {
+    testRule = {
+      send   = true
+      listen = true
+      manage = true
+    }
+  }
+
   tags = {
     environment = "testing"
     department  = "engineering"
