@@ -222,7 +222,7 @@ module "servicebus2" {
 
   resource_group_name = azurerm_resource_group.this.name
 
-  sku                           = "Premium"
+  sku                           = "Standard"
   location                      = "uksouth"
   name                          = "bry-sb-module2"
 
@@ -232,9 +232,9 @@ module "servicebus2" {
     }
 
     testQueue = {
-      auto_delete_on_idle                     = "PT50M"
       dead_lettering_on_message_expiration    = true
-      default_message_ttl                     = "P15D"
+      auto_delete_on_idle                     = "P10675198D"
+      default_message_ttl                     = "P10675198D"
       duplicate_detection_history_time_window = "P7D"
       enable_batched_operations               = true
       enable_express                          = false
