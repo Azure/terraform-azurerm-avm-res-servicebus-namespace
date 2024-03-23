@@ -171,11 +171,6 @@ module "servicebus" {
       requires_duplicate_detection = false
     }
 
-    testingsomething = {
-      requires_session                  = true
-      forward_dead_lettered_messages_to = "forwardQueue"
-    }
-
     testQueue = {
       auto_delete_on_idle                     = "P7D"
       dead_lettering_on_message_expiration    = true
