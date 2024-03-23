@@ -1,9 +1,9 @@
 resource "azurerm_servicebus_queue" "this" {
   for_each = var.queues
 
-  name                                    = each.key
+  name = each.key
 
-  namespace_id                            = azurerm_servicebus_namespace.this.id
+  namespace_id = azurerm_servicebus_namespace.this.id
 
   status                                  = each.value.status
   lock_duration                           = each.value.lock_duration
@@ -16,7 +16,7 @@ resource "azurerm_servicebus_queue" "this" {
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
   forward_to                              = var.sku != "Basic" ? each.value.forward_to : null
   requires_session                        = var.sku != "Basic" ? each.value.requires_session : null
-  enable_express                          = var.sku == "Standard" ? each.value.enable_express : null 
+  enable_express                          = var.sku == "Standard" ? each.value.enable_express : null
   auto_delete_on_idle                     = var.sku != "Basic" ? each.value.auto_delete_on_idle : null
   requires_duplicate_detection            = var.sku != "Basic" ? each.value.requires_duplicate_detection : null
   max_message_size_in_kilobytes           = var.sku == "Premium" ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
@@ -24,12 +24,12 @@ resource "azurerm_servicebus_queue" "this" {
 
   lifecycle {
     precondition {
-      condition = var.sku != "Premium" || each.value.max_message_size_in_kilobytes == null ? true : var.sku == "Premium" && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
+      condition     = var.sku != "Premium" || each.value.max_message_size_in_kilobytes == null ? true : var.sku == "Premium" && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
       error_message = "The max_message_size_in_kilobytes parameter if specified must be between 1024 and 102400 for Premium"
     }
 
     precondition {
-      condition = var.sku == "Standard" && coalesce(each.value.enable_express, false) && coalesce(each.value.requires_duplicate_detection, false) ? false : true
+      condition     = var.sku == "Standard" && coalesce(each.value.enable_express, false) && coalesce(each.value.requires_duplicate_detection, false) ? false : true
       error_message = "The requires_duplicate_detection parameter must be false when enable_express is true for Standard"
     }
   }
@@ -40,7 +40,7 @@ resource "azurerm_servicebus_queue" "this" {
 resource "azurerm_servicebus_queue_authorization_rule" "this" {
   for_each = local.queue_rules
 
-  name     = each.value.rule_name
+  name = each.value.rule_name
 
   queue_id = azurerm_servicebus_queue.this[each.value.queue_name].id
 

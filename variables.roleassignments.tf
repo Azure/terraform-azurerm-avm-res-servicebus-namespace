@@ -1,15 +1,15 @@
 variable "role_assignments" {
   type = map(object({
-    role_definition_id_or_name             = string
-    principal_id                           = string
-    
+    role_definition_id_or_name = string
+    principal_id               = string
+
     description                            = optional(string, null)
     skip_service_principal_aad_check       = optional(bool, false)
     delegated_managed_identity_resource_id = optional(string, null)
   }))
-  default     = {}
-  nullable    = false
-  
+  default  = {}
+  nullable = false
+
   description = <<DESCRIPTION
     Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
@@ -39,17 +39,17 @@ variable "role_assignments" {
   DESCRIPTION
 
   validation {
-    condition     = alltrue([
-      for k, v in var.role_assignments : 
-      v.role_definition_id_or_name != null 
+    condition = alltrue([
+      for k, v in var.role_assignments :
+      v.role_definition_id_or_name != null
     ])
     error_message = "Role definition id or name must be set"
   }
 
   validation {
-    condition     = alltrue([
-      for k, v in var.role_assignments : 
-      can(regex("^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$", v.principal_id)) 
+    condition = alltrue([
+      for k, v in var.role_assignments :
+      can(regex("^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$", v.principal_id))
     ])
     error_message = "principal_id must be a valid GUID"
   }

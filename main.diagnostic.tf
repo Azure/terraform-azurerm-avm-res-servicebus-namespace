@@ -1,9 +1,9 @@
 resource "azurerm_monitor_diagnostic_setting" "this" {
-  for_each                       = var.diagnostic_settings
+  for_each = var.diagnostic_settings
 
-  name                           = coalesce(each.value.name, "diag-${var.name}")
+  name = coalesce(each.value.name, "diag-${var.name}")
 
-  target_resource_id             = azurerm_servicebus_namespace.this.id
+  target_resource_id = azurerm_servicebus_namespace.this.id
 
   eventhub_name                  = each.value.event_hub_name
   log_analytics_workspace_id     = each.value.workspace_resource_id

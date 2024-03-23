@@ -21,7 +21,7 @@ variable "name" {
   }
 
   validation {
-    condition     = substr(var.name, 0, 1) != "-" && substr(var.name, length(var.name)-1, 1) != "-"
+    condition     = substr(var.name, 0, 1) != "-" && substr(var.name, length(var.name) - 1, 1) != "-"
     error_message = "The name variable must not start or end with a hyphen."
   }
 }
@@ -133,7 +133,7 @@ variable "minimum_tls_version" {
   nullable    = false
   default     = "1.2"
   description = "Defaults to `1.2`. The minimum supported TLS version for this Service Bus Namespace. Valid values are: 1.0, 1.1 and 1.2."
-  
+
   validation {
     condition     = var.minimum_tls_version == null || can(index(["1.0", "1.1", "1.2"], var.minimum_tls_version))
     error_message = "The minimum_tls_version variable must be 1.0, 1.1 or 1.2."
@@ -165,8 +165,8 @@ variable "managed_identities" {
   DESCRIPTION
 
   validation {
-    condition     = alltrue([
-      for mi_id in var.managed_identities.user_assigned_resource_ids : 
+    condition = alltrue([
+      for mi_id in var.managed_identities.user_assigned_resource_ids :
       can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$", mi_id))
     ])
     error_message = "Managed identity resource IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
@@ -210,7 +210,7 @@ variable "authorization_rules" {
     listen = optional(bool, false)
     manage = optional(bool, false)
   }))
-  default = {}
+  default     = {}
   description = <<DESCRIPTION
     Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. Map key is used as the name of the authorizaton rule. The following properties can be specified:
 
@@ -278,16 +278,16 @@ variable "customer_managed_key" {
   }
 
   validation {
-    condition = var.customer_managed_key == null ? true : var.customer_managed_key.key_name != null
+    condition     = var.customer_managed_key == null ? true : var.customer_managed_key.key_name != null
     error_message = "key_name must have a value"
   }
 }
 
 variable "network_rule_config" {
   type = object({
-    trusted_services_allowed      = optional(bool, false)
-    cidr_or_ip_rules              = optional(set(string), [])
-    default_action                = optional(string, "Allow")
+    trusted_services_allowed = optional(bool, false)
+    cidr_or_ip_rules         = optional(set(string), [])
+    default_action           = optional(string, "Allow")
 
     network_rules = optional(set(object({
       subnet_id                            = string
@@ -336,24 +336,24 @@ variable "network_rule_config" {
   }
 
   validation {
-    condition     = alltrue([
-      for value in var.network_rule_config.network_rules : 
+    condition = alltrue([
+      for value in var.network_rule_config.network_rules :
       can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.Network/virtualNetworks/.+/subnets/.+$", value.subnet_id))
-    ]) 
+    ])
     error_message = "Subnet IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
   }
 
   validation {
-    condition     = alltrue([
-      for value in var.network_rule_config.cidr_or_ip_rules : 
+    condition = alltrue([
+      for value in var.network_rule_config.cidr_or_ip_rules :
       value == null ? false : strcontains(value, "/") == false || can(cidrhost(value, 0))
     ])
     error_message = "Allowed Ips must be valid IPv4 CIDR."
   }
-  
+
   validation {
-    condition     = alltrue([
-      for value in var.network_rule_config.cidr_or_ip_rules : 
+    condition = alltrue([
+      for value in var.network_rule_config.cidr_or_ip_rules :
       value == null ? false : strcontains(value, "/") || can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", value))
     ])
     error_message = "Allowed IPs must be valid IPv4."
@@ -361,9 +361,9 @@ variable "network_rule_config" {
 }
 
 variable "tags" {
-  type     = map(string)
-  default  = {}
-  nullable = false
+  type        = map(string)
+  default     = {}
+  nullable    = false
   description = <<DESCRIPTION
     Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 

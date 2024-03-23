@@ -11,8 +11,8 @@ locals {
     ]
   ])
 
-  topic_rules = { 
-    for topic_rule in local.flatten_topic_rules : 
+  topic_rules = {
+    for topic_rule in local.flatten_topic_rules :
     "${topic_rule.topic_name}|${topic_rule.rule_name}" => topic_rule
   }
 
@@ -27,7 +27,7 @@ locals {
   ])
 
   topic_subscriptions = {
-    for topic_subscription in local.flatten_topic_subscription : 
+    for topic_subscription in local.flatten_topic_subscription :
     "${topic_subscription.topic_name}|${topic_subscription.subscription_name}" => topic_subscription
   }
 }

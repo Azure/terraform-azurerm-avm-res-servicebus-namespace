@@ -11,8 +11,8 @@ variable "diagnostic_settings" {
     log_groups                               = optional(set(string), ["allLogs"])
     metric_groups                            = optional(set(string), ["AllMetrics"])
   }))
-  default  = {}
-  nullable = false
+  default     = {}
+  nullable    = false
   description = <<DESCRIPTION
     Defaults to `{}`. A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
@@ -55,10 +55,10 @@ variable "diagnostic_settings" {
   DESCRIPTION
 
   validation {
-    condition     = alltrue([
-      for _, v in var.diagnostic_settings : 
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
       alltrue([
-        for c in v.metric_groups : 
+        for c in v.metric_groups :
         c == null ? false : contains(["AllMetrics"], c)
       ])
     ])
@@ -66,10 +66,10 @@ variable "diagnostic_settings" {
   }
 
   validation {
-    condition     = alltrue([
-      for _, v in var.diagnostic_settings : 
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
       alltrue([
-        for c in v.log_groups : 
+        for c in v.log_groups :
         c == null ? false : contains(["allLogs", "audit"], c)
       ])
     ])
@@ -77,10 +77,10 @@ variable "diagnostic_settings" {
   }
 
   validation {
-    condition     = alltrue([
-      for _, v in var.diagnostic_settings : 
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
       alltrue([
-        for c in v.log_categories : 
+        for c in v.log_categories :
         contains(["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"], c)
       ])
     ])
@@ -88,8 +88,8 @@ variable "diagnostic_settings" {
   }
 
   validation {
-    condition     = alltrue([
-      for _, v in var.diagnostic_settings : 
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
       contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)
     ])
     error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
@@ -106,32 +106,32 @@ variable "diagnostic_settings" {
   }
 
   validation {
-    condition     = alltrue([
-      for _, v in var.diagnostic_settings : 
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
       v.log_categories != null || v.log_groups != null || v.metric_groups != null
     ])
     error_message = "At least one of `log_categories`, `log_groups`, or `metric_groups` must be set."
   }
 
   validation {
-    condition     = alltrue([
-      for _, v in var.diagnostic_settings : 
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
       v.storage_account_resource_id == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.Storage/storageAccounts/.+$", v.storage_account_resource_id))
     ])
     error_message = "The storage_account_resource_id if specified must have the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}"
   }
 
   validation {
-    condition     = alltrue([
-      for _, v in var.diagnostic_settings : 
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
       v.workspace_resource_id == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.OperationalInsights/workspaces/.+$", v.workspace_resource_id))
     ])
     error_message = "The workspace_resource_id if specified must have the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}"
   }
 
   validation {
-    condition     = alltrue([
-      for _, v in var.diagnostic_settings : 
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
       v.event_hub_authorization_rule_resource_id == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.EventHub/namespaces/.+/authorizationRules/.+$", v.event_hub_authorization_rule_resource_id))
     ])
     error_message = "The event_hub_authorization_rule_resource_id if specified must have the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{eventHubNamespaceName}/authorizationRules/{authorizationRuleName}"

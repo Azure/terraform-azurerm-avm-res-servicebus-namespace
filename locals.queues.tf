@@ -9,8 +9,8 @@ locals {
     ]
   ])
 
-  queue_rules = { 
-    for queue_rule in local.flatten_queue_rules : 
+  queue_rules = {
+    for queue_rule in local.flatten_queue_rules :
     "${queue_rule.queue_name}|${queue_rule.rule_name}" => queue_rule
   }
 }
