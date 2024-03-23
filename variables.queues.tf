@@ -26,10 +26,11 @@ variable "queues" {
   default = {}
     description = <<DESCRIPTION
     Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.
+    The name of the queue must be unique among topics and queues within the namespace.
 
     map(
       object({
-        lock_duration                            = (Optional) - Its minimum and defaults value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
+        lock_duration                            = (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
         max_message_size_in_kilobytes            = (Optional) - Always set to `256` for Standard and Basic by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the queue.
         max_size_in_megabytes                    = (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the queue.
         requires_duplicate_detection             = (Optional) - Always set to `false` for Basic by Azure. Defaults to `false`. Boolean flag which controls whether the Queue requires duplicate detection. Changing this forces a new resource to be created.
@@ -46,7 +47,7 @@ variable "queues" {
         forward_to                               = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward messages to.
         forward_dead_lettered_messages_to        = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
 
-        Map key is used as the name of the authorizaton rule.
+        Defaults to `{}`. Map key is used as the name of the authorizaton rule.
         authorization_rules = map(object({ 
           send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Queue?
           listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Queue? 

@@ -65,7 +65,7 @@ module "servicebus" {
   capacity                      = 2
   local_auth_enabled            = true
   minimum_tls_version           = "1.1"
-  public_network_access_enabled = false
+  public_network_access_enabled = true
   premium_messaging_partitions  = 2
   zone_redundant                = true
   enable_telemetry              = true
@@ -87,7 +87,7 @@ module "servicebus" {
 
   network_rule_config = {
     trusted_services_allowed = true
-    default_action           = "Allow"
+    default_action           = "Deny"
     cidr_or_ip_rules         = ["168.125.123.255", "170.0.0.0/24"]
 
     network_rules = [
@@ -160,7 +160,7 @@ module "servicebus" {
 
     }
 
-    enableExpress = {
+    enableExpressQueue = {
       enable_express               = true
       requires_duplicate_detection = false
     }
@@ -176,7 +176,7 @@ module "servicebus" {
       lock_duration                           = "PT1M"
       requires_duplicate_detection            = true
       requires_session                        = true
-      max_delivery_count                      = 10
+      max_delivery_count                      = 100
       max_message_size_in_kilobytes           = 1024
       max_size_in_megabytes                   = 1024
       status                                  = "Active"
@@ -194,6 +194,14 @@ module "servicebus" {
   }
 
   topics = {
+    forwardTopic = {
+    }
+
+    enableExpressTopic = {
+      enable_express               = true
+      requires_duplicate_detection = false
+    }
+
     testTopic = {
       auto_delete_on_idle                     = "PT50M"
       default_message_ttl                     = "PT5M"
@@ -206,6 +214,22 @@ module "servicebus" {
       max_size_in_megabytes                   = 1024
       status                                  = "Active"
       support_ordering                        = true
+
+      subscriptions = {
+        testSubscription = {
+          dead_lettering_on_filter_evaluation_error = true
+          dead_lettering_on_message_expiration      = true
+          default_message_ttl                       = "PT5M"
+          enable_batched_operations                 = true
+          lock_duration                             = "PT1M"
+          max_delivery_count                        = 100
+          status                                    = "Active"
+          auto_delete_on_idle                       = "PT50M"
+          requires_session                          = true
+          # forward_dead_lettered_messages_to       = "forwardTopic"
+          # forward_to                              = "forwardTopic"
+        }
+      }
 
       authorization_rules = {
         testRule = {

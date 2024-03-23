@@ -304,6 +304,7 @@ variable "network_rule_config" {
       cidr_or_ip_rules         = (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
       default_action           = (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
 
+      Defaults to `[]`.
       network_rules = set(object({
         subnet_id                            = (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
         ignore_missing_vnet_service_endpoint = (Optional) - Defaults to `false`. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?

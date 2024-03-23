@@ -44,7 +44,7 @@ resource "azurerm_servicebus_queue_authorization_rule" "this" {
 
   queue_id = azurerm_servicebus_queue.this[each.value.queue_name].id
 
-  manage = each.value.manage
-  send   = each.value.manage ? true : each.value.send
-  listen = each.value.manage ? true : each.value.listen
+  manage = each.value.rule_params.manage
+  send   = each.value.rule_params.manage ? true : each.value.rule_params.send
+  listen = each.value.rule_params.manage ? true : each.value.rule_params.listen
 }
