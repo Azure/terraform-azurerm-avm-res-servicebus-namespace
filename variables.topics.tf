@@ -1,14 +1,5 @@
 variable "topics" {
   type = map(object({
-    role_assignments   = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      delegated_managed_identity_resource_id = optional(string, null)
-    })), {})
-
     enable_batched_operations               = optional(bool, true)
     requires_duplicate_detection            = optional(bool, false)
     enable_partitioning                     = optional(bool, null)
@@ -39,6 +30,15 @@ variable "topics" {
       default_message_ttl                       = optional(string, null)
       lock_duration                             = optional(string, "PT1M")
       status                                    = optional(string, "Active")
+    })), {})
+
+    role_assignments = optional(map(object({
+      role_definition_id_or_name = string
+      principal_id               = string
+
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      delegated_managed_identity_resource_id = optional(string, null)
     })), {})
   }))
   default     = {}

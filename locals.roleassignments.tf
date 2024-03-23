@@ -14,7 +14,7 @@ locals {
 
   queue_role_assignments = {
     for queue_role in local.flatten_queue_role_assignments :
-    "${queue_role.scope_type}|${queue_role.role_key}" => queue_role
+    "${queue_role.scope_type}|${queue_role.role_key}|${queue_role.queue_name}" => queue_role
   }
 
   flatten_topic_role_assignments = flatten([
@@ -30,7 +30,7 @@ locals {
 
   topic_role_assignments = {
     for topic_role in local.flatten_topic_role_assignments :
-    "${topic_role.scope_type}|${topic_role.role_key}" => topic_role
+    "${topic_role.scope_type}|${topic_role.role_key}|${topic_role.topic_name}" => topic_role
   }
 
   namespace_role_assignments = {

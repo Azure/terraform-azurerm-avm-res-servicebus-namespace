@@ -1,14 +1,5 @@
 variable "queues" {
   type = map(object({
-    role_assignments   = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      delegated_managed_identity_resource_id = optional(string, null)
-    })), {})
-
     max_delivery_count                      = optional(number, 10)
     enable_batched_operations               = optional(bool, true)
     requires_duplicate_detection            = optional(bool, false)
@@ -31,9 +22,18 @@ variable "queues" {
       listen = optional(bool, false)
       manage = optional(bool, false)
     })), {})
+
+    role_assignments = optional(map(object({
+      role_definition_id_or_name = string
+      principal_id               = string
+
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
   }))
-  default = {}
-    description = <<DESCRIPTION
+  default     = {}
+  description = <<DESCRIPTION
     Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.
     The name of the queue must be unique among topics and queues within the namespace.
 
@@ -122,7 +122,7 @@ variable "queues" {
 
   validation {
     condition = alltrue([
-      for _, v in var.queues : 
+      for _, v in var.queues :
       v.forward_to != null && v.requires_session ? false : true
     ])
     error_message = "Forwarding to another queue or topic is not supported when requires_session is set to true."
@@ -130,7 +130,7 @@ variable "queues" {
 
   validation {
     condition = alltrue([
-      for _, v in var.queues : 
+      for _, v in var.queues :
       contains(["Active", "Creating", "Deleting", "Disabled", "ReceiveDisabled", "Renaming", "SendDisabled", "Unknown"], v.status)
     ])
     error_message = "The status parameter can only be `Active`, `Creating`, `Deleting`, `Disabled`, `ReceiveDisabled`, `Renaming`, `SendDisabled`, `Unknown`."
@@ -138,7 +138,7 @@ variable "queues" {
 
   validation {
     condition = alltrue([
-      for _, v in var.queues : 
+      for _, v in var.queues :
       contains([1024, 2048, 3072, 4096, 5120, 10240, 20480, 40960, 81920], v.max_size_in_megabytes)
     ])
     error_message = "The max_size_in_megabytes parameter must be one of `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960`, `81920`."
@@ -146,29 +146,29 @@ variable "queues" {
 
   validation {
     condition = alltrue([
-      for _, v in var.queues : 
+      for _, v in var.queues :
       1 <= v.max_delivery_count && 2147483647 >= v.max_delivery_count
     ])
     error_message = "value of max_delivery_count must be between 1 and 2147483647."
   }
 
   validation {
-    condition     = alltrue(flatten([
-      for queue_name, queue_params in var.queues : 
+    condition = alltrue(flatten([
+      for queue_name, queue_params in var.queues :
       [
-        for k, v in queue_params.role_assignments : 
-        v.role_definition_id_or_name != null 
+        for k, v in queue_params.role_assignments :
+        v.role_definition_id_or_name != null
       ]
     ]))
     error_message = "Role definition id or name must be set"
   }
 
   validation {
-    condition     = alltrue(flatten([
-      for queue_name, queue_params in var.queues : 
+    condition = alltrue(flatten([
+      for queue_name, queue_params in var.queues :
       [
-        for k, v in queue_params.role_assignments : 
-        can(regex("^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$", v.principal_id)) 
+        for k, v in queue_params.role_assignments :
+        can(regex("^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$", v.principal_id))
       ]
     ]))
     error_message = "principal_id must be a valid GUID"
