@@ -160,13 +160,24 @@ module "servicebus" {
 
     }
 
+    fromForwardQueue = {
+      requires_session                  = false
+      forward_to                        = "forwardQueue"
+      forward_dead_lettered_messages_to = "forwardQueue"
+    }
+
     enableExpressQueue = {
       enable_express               = true
       requires_duplicate_detection = false
     }
 
+    testingsomething = {
+      requires_session                  = true
+      forward_dead_lettered_messages_to = "forwardQueue"
+    }
+
     testQueue = {
-      auto_delete_on_idle                     = "PT50M"
+      auto_delete_on_idle                     = "P7D"
       dead_lettering_on_message_expiration    = true
       default_message_ttl                     = "PT5M"
       duplicate_detection_history_time_window = "PT5M"
@@ -180,8 +191,15 @@ module "servicebus" {
       max_message_size_in_kilobytes           = 1024
       max_size_in_megabytes                   = 1024
       status                                  = "Active"
-      # forward_to                              = "forwardQueue"
-      # forward_dead_lettered_messages_to       = "forwardQueue"
+
+      role_assignments = {
+        key = {
+          skip_service_principal_aad_check = false
+          role_definition_id_or_name       = "Contributor"
+          description                      = "This is a test role assignment"
+          principal_id                     = data.azurerm_client_config.current.object_id
+        }
+      }
 
       authorization_rules = {
         testRule = {
@@ -203,17 +221,26 @@ module "servicebus" {
     }
 
     testTopic = {
-      auto_delete_on_idle                     = "PT50M"
+      auto_delete_on_idle                     = "P7D"
       default_message_ttl                     = "PT5M"
       duplicate_detection_history_time_window = "PT5M"
       enable_batched_operations               = true
       enable_express                          = false
       enable_partitioning                     = true
-      requires_duplicate_detection            = true
+      requires_duplicate_detection            = null
       max_message_size_in_kilobytes           = 1024
       max_size_in_megabytes                   = 1024
       status                                  = "Active"
       support_ordering                        = true
+
+      role_assignments = {
+        key = {
+          skip_service_principal_aad_check = false
+          role_definition_id_or_name       = "Contributor"
+          description                      = "This is a test role assignment"
+          principal_id                     = data.azurerm_client_config.current.object_id
+        }
+      }
 
       subscriptions = {
         testSubscription = {
@@ -224,10 +251,14 @@ module "servicebus" {
           lock_duration                             = "PT1M"
           max_delivery_count                        = 100
           status                                    = "Active"
-          auto_delete_on_idle                       = "PT50M"
+          auto_delete_on_idle                       = "P7D"
           requires_session                          = true
-          # forward_dead_lettered_messages_to       = "forwardTopic"
-          # forward_to                              = "forwardTopic"
+        }
+
+        fromForwardSubscription = {
+          requires_session                  = false
+          forward_to                        = "forwardTopic"
+          forward_dead_lettered_messages_to = "forwardTopic"
         }
       }
 

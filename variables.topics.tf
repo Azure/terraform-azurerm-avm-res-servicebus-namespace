@@ -1,5 +1,14 @@
 variable "topics" {
   type = map(object({
+    role_assignments   = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
+
     enable_batched_operations               = optional(bool, true)
     requires_duplicate_detection            = optional(bool, false)
     enable_partitioning                     = optional(bool, null)
@@ -52,26 +61,41 @@ variable "topics" {
         support_ordering                         = (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic supports ordering.
 
         Defaults to `{}`. Map key is used as the name of the authorizaton rule.
-        authorization_rules = map(object({
-          send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Topic?
-          listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Topic? 
-          manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Topic?
-        }))
+        authorization_rules = map(
+          object({
+            send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Topic?
+            listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Topic? 
+            manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Topic?
+          })
+        )
 
         Defaults to `{}`. Map key is used as the name of the subscription.
-        subscriptions = map(object({
-          max_delivery_count                        = (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.
-          dead_lettering_on_filter_evaluation_error = (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription has dead letter support on filter evaluation exceptions
-          dead_lettering_on_message_expiration      = (Optional) - Defaults to `false`. Boolean flag which controls whether the Subscription has dead letter support when a message expires.
-          enable_batched_operations                 = (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription supports batched operations.
-          requires_session                          = (Optional) - Defaults to `false`. Boolean flag which controls whether this Subscription supports the concept of a session. Changing this forces a new resource to be created.
-          forward_to                                = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward messages to.
-          forward_dead_lettered_messages_to         = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
-          auto_delete_on_idle                       = (Optional) - Defaults to `null`. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.
-          default_message_ttl                       = (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this queue. This is the default value used when TTL is not set on message itself.
-          lock_duration                             = (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
-          status                                    = (Optional) - Defaults to `Active`. The status of the Subscription. Possible values are Active, ReceiveDisabled, Disabled.
-        }))
+        subscriptions = map(
+          object({
+            max_delivery_count                        = (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.
+            dead_lettering_on_filter_evaluation_error = (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription has dead letter support on filter evaluation exceptions
+            dead_lettering_on_message_expiration      = (Optional) - Defaults to `false`. Boolean flag which controls whether the Subscription has dead letter support when a message expires.
+            enable_batched_operations                 = (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription supports batched operations.
+            requires_session                          = (Optional) - Defaults to `false`. Boolean flag which controls whether this Subscription supports the concept of a session. Changing this forces a new resource to be created.
+            forward_to                                = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward messages to.
+            forward_dead_lettered_messages_to         = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
+            auto_delete_on_idle                       = (Optional) - Defaults to `null`. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.
+            default_message_ttl                       = (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this queue. This is the default value used when TTL is not set on message itself.
+            lock_duration                             = (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
+            status                                    = (Optional) - Defaults to `Active`. The status of the Subscription. Possible values are Active, ReceiveDisabled, Disabled.
+          })
+        )
+
+        Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+        role_assignments = map(
+          object({
+            role_definition_id_or_name             = (Required) - The ID or name of the role definition to assign to the principal.
+            principal_id                           = (Required) - It's a GUID - The ID of the principal to assign the role to. 
+            description                            = (Optional) - Defaults to `null`. The description of the role assignment.
+            delegated_managed_identity_resource_id = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
+            skip_service_principal_aad_check       = (Optional) - Defaults to `false`. If the principal_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal_id is a Service Principal identity. 
+          })
+        )
       })
     )
 
@@ -79,7 +103,7 @@ variable "topics" {
     ```terraform
     topics = {
       testTopic = {
-        auto_delete_on_idle                     = "PT50M"
+        auto_delete_on_idle                     = "P7D"
         default_message_ttl                     = "PT5M"
         duplicate_detection_history_time_window = "PT5M"
         enable_batched_operations               = true
@@ -100,10 +124,19 @@ variable "topics" {
             lock_duration                             = "PT1M"
             max_delivery_count                        = 100
             status                                    = "Active"
-            auto_delete_on_idle                       = "PT50M"
-            requires_session                          = true
-            # forward_dead_lettered_messages_to       = "forwardTopic"
-            # forward_to                              = "forwardTopic"
+            auto_delete_on_idle                       = "P7D"
+            requires_session                          = false
+            forward_dead_lettered_messages_to         = "forwardTopic"
+            forward_to                                = "forwardTopic"
+          }
+        }
+
+        role_assignments = {
+          "key" = {
+            skip_service_principal_aad_check = false
+            role_definition_id_or_name       = "Contributor"
+            description                      = "This is a test role assignment"
+            principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
           }
         }
         

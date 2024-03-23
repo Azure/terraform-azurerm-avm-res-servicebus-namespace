@@ -18,7 +18,7 @@ variable "role_assignments" {
         role_definition_id_or_name             = (Required) - The ID or name of the role definition to assign to the principal.
         principal_id                           = (Required) - It's a GUID - The ID of the principal to assign the role to. 
         description                            = (Optional) - Defaults to `null`. The description of the role assignment.
-        delegated_managed_identity_resource_id = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created.
+        delegated_managed_identity_resource_id = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
         skip_service_principal_aad_check       = (Optional) - Defaults to `false`. If the principal_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal_id is a Service Principal identity. 
       })
     )

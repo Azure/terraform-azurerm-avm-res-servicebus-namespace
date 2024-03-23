@@ -1,5 +1,5 @@
 resource "azurerm_servicebus_topic" "this" {
-  for_each = var.sku != "Basic" ? var.topics : {}
+  for_each = local.normalized_topics
 
   name = each.key
 
@@ -14,7 +14,7 @@ resource "azurerm_servicebus_topic" "this" {
   requires_duplicate_detection            = each.value.requires_duplicate_detection
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
   enable_express                          = var.sku == "Standard" ? each.value.enable_express : false 
-  max_message_size_in_kilobytes           = var.sku != "Premium" ? null : coalesce(each.value.max_message_size_in_kilobytes, 1024)
+  max_message_size_in_kilobytes           = var.sku == "Premium" ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
   enable_partitioning                     = var.sku != "Premium" ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
 
   lifecycle {

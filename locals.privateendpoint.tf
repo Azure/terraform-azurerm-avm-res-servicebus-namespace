@@ -12,4 +12,6 @@ locals {
       ]
     ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc 
   } : {}
+
+  normalized_private_endpoints = var.sku == "Premium" ? var.private_endpoints : {}
 }

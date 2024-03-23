@@ -6,7 +6,6 @@ resource "azurerm_servicebus_queue" "this" {
   namespace_id                            = azurerm_servicebus_namespace.this.id
 
   status                                  = each.value.status
-  forward_to                              = each.value.forward_to
   lock_duration                           = each.value.lock_duration
   max_delivery_count                      = each.value.max_delivery_count
   default_message_ttl                     = each.value.default_message_ttl
@@ -15,11 +14,12 @@ resource "azurerm_servicebus_queue" "this" {
   forward_dead_lettered_messages_to       = each.value.forward_dead_lettered_messages_to
   dead_lettering_on_message_expiration    = each.value.dead_lettering_on_message_expiration
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
+  forward_to                              = var.sku != "Basic" ? each.value.forward_to : null
   requires_session                        = var.sku != "Basic" ? each.value.requires_session : null
   enable_express                          = var.sku == "Standard" ? each.value.enable_express : null 
   auto_delete_on_idle                     = var.sku != "Basic" ? each.value.auto_delete_on_idle : null
   requires_duplicate_detection            = var.sku != "Basic" ? each.value.requires_duplicate_detection : null
-  max_message_size_in_kilobytes           = var.sku != "Premium" ? null : coalesce(each.value.max_message_size_in_kilobytes, 1024)
+  max_message_size_in_kilobytes           = var.sku == "Premium" ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
   enable_partitioning                     = var.sku != "Premium" ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
 
   lifecycle {
