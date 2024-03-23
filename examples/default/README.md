@@ -142,7 +142,7 @@ module "servicebus" {
   customer_managed_key = {
     infrastructure_encryption_enabled  = true
     key_name                           = "customermanagedkey"
-    key_version                        = "${local.customer_managed_key_id}"
+    key_version                        = local.customer_managed_key_id
     key_vault_resource_id              = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.KeyVault/vaults/${local.key_vault_name}"
     user_assigned_identity_resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"
   }
