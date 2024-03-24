@@ -32,7 +32,7 @@ resource "azurerm_servicebus_namespace" "this" {
     content {
       infrastructure_encryption_enabled = var.customer_managed_key.infrastructure_encryption_enabled
       identity_id                       = var.customer_managed_key.user_assigned_identity_resource_id
-      key_vault_key_id                  = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${coalesce(var.customer_managed_key.key_version, "")}"
+      key_vault_key_id                  = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${var.customer_managed_key.key_version != null ? var.customer_managed_key.key_version : ""}"
     }
   }
 

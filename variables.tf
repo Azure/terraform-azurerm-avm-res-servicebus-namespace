@@ -249,7 +249,7 @@ variable "customer_managed_key" {
       key_name                           = (Required) - The key name for the customer managed key in the key vault.
       user_assigned_identity_resource_id = (Required) - The user assigned identity to use when access the key vault
       key_vault_resource_id              = (Required) - The full Azure Resource ID of the key_vault where the customer managed key will be referenced from.
-      key_version                        = (Optional) - Defaults to `null`. The version of the key to use
+      key_version                        = (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use
       infrastructure_encryption_enabled  = (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
     })
 

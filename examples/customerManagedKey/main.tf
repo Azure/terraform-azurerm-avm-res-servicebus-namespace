@@ -25,9 +25,8 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix                  = "cmk"
-  key_vault_name          = "brytest2"
-  customer_managed_key_id = "b975a2e3f7a84290a31c9362c99627f7"
+  prefix   = "cmk"
+  key_name = "customermanagedkey"
 }
 
 module "regions" {
@@ -45,24 +44,71 @@ module "naming" {
   version = ">= 0.3.0"
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
   location = module.regions.regions[random_integer.region_index.result].name
+}
+
+resource "azurerm_user_assigned_identity" "example" {
+  name                = "example-${local.prefix}"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+}
+
+module "key_vault" {
+  source  = "Azure/avm-res-keyvault-vault/azurerm"
+  version = "0.5.3"
+
+  resource_group_name           = azurerm_resource_group.example.name
+  name                          = module.naming.key_vault.name_unique
+  location                      = azurerm_resource_group.example.location
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  purge_protection_enabled      = true
+  public_network_access_enabled = true
+
+  network_acls = {
+    default_action = "Allow"
+  }
+
+  keys = {
+    cmk = {
+      key_opts = [
+        "wrapKey",
+        "unwrapKey"
+      ]
+
+      key_size     = 4096
+      key_type     = "RSA"
+      name         = local.key_name
+      key_vault_id = module.key_vault.resource.id
+    }
+  }
+
+  role_assignments = {
+    cmk_user_mi = {
+      role_definition_id_or_name = "Key Vault Crypto User"
+      principal_id               = azurerm_user_assigned_identity.example.principal_id
+    }
+  }
 }
 
 module "servicebus" {
   source = "../../"
 
   sku                 = "Premium"
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.example.name
   location            = module.regions.regions[random_integer.region_index.result].name
   name                = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
 
+  managed_identities = {
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
+  }
+
   customer_managed_key = {
     infrastructure_encryption_enabled  = true
-    key_name                           = "customermanagedkey"
-    key_version                        = local.customer_managed_key_id
-    key_vault_resource_id              = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.KeyVault/vaults/${local.key_vault_name}"
-    user_assigned_identity_resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"
+    key_name                           = local.key_name
+    key_vault_resource_id              = module.key_vault.resource.id
+    #key_version                        = module.key_vault.resource_keys.cmk.version
+    user_assigned_identity_resource_id = azurerm_user_assigned_identity.example.id
   }
 }
