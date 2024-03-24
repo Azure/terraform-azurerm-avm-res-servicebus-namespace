@@ -50,23 +50,23 @@ The following input variables are required:
 
 ### <a name="input_name"></a> [name](#input\_name)
 
-Description:     Specifies the name of the ServiceBus Namespace resource.   
-    Changing this forces a new resource to be created.   
-    Name must only contain letters, numbers, and hyphens and be between 6 and 50 characteres long. Also, it must not start or end with a hyphen.
+Description:   Specifies the name of the ServiceBus Namespace resource.   
+  Changing this forces a new resource to be created.   
+  Name must only contain letters, numbers, and hyphens and be between 6 and 50 characteres long. Also, it must not start or end with a hyphen.
 
-    Example Inputs: sb-sharepoint-prod-westus-001  
-    See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicebus
+  Example Inputs: sb-sharepoint-prod-westus-001  
+  See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicebus
 
 Type: `string`
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
-Description:     The name of the resource group in which to create this resource.   
-    Changing this forces a new resource to be created.  
-    Name must be less than 90 characters long and must only contain underscores, hyphens, periods, parentheses, letters, or digits.
+Description:   The name of the resource group in which to create this resource.   
+  Changing this forces a new resource to be created.  
+  Name must be less than 90 characters long and must only contain underscores, hyphens, periods, parentheses, letters, or digits.
 
-    Example Inputs: rg-sharepoint-prod-westus-001  
-    See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftresources
+  Example Inputs: rg-sharepoint-prod-westus-001  
+  See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftresources
 
 Type: `string`
 
@@ -76,7 +76,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_authorization_rules"></a> [authorization\_rules](#input\_authorization\_rules)
 
-Description:     Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. Map key is used as the name of the authorizaton rule. The following properties can be specified:
+Description:   Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. Map key is used as the name of the authorizaton rule. The following properties can be specified:
 
     authorization\_rules = map(object({  
       send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?  
@@ -109,8 +109,8 @@ Default: `{}`
 
 ### <a name="input_capacity"></a> [capacity](#input\_capacity)
 
-Description:     Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the capacity.   
-    When sku is Premium, capacity can be 1, 2, 4, 8 or 16.
+Description:   Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the capacity.   
+  When sku is Premium, capacity can be 1, 2, 4, 8 or 16.
 
 Type: `number`
 
@@ -118,7 +118,7 @@ Default: `null`
 
 ### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
 
-Description:     Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
+Description:   Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
 
     object({  
       key\_name                           = (Required) - The key name for the customer managed key in the key vault.  
@@ -128,7 +128,7 @@ Description:     Defaults to `null`. Ignored for Basic and Standard. Defines a c
       infrastructure\_encryption\_enabled  = (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
     })
 
-    > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
+  > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
 
   Example Inputs:
   ```hcl
@@ -157,7 +157,7 @@ Default: `null`
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
-Description:     Defaults to `{}`. A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description:   Defaults to `{}`. A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
     map(  
       object({  
@@ -174,7 +174,7 @@ Description:     Defaults to `{}`. A map of diagnostic settings to create. The m
       })
     )
 
-    > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
+  > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
   Example Inputs:
   ```hcl
@@ -216,9 +216,9 @@ Default: `{}`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description:     Defaults to `true`. This variable controls whether or not telemetry is enabled for the module.  
-    For more information see https://aka.ms/avm/telemetryinfo.  
-    If it is set to false, then no telemetry will be collected.
+Description:   Defaults to `true`. This variable controls whether or not telemetry is enabled for the module.  
+  For more information see https://aka.ms/avm/telemetryinfo.  
+  If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
@@ -234,12 +234,12 @@ Default: `true`
 
 ### <a name="input_location"></a> [location](#input\_location)
 
-Description:     Azure region where the resource should be deployed.  
-    If null, the location will be inferred from the resource group location.  
-    Changing this forces a new resource to be created.  
+Description:   Azure region where the resource should be deployed.  
+  If null, the location will be inferred from the resource group location.  
+  Changing this forces a new resource to be created.  
 
-    Example Inputs: eastus  
-    See more in CLI: az account list-locations -o table --query "[].name"
+  Example Inputs: eastus  
+  See more in CLI: az account list-locations -o table --query "[].name"
 
 Type: `string`
 
@@ -247,9 +247,9 @@ Default: `null`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
-Description:     Defaults to `null`. Controls the Resource Lock configuration for this resource.   
-    If specified, it will be inherited by child resources unless overriden when creating those child resources.   
-    The following properties can be specified:
+Description:   Defaults to `null`. Controls the Resource Lock configuration for this resource.   
+  If specified, it will be inherited by child resources unless overriden when creating those child resources.   
+  The following properties can be specified:
 
     object({  
       kind = (Required) - The type of lock. Possible values are `CanNotDelete` and `ReadOnly`.  
@@ -277,7 +277,7 @@ Default: `null`
 
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 
-Description:     Defaults to `{}`. Controls the Managed Identity configuration on this resource. The following properties can be specified:
+Description:   Defaults to `{}`. Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
     object({  
       system\_assigned            = (Optional) - Defaults to `false`. Specifies if the System Assigned Managed Identity should be enabled.  
@@ -313,7 +313,7 @@ Default: `"1.2"`
 
 ### <a name="input_network_rule_config"></a> [network\_rule\_config](#input\_network\_rule\_config)
 
-Description:     Defaults to `{}`. Ignored for Basic and Standard. Defines the network rules configuration for the resource.
+Description:   Defaults to `{}`. Ignored for Basic and Standard. Defines the network rules configuration for the resource.
 
     object({  
       trusted\_services\_allowed = (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration?   
@@ -327,7 +327,7 @@ Description:     Defaults to `{}`. Ignored for Basic and Standard. Defines the n
       }))
     })
 
-    > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore\_missing\_vnet\_service\_endpoint is set to `false`.
+  > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore\_missing\_vnet\_service\_endpoint is set to `false`.
 
   Example Inputs:
   ```hcl
@@ -364,8 +364,8 @@ Default: `{}`
 
 ### <a name="input_premium_messaging_partitions"></a> [premium\_messaging\_partitions](#input\_premium\_messaging\_partitions)
 
-Description:     Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the number of messaging partitions.   
-    Possible values when Premium are 1, 2, and 4. Changing this forces a new resource to be created.
+Description:   Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the number of messaging partitions.   
+  Possible values when Premium are 1, 2, and 4. Changing this forces a new resource to be created.
 
 Type: `number`
 
@@ -373,23 +373,23 @@ Default: `null`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
-Description:     Default to `{}`. Ignored for Basic and Standard. A map of private endpoints to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description:   Default to `{}`. Ignored for Basic and Standard. A map of private endpoints to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-    - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-    - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-    - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-    - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-    - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-    - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-    - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-    - `application_security_group_associations` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-    - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-    - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-    - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-    - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
-    - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-      - `name` - The name of the IP configuration.
-      - `private_ip_address` - The private IP address of the IP configuration.
+  - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
+  - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
+  - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+  - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
+  - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
+  - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
+  - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
+  - `application_security_group_associations` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
+  - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
+  - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
+  - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
+  - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+    - `name` - The name of the IP configuration.
+    - `private_ip_address` - The private IP address of the IP configuration.
 
 Type:
 
@@ -450,8 +450,8 @@ Default: `true`
 
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
-Description:     Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.  
-    The name of the queue must be unique among topics and queues within the namespace.
+Description:   Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.  
+  The name of the queue must be unique among topics and queues within the namespace.
 
     map(  
       object({  
@@ -494,7 +494,7 @@ Description:     Defaults to `{}`. A map of queues to create. The map key is use
       })
     )
 
-    Example Inputs:
+  Example Inputs:
   ```hcl
   queues = {
     testQueue = {
@@ -577,7 +577,7 @@ Default: `{}`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
-Description:     Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description:   Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
     map(  
       object({  
@@ -589,7 +589,7 @@ Description:     Defaults to `{}`. A map of role assignments to create. The map 
       })
     )
 
-    > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
   Example Inputs:
   ```hcl
@@ -620,8 +620,8 @@ Default: `{}`
 
 ### <a name="input_sku"></a> [sku](#input\_sku)
 
-Description:     Defaults to `Standard`. Defines which tier to use. Options are Basic, Standard or Premium.   
-    Please note that setting this field to Premium will force the creation of a new resource.
+Description:   Defaults to `Standard`. Defines which tier to use. Options are Basic, Standard or Premium.   
+  Please note that setting this field to Premium will force the creation of a new resource.
 
 Type: `string`
 
@@ -629,7 +629,7 @@ Default: `"Standard"`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
-Description:     Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
+Description:   Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 
   Example Inputs:
   ```hcl
@@ -644,8 +644,8 @@ Default: `{}`
 
 ### <a name="input_topics"></a> [topics](#input\_topics)
 
-Description:     Defaults to `{}`. Ignored for Basic. A map of topics to create. The map key is used as the name of the topic.  
-    The name of the topic must be unique among topics and queues within the namespace.
+Description:   Defaults to `{}`. Ignored for Basic. A map of topics to create. The map key is used as the name of the topic.  
+  The name of the topic must be unique among topics and queues within the namespace.
 
     map(  
       object({  
@@ -803,8 +803,8 @@ Default: `{}`
 
 ### <a name="input_zone_redundant"></a> [zone\_redundant](#input\_zone\_redundant)
 
-Description:     Always set to `false` for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant.   
-    Changing this forces a new resource to be created.
+Description:   Always set to `false` for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant.   
+  Changing this forces a new resource to be created.
 
 Type: `bool`
 

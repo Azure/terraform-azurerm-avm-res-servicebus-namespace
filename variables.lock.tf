@@ -5,9 +5,9 @@ variable "lock" {
   })
   default     = null
   description = <<DESCRIPTION
-    Defaults to `null`. Controls the Resource Lock configuration for this resource. 
-    If specified, it will be inherited by child resources unless overriden when creating those child resources. 
-    The following properties can be specified:
+  Defaults to `null`. Controls the Resource Lock configuration for this resource. 
+  If specified, it will be inherited by child resources unless overriden when creating those child resources. 
+  The following properties can be specified:
 
     object({
       kind = (Required) - The type of lock. Possible values are `CanNotDelete` and `ReadOnly`.

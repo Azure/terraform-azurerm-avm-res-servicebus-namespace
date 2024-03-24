@@ -34,8 +34,8 @@ variable "queues" {
   }))
   default     = {}
   description = <<DESCRIPTION
-    Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.
-    The name of the queue must be unique among topics and queues within the namespace.
+  Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.
+  The name of the queue must be unique among topics and queues within the namespace.
 
     map(
       object({
@@ -78,7 +78,7 @@ variable "queues" {
       })
     )
 
-    Example Inputs:
+  Example Inputs:
   ```hcl
   queues = {
     testQueue = {

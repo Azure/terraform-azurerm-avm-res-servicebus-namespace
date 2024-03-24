@@ -11,7 +11,7 @@ variable "role_assignments" {
   nullable = false
 
   description = <<DESCRIPTION
-    Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
     map(
       object({
@@ -23,7 +23,7 @@ variable "role_assignments" {
       })
     )
 
-    > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
   Example Inputs:
   ```hcl

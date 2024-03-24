@@ -43,8 +43,8 @@ variable "topics" {
   }))
   default     = {}
   description = <<DESCRIPTION
-    Defaults to `{}`. Ignored for Basic. A map of topics to create. The map key is used as the name of the topic.
-    The name of the topic must be unique among topics and queues within the namespace.
+  Defaults to `{}`. Ignored for Basic. A map of topics to create. The map key is used as the name of the topic.
+  The name of the topic must be unique among topics and queues within the namespace.
 
     map(
       object({

@@ -2,12 +2,12 @@ variable "name" {
   type        = string
   nullable    = false
   description = <<DESCRIPTION
-    Specifies the name of the ServiceBus Namespace resource. 
-    Changing this forces a new resource to be created. 
-    Name must only contain letters, numbers, and hyphens and be between 6 and 50 characteres long. Also, it must not start or end with a hyphen.
+  Specifies the name of the ServiceBus Namespace resource. 
+  Changing this forces a new resource to be created. 
+  Name must only contain letters, numbers, and hyphens and be between 6 and 50 characteres long. Also, it must not start or end with a hyphen.
 
-    Example Inputs: sb-sharepoint-prod-westus-001
-    See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicebus
+  Example Inputs: sb-sharepoint-prod-westus-001
+  See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicebus
   DESCRIPTION
 
   validation {
@@ -30,12 +30,12 @@ variable "resource_group_name" {
   type        = string
   nullable    = false
   description = <<DESCRIPTION
-    The name of the resource group in which to create this resource. 
-    Changing this forces a new resource to be created.
-    Name must be less than 90 characters long and must only contain underscores, hyphens, periods, parentheses, letters, or digits.
+  The name of the resource group in which to create this resource. 
+  Changing this forces a new resource to be created.
+  Name must be less than 90 characters long and must only contain underscores, hyphens, periods, parentheses, letters, or digits.
 
-    Example Inputs: rg-sharepoint-prod-westus-001
-    See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftresources
+  Example Inputs: rg-sharepoint-prod-westus-001
+  See more: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftresources
   DESCRIPTION
 
   validation {
@@ -53,12 +53,12 @@ variable "location" {
   type        = string
   default     = null
   description = <<DESCRIPTION
-    Azure region where the resource should be deployed.
-    If null, the location will be inferred from the resource group location.
-    Changing this forces a new resource to be created.
-    
-    Example Inputs: eastus
-    See more in CLI: az account list-locations -o table --query "[].name"
+  Azure region where the resource should be deployed.
+  If null, the location will be inferred from the resource group location.
+  Changing this forces a new resource to be created.
+  
+  Example Inputs: eastus
+  See more in CLI: az account list-locations -o table --query "[].name"
   DESCRIPTION
 }
 
@@ -67,8 +67,8 @@ variable "sku" {
   nullable    = false
   default     = "Standard"
   description = <<DESCRIPTION
-    Defaults to `Standard`. Defines which tier to use. Options are Basic, Standard or Premium. 
-    Please note that setting this field to Premium will force the creation of a new resource.
+  Defaults to `Standard`. Defines which tier to use. Options are Basic, Standard or Premium. 
+  Please note that setting this field to Premium will force the creation of a new resource.
   DESCRIPTION
 
   validation {
@@ -81,8 +81,8 @@ variable "capacity" {
   type        = number
   default     = null
   description = <<DESCRIPTION
-    Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the capacity. 
-    When sku is Premium, capacity can be 1, 2, 4, 8 or 16.
+  Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the capacity. 
+  When sku is Premium, capacity can be 1, 2, 4, 8 or 16.
   DESCRIPTION
 
   validation {
@@ -95,8 +95,8 @@ variable "premium_messaging_partitions" {
   type        = number
   default     = null
   description = <<DESCRIPTION
-    Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the number of messaging partitions. 
-    Possible values when Premium are 1, 2, and 4. Changing this forces a new resource to be created.
+  Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the number of messaging partitions. 
+  Possible values when Premium are 1, 2, and 4. Changing this forces a new resource to be created.
   DESCRIPTION
 
   validation {
@@ -109,8 +109,8 @@ variable "zone_redundant" {
   type        = bool
   default     = null
   description = <<DESCRIPTION
-    Always set to `false` for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant. 
-    Changing this forces a new resource to be created.
+  Always set to `false` for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant. 
+  Changing this forces a new resource to be created.
   DESCRIPTION
 }
 
@@ -148,7 +148,7 @@ variable "managed_identities" {
   default     = {}
   nullable    = false
   description = <<DESCRIPTION
-    Defaults to `{}`. Controls the Managed Identity configuration on this resource. The following properties can be specified:
+  Defaults to `{}`. Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
     object({
       system_assigned            = (Optional) - Defaults to `false`. Specifies if the System Assigned Managed Identity should be enabled.
@@ -210,7 +210,7 @@ variable "authorization_rules" {
   }))
   default     = {}
   description = <<DESCRIPTION
-    Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. Map key is used as the name of the authorizaton rule. The following properties can be specified:
+  Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. Map key is used as the name of the authorizaton rule. The following properties can be specified:
 
     authorization_rules = map(object({
       send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
@@ -241,7 +241,7 @@ variable "customer_managed_key" {
   })
   default     = null
   description = <<DESCRIPTION
-    Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
+  Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
 
     object({
       key_name                           = (Required) - The key name for the customer managed key in the key vault.
@@ -251,7 +251,7 @@ variable "customer_managed_key" {
       infrastructure_encryption_enabled  = (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
     })
 
-    > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
+  > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
 
   Example Inputs:
   ```hcl
@@ -295,7 +295,7 @@ variable "network_rule_config" {
   nullable    = false
   default     = {}
   description = <<DESCRIPTION
-    Defaults to `{}`. Ignored for Basic and Standard. Defines the network rules configuration for the resource.
+  Defaults to `{}`. Ignored for Basic and Standard. Defines the network rules configuration for the resource.
 
     object({
       trusted_services_allowed = (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration? 
@@ -309,7 +309,7 @@ variable "network_rule_config" {
       }))
     })
 
-    > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore_missing_vnet_service_endpoint is set to `false`.
+  > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore_missing_vnet_service_endpoint is set to `false`.
 
   Example Inputs:
   ```hcl
@@ -363,7 +363,7 @@ variable "tags" {
   default     = {}
   nullable    = false
   description = <<DESCRIPTION
-    Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
+  Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 
   Example Inputs:
   ```hcl

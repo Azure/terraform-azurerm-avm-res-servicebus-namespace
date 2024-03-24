@@ -14,7 +14,7 @@ variable "diagnostic_settings" {
   default     = {}
   nullable    = false
   description = <<DESCRIPTION
-    Defaults to `{}`. A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  Defaults to `{}`. A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
     map(
       object({
@@ -31,7 +31,7 @@ variable "diagnostic_settings" {
       })
     )
 
-    > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
+  > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
   Example Inputs:
   ```hcl
