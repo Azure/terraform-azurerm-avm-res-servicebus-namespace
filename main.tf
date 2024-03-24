@@ -7,10 +7,10 @@ resource "azurerm_servicebus_namespace" "this" {
 
   sku                           = var.sku
   tags                          = var.tags
-  location                      = var.location
   local_auth_enabled            = var.local_auth_enabled
   resource_group_name           = var.resource_group_name
   minimum_tls_version           = var.minimum_tls_version
+  location                      = local.normalized_location
   public_network_access_enabled = var.public_network_access_enabled
 
   capacity                     = local.normalized_capacity
