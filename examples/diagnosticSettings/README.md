@@ -31,11 +31,8 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix               = "diag"
-  event_hub_namespace  = "brytest2"
-  storage_account_name = "brytest2"
-
-  skus = ["Basic", "Standard", "Premium"]
+  prefix = "diag"
+  skus   = ["Basic", "Standard", "Premium"]
 }
 
 module "regions" {
