@@ -104,6 +104,7 @@ module "servicebus" {
     max = {
       name                        = "max"
       private_dns_zone_group_name = "max_group"
+      subnet_resource_id          = module.vnet.subnets.default.id
 
       role_assignments = {
         key = {
@@ -123,21 +124,22 @@ module "servicebus" {
         department  = "engineering"
       }
 
-      subnet_resource_id = module.vnet.subnets.default.id
-
       application_security_group_associations = {
         asg1 = azurerm_application_security_group.example.id
       }
+    }
 
+    staticIp = {
+      name                   = "staticIp"
       network_interface_name = "nic1"
-      # ip_configurations = {
-      #   ipconfig1 = {
-      #     name               = "ipconfig1"
-      #     group_id           = "vault"
-      #     member_name        = "default"
-      #     private_ip_address = "10.0.0.7"
-      #   }
-      # }
+      subnet_resource_id     = module.vnet.subnets.default.id
+
+      ip_configurations = {
+        ipconfig1 = {
+          name               = "ipconfig1"
+          private_ip_address = "10.0.0.7"
+        }
+      }
     }
 
     noDnsGroup = {
