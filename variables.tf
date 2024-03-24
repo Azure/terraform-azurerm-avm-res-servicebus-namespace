@@ -150,10 +150,8 @@ variable "managed_identities" {
   description = <<DESCRIPTION
   Defaults to `{}`. Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
-    object({
-      system_assigned            = (Optional) - Defaults to `false`. Specifies if the System Assigned Managed Identity should be enabled.
-      user_assigned_resource_ids = (Optional) - Defaults to `[]`. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
-    })
+  - `system_assigned`            - (Optional) - Defaults to `false`. Specifies if the System Assigned Managed Identity should be enabled.
+  - `user_assigned_resource_ids` - (Optional) - Defaults to `[]`. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
 
   Example Inputs:
   ```hcl
@@ -210,13 +208,12 @@ variable "authorization_rules" {
   }))
   default     = {}
   description = <<DESCRIPTION
-  Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. Map key is used as the name of the authorizaton rule. The following properties can be specified:
+  Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. The following properties can be specified:
 
-    authorization_rules = map(object({
-      send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
-      listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace? 
-      manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
-    }))
+  - `authorization_rules` - Map key is used as the name of the authorizaton rule. 
+    - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
+    - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace? 
+    - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
 
   Example Inputs:
   ```hcl
@@ -243,13 +240,11 @@ variable "customer_managed_key" {
   description = <<DESCRIPTION
   Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
 
-    object({
-      key_name                           = (Required) - The key name for the customer managed key in the key vault.
-      user_assigned_identity_resource_id = (Required) - The user assigned identity to use when access the key vault
-      key_vault_resource_id              = (Required) - The full Azure Resource ID of the key_vault where the customer managed key will be referenced from.
-      key_version                        = (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use
-      infrastructure_encryption_enabled  = (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
-    })
+  - `key_name`                           - (Required) - The key name for the customer managed key in the key vault.
+  - `user_assigned_identity_resource_id` - (Required) - The user assigned identity to use when access the key vault
+  - `key_vault_resource_id`              - (Required) - The full Azure Resource ID of the key_vault where the customer managed key will be referenced from.
+  - `key_version`                        - (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use
+  - `infrastructure_encryption_enabled`  - (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
 
   > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
 
@@ -297,17 +292,13 @@ variable "network_rule_config" {
   description = <<DESCRIPTION
   Defaults to `{}`. Ignored for Basic and Standard. Defines the network rules configuration for the resource.
 
-    object({
-      trusted_services_allowed = (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration? 
-      cidr_or_ip_rules         = (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
-      default_action           = (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
+  - `trusted_services_allowed` - (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration? 
+  - `cidr_or_ip_rules`         - (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
+  - `default_action`           - (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
 
-      Defaults to `[]`.
-      network_rules = set(object({
-        subnet_id                            = (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
-        ignore_missing_vnet_service_endpoint = (Optional) - Defaults to `false`. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
-      }))
-    })
+  - `network_rules` - (Optional) - Defaults to `[]`.
+    - `subnet_id`                            - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
+    - `ignore_missing_vnet_service_endpoint` - (Optional) - Defaults to `false`. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
 
   > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore_missing_vnet_service_endpoint is set to `false`.
 

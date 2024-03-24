@@ -76,13 +76,12 @@ The following input variables are optional (have default values):
 
 ### <a name="input_authorization_rules"></a> [authorization\_rules](#input\_authorization\_rules)
 
-Description:   Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. Map key is used as the name of the authorizaton rule. The following properties can be specified:
+Description:   Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. The following properties can be specified:
 
-    authorization\_rules = map(object({  
-      send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?  
-      listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace?   
-      manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
-    }))
+  - `authorization_rules` - Map key is used as the name of the authorizaton rule.
+    - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
+    - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace?
+    - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
 
   Example Inputs:
   ```hcl
@@ -120,13 +119,11 @@ Default: `null`
 
 Description:   Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
 
-    object({  
-      key\_name                           = (Required) - The key name for the customer managed key in the key vault.  
-      user\_assigned\_identity\_resource\_id = (Required) - The user assigned identity to use when access the key vault  
-      key\_vault\_resource\_id              = (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.  
-      key\_version                        = (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use  
-      infrastructure\_encryption\_enabled  = (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
-    })
+  - `key_name`                           - (Required) - The key name for the customer managed key in the key vault.
+  - `user_assigned_identity_resource_id` - (Required) - The user assigned identity to use when access the key vault
+  - `key_vault_resource_id`              - (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.
+  - `key_version`                        - (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use
+  - `infrastructure_encryption_enabled`  - (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
 
   > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
 
@@ -159,20 +156,16 @@ Default: `null`
 
 Description:   Defaults to `{}`. A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-    map(  
-      object({  
-        name                                     = (Optional) - The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.  
-        log\_categories                           = (Optional) - Defaults to `[]`. A set of log categories to export. Possible values are: `ApplicationMetricsLogs`, `RuntimeAuditLogs`, `VNetAndIPFilteringLogs` or `OperationalLogs`.  
-        log\_groups                               = (Optional) - Defaults to `[]` if log\_categories is set, if not it defaults to `["allLogs", "audit"]`. A set of log groups to send to export. Possible values are `allLogs` and `audit`.  
-        metric\_groups                            = (Optional) - Defaults to `["AllMetrics"]`. A set of metric groups to export.  
-        log\_analytics\_destination\_type           = (Optional) - Defaults to `Dedicated`. The destination log analytics workspace table for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.  
-        workspace\_resource\_id                    = (Optional) - The resource ID of the log analytics workspace to send logs and metrics to.  
-        storage\_account\_resource\_id              = (Optional) - The resource ID of the storage account to send logs and metrics to.  
-        event\_hub\_authorization\_rule\_resource\_id = (Optional) - The resource ID of the event hub authorization rule to send logs and metrics to.  
-        event\_hub\_name                           = (Optional) - The name of the event hub. If none is specified, the default event hub will be selected.  
-        marketplace\_partner\_resource\_id          = (Optional) - The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
-      })
-    )
+  - `name`                                     - (Optional) - The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
+  - `log_categories`                           - (Optional) - Defaults to `[]`. A set of log categories to export. Possible values are: `ApplicationMetricsLogs`, `RuntimeAuditLogs`, `VNetAndIPFilteringLogs` or `OperationalLogs`.
+  - `log_groups`                               - (Optional) - Defaults to `[]` if log\_categories is set, if not it defaults to `["allLogs", "audit"]`. A set of log groups to send to export. Possible values are `allLogs` and `audit`.
+  - `metric_groups`                            - (Optional) - Defaults to `["AllMetrics"]`. A set of metric groups to export.
+  - `log_analytics_destination_type`           - (Optional) - Defaults to `Dedicated`. The destination log analytics workspace table for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+  - `workspace_resource_id`                    - (Optional) - The resource ID of the log analytics workspace to send logs and metrics to.
+  - `storage_account_resource_id`              - (Optional) - The resource ID of the storage account to send logs and metrics to.
+  - `event_hub_authorization_rule_resource_id` - (Optional) - The resource ID of the event hub authorization rule to send logs and metrics to.
+  - `event_hub_name`                           - (Optional) - The name of the event hub. If none is specified, the default event hub will be selected.
+  - `marketplace_partner_resource_id`          - (Optional) - The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
 
   > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
@@ -251,10 +244,8 @@ Description:   Defaults to `null`. Controls the Resource Lock configuration for 
   If specified, it will be inherited by child resources unless overriden when creating those child resources.   
   The following properties can be specified:
 
-    object({  
-      kind = (Required) - The type of lock. Possible values are `CanNotDelete` and `ReadOnly`.  
-      name = (Optional) - The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
-    })
+  - `kind` - (Required) - The type of lock. Possible values are `CanNotDelete` and `ReadOnly`.
+  - `name` - (Optional) - The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
 
   Example Inputs:
   ```hcl
@@ -279,10 +270,8 @@ Default: `null`
 
 Description:   Defaults to `{}`. Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
-    object({  
-      system\_assigned            = (Optional) - Defaults to `false`. Specifies if the System Assigned Managed Identity should be enabled.  
-      user\_assigned\_resource\_ids = (Optional) - Defaults to `[]`. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
-    })
+  - `system_assigned`            - (Optional) - Defaults to `false`. Specifies if the System Assigned Managed Identity should be enabled.
+  - `user_assigned_resource_ids` - (Optional) - Defaults to `[]`. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
 
   Example Inputs:
   ```hcl
@@ -315,17 +304,13 @@ Default: `"1.2"`
 
 Description:   Defaults to `{}`. Ignored for Basic and Standard. Defines the network rules configuration for the resource.
 
-    object({  
-      trusted\_services\_allowed = (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration?   
-      cidr\_or\_ip\_rules         = (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.  
-      default\_action           = (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
+  - `trusted_services_allowed` - (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration?
+  - `cidr_or_ip_rules`         - (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
+  - `default_action`           - (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
 
-      Defaults to `[]`.  
-      network\_rules = set(object({  
-        subnet\_id                            = (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.  
-        ignore\_missing\_vnet\_service\_endpoint = (Optional) - Defaults to `false`. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
-      }))
-    })
+  - `network_rules` - (Optional) - Defaults to `[]`.
+    - `subnet_id`                            - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
+    - `ignore_missing_vnet_service_endpoint` - (Optional) - Defaults to `false`. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
 
   > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore\_missing\_vnet\_service\_endpoint is set to `false`.
 
@@ -453,46 +438,34 @@ Default: `true`
 Description:   Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.  
   The name of the queue must be unique among topics and queues within the namespace.
 
-    map(  
-      object({  
-        lock\_duration                            = (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.  
-        max\_message\_size\_in\_kilobytes            = (Optional) - Always set to `256` for Standard and Basic by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the queue.  
-        max\_size\_in\_megabytes                    = (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the queue.  
-        requires\_duplicate\_detection             = (Optional) - Always set to `false` for Basic by Azure. It Defaults to `false` for the rest of skus. Boolean flag which controls whether the Queue requires duplicate detection. Changing this forces a new resource to be created.  
-        requires\_session                         = (Optional) - Always set to `false` for Basic by Azure. It Defaults to `false` for the rest of skus. Boolean flag which controls whether the Queue requires sessions. This will allow ordered handling of unbounded sequences of related messages. With sessions enabled a queue can guarantee first-in-first-out delivery of messages. Changing this forces a new resource to be created.  
-        default\_message\_ttl                      = (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this queue. This is the default value used when TTL is not set on message itself.  
-        dead\_lettering\_on\_message\_expiration     = (Optional) - Defaults to `false`. Boolean flag which controls whether the Queue has dead letter support when a message expires.  
-        duplicate\_detection\_history\_time\_window  = (Optional) - Defaults to `PT10M` (10 minutes). Minimun of `PT20S` (seconds) and Maximun of `P7D` (7 days). The ISO 8601 timespan duration during which duplicates can be detected.  
-        max\_delivery\_count                       = (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.  
-        status                                   = (Optional) - Defaults to `Active`. The status of the Queue. Possible values are Active, Creating, Deleting, Disabled, ReceiveDisabled, Renaming, SendDisabled, Unknown.  
-        enable\_batched\_operations                = (Optional) - Defaults to `true`. Boolean flag which controls whether server-side batched operations are enabled.  
-        auto\_delete\_on\_idle                      = (Optional) - Always set to `null` when Basic. It Defaults to `null` for the rest of skus. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.  
-        enable\_partitioning                      = (Optional) - Defaults to `false` for Basic and Standard. For Premium if premium\_messaging\_partitions is greater than `1` it will always be set to true if not it will be set to `false`. Boolean flag which controls whether to enable the queue to be partitioned across multiple message brokers. Changing this forces a new resource to be created.   
-        enable\_express                           = (Optional) - Always set to `false` for Premium and Basic by Azure. Defaults to `false` for Standard. Boolean flag which controls whether Express Entities are enabled. An express queue holds a message in memory temporarily before writing it to persistent storage. It requires requires\_duplicate\_detection to be set to `false`  
-        forward\_to                               = (Optional) - Always set to `false` for Basic by Azure. It Defaults to `null` for the rest of skus. The name of a Queue or Topic to automatically forward messages to. It cannot be enabled if requires\_session is enabled.  
-        forward\_dead\_lettered\_messages\_to        = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
+  - `lock_duration`                           - (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
+  - `max_message_size_in_kilobytes`           - (Optional) - Always set to `256` for Standard and Basic by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the queue.
+  - `max_size_in_megabytes`                   - (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the queue.
+  - `requires_duplicate_detection`            - (Optional) - Always set to `false` for Basic by Azure. It Defaults to `false` for the rest of skus. Boolean flag which controls whether the Queue requires duplicate detection. Changing this forces a new resource to be created.
+  - `requires_session`                        - (Optional) - Always set to `false` for Basic by Azure. It Defaults to `false` for the rest of skus. Boolean flag which controls whether the Queue requires sessions. This will allow ordered handling of unbounded sequences of related messages. With sessions enabled a queue can guarantee first-in-first-out delivery of messages. Changing this forces a new resource to be created.
+  - `default_message_ttl`                     - (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this queue. This is the default value used when TTL is not set on message itself.
+  - `dead_lettering_on_message_expiration`    - (Optional) - Defaults to `false`. Boolean flag which controls whether the Queue has dead letter support when a message expires.
+  - `duplicate_detection_history_time_window` - (Optional) - Defaults to `PT10M` (10 minutes). Minimun of `PT20S` (seconds) and Maximun of `P7D` (7 days). The ISO 8601 timespan duration during which duplicates can be detected.
+  - `max_delivery_count`                      - (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.
+  - `status`                                  - (Optional) - Defaults to `Active`. The status of the Queue. Possible values are Active, Creating, Deleting, Disabled, ReceiveDisabled, Renaming, SendDisabled, Unknown.
+  - `enable_batched_operations`               - (Optional) - Defaults to `true`. Boolean flag which controls whether server-side batched operations are enabled.
+  - `auto_delete_on_idle`                     - (Optional) - Always set to `null` when Basic. It Defaults to `null` for the rest of skus. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.
+  - `enable_partitioning`                     - (Optional) - Defaults to `false` for Basic and Standard. For Premium if premium\_messaging\_partitions is greater than `1` it will always be set to true if not it will be set to `false`. Boolean flag which controls whether to enable the queue to be partitioned across multiple message brokers. Changing this forces a new resource to be created.
+  - `enable_express`                          - (Optional) - Always set to `false` for Premium and Basic by Azure. Defaults to `false` for Standard. Boolean flag which controls whether Express Entities are enabled. An express queue holds a message in memory temporarily before writing it to persistent storage. It requires requires\_duplicate\_detection to be set to `false`
+  - `forward_to`                              - (Optional) - Always set to `false` for Basic by Azure. It Defaults to `null` for the rest of skus. The name of a Queue or Topic to automatically forward messages to. It cannot be enabled if requires\_session is enabled.
+  - `forward_dead_lettered_messages_to`       - (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
 
-        Defaults to `{}`. Map key is used as the name of the authorizaton rule.  
-        authorization\_rules = map(  
-          object({   
-            send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Queue?  
-            listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Queue?   
-            manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Queue?
-          })
-        )  
-      
-        Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  
-        role\_assignments = map(  
-          object({  
-            role\_definition\_id\_or\_name             = (Required) - The ID or name of the role definition to assign to the principal.  
-            principal\_id                           = (Required) - It's a GUID - The ID of the principal to assign the role to.   
-            description                            = (Optional) - Defaults to `null`. The description of the role assignment.  
-            delegated\_managed\_identity\_resource\_id = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.  
-            skip\_service\_principal\_aad\_check       = (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
-          })
-        )
-      })
-    )
+  - `authorization_rules` - (Optional) - Defaults to `{}`. Map key is used as the name of the authorizaton rule.
+    - `send`   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Queue?
+    - `listen` = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Queue?
+    - `manage` = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Queue?
+
+  - `role_assignments` - (Optional) - Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+    - `role_definition_id_or_name`             = (Required) - The ID or name of the role definition to assign to the principal.
+    - `principal_id`                           = (Required) - It's a GUID - The ID of the principal to assign the role to.
+    - `description`                            = (Optional) - Defaults to `null`. The description of the role assignment.
+    - `delegated_managed_identity_resource_id` = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
+    - `skip_service_principal_aad_check`       = (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
 
   Example Inputs:
   ```hcl
@@ -579,15 +552,11 @@ Default: `{}`
 
 Description:   Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-    map(  
-      object({  
-        role\_definition\_id\_or\_name             = (Required) - The ID or name of the role definition to assign to the principal.  
-        principal\_id                           = (Required) - It's a GUID - The ID of the principal to assign the role to.   
-        description                            = (Optional) - Defaults to `null`. The description of the role assignment.  
-        delegated\_managed\_identity\_resource\_id = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.  
-        skip\_service\_principal\_aad\_check       = (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
-      })
-    )
+  - `role_definition_id_or_name`             - (Required) - The ID or name of the role definition to assign to the principal.
+  - `principal_id`                           - (Required) - It's a GUID - The ID of the principal to assign the role to.
+  - `description`                            - (Optional) - Defaults to `null`. The description of the role assignment.
+  - `delegated_managed_identity_resource_id` - (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
+  - `skip_service_principal_aad_check`       - (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
 
   > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
@@ -647,58 +616,42 @@ Default: `{}`
 Description:   Defaults to `{}`. Ignored for Basic. A map of topics to create. The map key is used as the name of the topic.  
   The name of the topic must be unique among topics and queues within the namespace.
 
-    map(  
-      object({  
-        max\_message\_size\_in\_kilobytes            = (Optional) - Always set to `256` for Standard by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the Topic.  
-        max\_size\_in\_megabytes                    = (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the Topic.  
-        requires\_duplicate\_detection             = (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic requires duplicate detection. Changing this forces a new resource to be created.  
-        default\_message\_ttl                      = (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this topic. This is the default value used when TTL is not set on message itself.  
-        duplicate\_detection\_history\_time\_window  = (Optional) - Defaults to `PT10M` (10 minutes). Minimun of `PT20S` (seconds) and Maximun of `P7D` (7 days). The ISO 8601 timespan duration during which duplicates can be detected.  
-        status                                   = (Optional) - Defaults to `Active`. The status of the Topic. Possible values are Active, Creating, Deleting, Disabled, ReceiveDisabled, Renaming, SendDisabled, Unknown.  
-        enable\_batched\_operations                = (Optional) - Defaults to `true`. Boolean flag which controls whether server-side batched operations are enabled.  
-        auto\_delete\_on\_idle                      = (Optional) - Defaults to `null`. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.  
-        enable\_partitioning                      = (Optional) - Defaults to `false` for Standard. For Premium if premium\_messaging\_partitions is greater than `1` it will always be set to true if not it will be set to `false`. Boolean flag which controls whether to enable the topic to be partitioned across multiple message brokers. Changing this forces a new resource to be created.   
-        enable\_express                           = (Optional) - Defaults to `false` for Standard. Always set to `false` for Premium. Boolean flag which controls whether Express Entities are enabled. An express topic holds a message in memory temporarily before writing it to persistent storage.  
-        support\_ordering                         = (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic supports ordering.
+  - `max_message_size_in_kilobytes`           - (Optional) - Always set to `256` for Standard by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the Topic.
+  - `max_size_in_megabytes`                   - (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the Topic.
+  - `requires_duplicate_detection`            - (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic requires duplicate detection. Changing this forces a new resource to be created.
+  - `default_message_ttl`                     - (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this topic. This is the default value used when TTL is not set on message itself.
+  - `duplicate_detection_history_time_window` - (Optional) - Defaults to `PT10M` (10 minutes). Minimun of `PT20S` (seconds) and Maximun of `P7D` (7 days). The ISO 8601 timespan duration during which duplicates can be detected.
+  - `status`                                  - (Optional) - Defaults to `Active`. The status of the Topic. Possible values are Active, Creating, Deleting, Disabled, ReceiveDisabled, Renaming, SendDisabled, Unknown.
+  - `enable_batched_operations`               - (Optional) - Defaults to `true`. Boolean flag which controls whether server-side batched operations are enabled.
+  - `auto_delete_on_idle`                     - (Optional) - Defaults to `null`. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.
+  - `enable_partitioning`                     - (Optional) - Defaults to `false` for Standard. For Premium if premium\_messaging\_partitions is greater than `1` it will always be set to true if not it will be set to `false`. Boolean flag which controls whether to enable the topic to be partitioned across multiple message brokers. Changing this forces a new resource to be created.
+  - `enable_express`                          - (Optional) - Defaults to `false` for Standard. Always set to `false` for Premium. Boolean flag which controls whether Express Entities are enabled. An express topic holds a message in memory temporarily before writing it to persistent storage.
+  - `support_ordering`                        - (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic supports ordering.
 
-        Defaults to `{}`. Map key is used as the name of the authorizaton rule.  
-        authorization\_rules = map(  
-          object({  
-            send   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Topic?  
-            listen = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Topic?   
-            manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Topic?
-          })
-        )
+  - `authorization_rules` - (Optional) - Defaults to `{}`. Map key is used as the name of the authorizaton rule.
+    - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Topic?
+    - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Topic?
+    - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Topic?
 
-        Defaults to `{}`. Map key is used as the name of the subscription.  
-        subscriptions = map(  
-          object({  
-            max\_delivery\_count                        = (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.  
-            dead\_lettering\_on\_filter\_evaluation\_error = (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription has dead letter support on filter evaluation exceptions  
-            dead\_lettering\_on\_message\_expiration      = (Optional) - Defaults to `false`. Boolean flag which controls whether the Subscription has dead letter support when a message expires.  
-            enable\_batched\_operations                 = (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription supports batched operations.  
-            requires\_session                          = (Optional) - Defaults to `false`. Boolean flag which controls whether this Subscription supports the concept of a session. Changing this forces a new resource to be created.  
-            forward\_to                                = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward messages to.  
-            forward\_dead\_lettered\_messages\_to         = (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to  
-            auto\_delete\_on\_idle                       = (Optional) - Defaults to `null`. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.  
-            default\_message\_ttl                       = (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this queue. This is the default value used when TTL is not set on message itself.  
-            lock\_duration                             = (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.  
-            status                                    = (Optional) - Defaults to `Active`. The status of the Subscription. Possible values are Active, ReceiveDisabled, Disabled.
-          })
-        )
+  - `subscriptions - (Optional) - Defaults to `{}`. Map key is used as the name of the subscription.
+    - `max\_delivery\_count`                        - (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.
+    - `dead\_lettering\_on\_filter\_evaluation\_error` - (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription has dead letter support on filter evaluation exceptions
+    - `dead\_lettering\_on\_message\_expiration`      - (Optional) - Defaults to `false`. Boolean flag which controls whether the Subscription has dead letter support when a message expires.
+    - `enable\_batched\_operations`                 - (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription supports batched operations.
+    - `requires\_session`                          - (Optional) - Defaults to `false`. Boolean flag which controls whether this Subscription supports the concept of a session. Changing this forces a new resource to be created.
+    - `forward\_to`                                - (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward messages to.
+    - `forward\_dead\_lettered\_messages\_to`         - (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
+    - `auto\_delete\_on\_idle`                       - (Optional) - Defaults to `null`. Minimum of `PT5M` (5 minutes) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the idle interval after which the Topic is automatically deleted.
+    - `default\_message\_ttl`                       - (Optional) - Defaults to `null`. Mininum value of `PT5S` (5 seconds) and maximum of `P10675198D` (10675198 days). Set `null` for never. The ISO 8601 timespan duration of the TTL of messages sent to this queue. This is the default value used when TTL is not set on message itself.
+    - `lock\_duration`                             - (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
+    - `status`                                    - (Optional) - Defaults to `Active`. The status of the Subscription. Possible values are Active, ReceiveDisabled, Disabled.
 
-        Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  
-        role\_assignments = map(  
-          object({  
-            role\_definition\_id\_or\_name             = (Required) - The ID or name of the role definition to assign to the principal.  
-            principal\_id                           = (Required) - It's a GUID - The ID of the principal to assign the role to.   
-            description                            = (Optional) - Defaults to `null`. The description of the role assignment.  
-            delegated\_managed\_identity\_resource\_id = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.  
-            skip\_service\_principal\_aad\_check       = (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
-          })
-        )
-      })
-    )
+  - `role\_assignments - (Optional) - Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+    - `role_definition_id_or_name`             - (Required) - The ID or name of the role definition to assign to the principal.
+    - `principal_id`                           - (Required) - It's a GUID - The ID of the principal to assign the role to.
+    - `description`                            - (Optional) - Defaults to `null`. The description of the role assignment.
+    - `delegated_managed_identity_resource_id` - (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
+    - `skip_service_principal_aad_check`       - (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
 
   Example Inputs:
   ```hcl
