@@ -112,5 +112,5 @@ module "servicebus" {
     user_assigned_identity_resource_id = azurerm_user_assigned_identity.example.id
   }
 
-  depends_on = [ module.key_vault ]
+  depends_on = [module.key_vault]
 }

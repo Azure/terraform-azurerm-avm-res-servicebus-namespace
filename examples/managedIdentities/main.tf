@@ -44,9 +44,15 @@ module "naming" {
   version = ">= 0.3.0"
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
   location = module.regions.regions[random_integer.region_index.result].name
+}
+
+resource "azurerm_user_assigned_identity" "example" {
+  name                = "example-${local.prefix}"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
 }
 
 module "servicebus" {
@@ -55,12 +61,12 @@ module "servicebus" {
   for_each = toset(local.skus)
 
   sku                 = each.value
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.example.name
   location            = module.regions.regions[random_integer.region_index.result].name
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
 
   managed_identities = {
     system_assigned            = true
-    user_assigned_resource_ids = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"]
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
   }
 }

@@ -49,16 +49,33 @@ module "naming" {
   version = ">= 0.3.0"
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
   location = module.regions.regions[random_integer.region_index.result].name
+}
+
+module "vnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm"
+  version = "0.1.4"
+
+  virtual_network_address_space = ["10.0.0.0/16"]
+  resource_group_name           = azurerm_resource_group.example.name
+  location                      = module.regions.regions[random_integer.region_index.result].name
+  name                          = "${module.naming.virtual_network.name_unique}-${local.prefix}"
+
+  subnets = {
+    default = {
+      address_prefixes  = ["10.0.0.0/24"]
+      service_endpoints = ["Microsoft.ServiceBus"]
+    }
+  }
 }
 
 module "servicebus" {
   source = "../../"
 
   sku                           = "Premium"
-  resource_group_name           = azurerm_resource_group.this.name
+  resource_group_name           = azurerm_resource_group.example.name
   location                      = module.regions.regions[random_integer.region_index.result].name
   name                          = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
   public_network_access_enabled = true
@@ -71,7 +88,7 @@ module "servicebus" {
     network_rules = [
       {
         ignore_missing_vnet_service_endpoint = false
-        subnet_id                            = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Network/virtualNetworks/brytest/subnets/default"
+        subnet_id                            = module.vnet.subnets.default.id
       }
     ]
   }
@@ -101,7 +118,7 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
@@ -139,6 +156,12 @@ Version: >= 0.3.0
 Source: ../../
 
 Version:
+
+### <a name="module_vnet"></a> [vnet](#module\_vnet)
+
+Source: Azure/avm-res-network-virtualnetwork/azurerm
+
+Version: 0.1.4
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

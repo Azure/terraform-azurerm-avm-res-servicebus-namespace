@@ -51,7 +51,7 @@ module "naming" {
   version = ">= 0.3.0"
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
   location = module.regions.regions[random_integer.region_index.result].name
 }
@@ -61,7 +61,7 @@ module "servicebus" {
 
   for_each = toset(local.skus)
 
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.example.name
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
 }
 ```
@@ -89,7 +89,7 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 

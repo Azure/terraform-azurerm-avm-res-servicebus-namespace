@@ -125,7 +125,7 @@ Description:     Defaults to `null`. Ignored for Basic and Standard. Defines a c
       key\_name                           = (Required) - The key name for the customer managed key in the key vault.  
       user\_assigned\_identity\_resource\_id = (Required) - The user assigned identity to use when access the key vault  
       key\_vault\_resource\_id              = (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.  
-      key\_version                        = (Optional) - Defaults to `null`. The version of the key to use  
+      key\_version                        = (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use  
       infrastructure\_encryption\_enabled  = (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
     })
 
