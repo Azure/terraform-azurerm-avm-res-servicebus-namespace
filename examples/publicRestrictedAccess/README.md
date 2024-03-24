@@ -60,7 +60,7 @@ module "vnet" {
 
   virtual_network_address_space = ["10.0.0.0/16"]
   resource_group_name           = azurerm_resource_group.example.name
-  location                      = module.regions.regions[random_integer.region_index.result].name
+  location                      = azurerm_resource_group.example.location
   name                          = "${module.naming.virtual_network.name_unique}-${local.prefix}"
 
   subnets = {
@@ -76,7 +76,6 @@ module "servicebus" {
 
   sku                           = "Premium"
   resource_group_name           = azurerm_resource_group.example.name
-  location                      = module.regions.regions[random_integer.region_index.result].name
   name                          = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
   public_network_access_enabled = true
 

@@ -62,7 +62,7 @@ module "servicebus" {
 
   sku                                     = each.value
   resource_group_name                     = azurerm_resource_group.example.name
-  location                                = module.regions.regions[random_integer.region_index.result].name
+  location                                = azurerm_resource_group.example.location
   name                                    = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
   capacity                                = 2
   local_auth_enabled                      = true

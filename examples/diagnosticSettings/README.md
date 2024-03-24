@@ -58,6 +58,40 @@ resource "azurerm_resource_group" "example" {
   location = module.regions.regions[random_integer.region_index.result].name
 }
 
+resource "azurerm_storage_account" "example" {
+
+  resource_group_name      = azurerm_resource_group.example.name
+  name                     = "${module.naming.storage_account.name_unique}${local.prefix}"
+  location                 = azurerm_resource_group.example.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+module "log_analytics_workspace" {
+  source  = "Azure/avm-res-operationalinsights-workspace/azurerm"
+  version = "0.1.3"
+
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  name                = "${module.naming.log_analytics_workspace.name_unique}-${local.prefix}"
+}
+
+resource "azurerm_eventhub_namespace" "example" {
+  sku = "Basic"
+
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  name                = "${module.naming.eventhub_namespace.name_unique}-${local.prefix}"
+}
+
+resource "azurerm_eventhub" "example" {
+  name                = "diagnosticshub"
+  resource_group_name = azurerm_resource_group.example.name
+  namespace_name      = azurerm_eventhub_namespace.example.name
+  partition_count     = 2
+  message_retention   = 1
+}
+
 module "servicebus" {
   source = "../../"
 
@@ -65,7 +99,6 @@ module "servicebus" {
 
   sku                 = each.value
   resource_group_name = azurerm_resource_group.example.name
-  location            = module.regions.regions[random_integer.region_index.result].name
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
 
   diagnostic_settings = {
@@ -75,7 +108,7 @@ module "servicebus" {
 
       name                           = "diagtest1"
       log_analytics_destination_type = "Dedicated"
-      workspace_resource_id          = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.OperationalInsights/workspaces/brytesting"
+      workspace_resource_id          = module.log_analytics_workspace.resource.id
     }
 
     diagnostic2 = {
@@ -84,8 +117,8 @@ module "servicebus" {
 
       name                                     = "diagtest2"
       log_analytics_destination_type           = "Dedicated"
-      event_hub_name                           = "brytesthub"
-      event_hub_authorization_rule_resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.EventHub/namespaces/${local.event_hub_namespace}/authorizationRules/RootManageSharedAccessKey"
+      event_hub_name                           = azurerm_eventhub.example.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.example.id}/authorizationRules/RootManageSharedAccessKey"
     }
 
     diagnostic3 = {
@@ -94,7 +127,7 @@ module "servicebus" {
 
       name                           = "diagtest3"
       log_analytics_destination_type = "Dedicated"
-      storage_account_resource_id    = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Storage/storageAccounts/${local.storage_account_name}"
+      storage_account_resource_id    = azurerm_storage_account.example.id
     }
   }
 }
@@ -123,7 +156,10 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
+- [azurerm_eventhub.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub) (resource)
+- [azurerm_eventhub_namespace.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub_namespace) (resource)
 - [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_storage_account.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
@@ -143,6 +179,12 @@ No outputs.
 ## Modules
 
 The following Modules are called:
+
+### <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace)
+
+Source: Azure/avm-res-operationalinsights-workspace/azurerm
+
+Version: 0.1.3
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
