@@ -111,4 +111,6 @@ module "servicebus" {
     #key_version                        = module.key_vault.resource_keys.cmk.version
     user_assigned_identity_resource_id = azurerm_user_assigned_identity.example.id
   }
+
+  depends_on = [ module.key_vault ]
 }
