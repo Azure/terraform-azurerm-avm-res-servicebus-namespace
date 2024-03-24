@@ -824,9 +824,53 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
+### <a name="output_resource"></a> [resource](#output\_resource)
 
-Description:       A map of the private endpoints created.
+Description: The service bus namespace created
+
+### <a name="output_resource_authorization_rules"></a> [resource\_authorization\_rules](#output\_resource\_authorization\_rules)
+
+Description: The service bus namespace authorization rules created
+
+### <a name="output_resource_diagnostic_settings"></a> [resource\_diagnostic\_settings](#output\_resource\_diagnostic\_settings)
+
+Description: The diagnostic settings created
+
+### <a name="output_resource_locks"></a> [resource\_locks](#output\_resource\_locks)
+
+Description: The management locks created
+
+### <a name="output_resource_private_endpoints"></a> [resource\_private\_endpoints](#output\_resource\_private\_endpoints)
+
+Description: A map of the private endpoints created.
+
+### <a name="output_resource_private_endpoints_application_security_group_association"></a> [resource\_private\_endpoints\_application\_security\_group\_association](#output\_resource\_private\_endpoints\_application\_security\_group\_association)
+
+Description: The private endpoint application security group associations created
+
+### <a name="output_resource_queues"></a> [resource\_queues](#output\_resource\_queues)
+
+Description: The service bus queues created
+
+### <a name="output_resource_queues_authorization_rules"></a> [resource\_queues\_authorization\_rules](#output\_resource\_queues\_authorization\_rules)
+
+Description: The service bus queues authorization rules created
+
+### <a name="output_resource_role_assignments"></a> [resource\_role\_assignments](#output\_resource\_role\_assignments)
+
+Description: The role assignments created
+
+### <a name="output_resource_topics"></a> [resource\_topics](#output\_resource\_topics)
+
+Description: The service bus topics created
+
+### <a name="output_resource_topics_authorization_rules"></a> [resource\_topics\_authorization\_rules](#output\_resource\_topics\_authorization\_rules)
+
+Description: The service bus topics authorization rules created
+
+### <a name="output_resource_topics_subscriptions"></a> [resource\_topics\_subscriptions](#output\_resource\_topics\_subscriptions)
+
+Description: The service bus topic subscriptions created
 
 ## Modules
 

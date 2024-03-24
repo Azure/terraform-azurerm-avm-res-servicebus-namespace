@@ -25,9 +25,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix = "default"
-
-  skus = ["Basic", "Standard", "Premium"]
+  prefix = "resPub"
 }
 
 module "regions" {
@@ -53,8 +51,22 @@ resource "azurerm_resource_group" "this" {
 module "servicebus" {
   source = "../../"
 
-  for_each = toset(local.skus)
+  sku                           = "Premium"
+  resource_group_name           = azurerm_resource_group.this.name
+  location                      = module.regions.regions[random_integer.region_index.result].name
+  name                          = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
+  public_network_access_enabled = true
 
-  resource_group_name = azurerm_resource_group.this.name
-  name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
+  network_rule_config = {
+    trusted_services_allowed = true
+    default_action           = "Deny"
+    cidr_or_ip_rules         = ["168.125.123.255", "170.0.0.0/24"]
+
+    network_rules = [
+      {
+        ignore_missing_vnet_service_endpoint = false
+        subnet_id                            = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Network/virtualNetworks/brytest/subnets/default"
+      }
+    ]
+  }
 }

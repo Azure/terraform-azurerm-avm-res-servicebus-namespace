@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example
+# Managed identity example
 
-This deploys the module in its simplest form.
+This deploys the module with a system and user assigned managed identity
 
 ```hcl
 terraform {
@@ -31,9 +31,8 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix = "default"
-
-  skus = ["Basic", "Standard", "Premium"]
+  prefix = "mi"
+  skus   = ["Basic", "Standard", "Premium"]
 }
 
 module "regions" {
@@ -61,8 +60,15 @@ module "servicebus" {
 
   for_each = toset(local.skus)
 
+  sku                 = each.value
   resource_group_name = azurerm_resource_group.this.name
+  location            = module.regions.regions[random_integer.region_index.result].name
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
+
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.ManagedIdentity/userAssignedIdentities/brytest"]
+  }
 }
 ```
 

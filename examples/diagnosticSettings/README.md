@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example
+# Diagnostic settings example
 
-This deploys the module in its simplest form.
+This deploys the module configured its diagnostic settings with multiple combinations
 
 ```hcl
 terraform {
@@ -31,7 +31,9 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix = "default"
+  prefix               = "diag"
+  event_hub_namespace  = "brytest2"
+  storage_account_name = "brytest2"
 
   skus = ["Basic", "Standard", "Premium"]
 }
@@ -61,8 +63,40 @@ module "servicebus" {
 
   for_each = toset(local.skus)
 
+  sku                 = each.value
   resource_group_name = azurerm_resource_group.this.name
+  location            = module.regions.regions[random_integer.region_index.result].name
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
+
+  diagnostic_settings = {
+    diagnostic1 = {
+      log_groups    = ["allLogs"]
+      metric_groups = ["AllMetrics"]
+
+      name                           = "diagtest1"
+      log_analytics_destination_type = "Dedicated"
+      workspace_resource_id          = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.OperationalInsights/workspaces/brytesting"
+    }
+
+    diagnostic2 = {
+      log_groups    = ["audit"]
+      metric_groups = ["AllMetrics"]
+
+      name                                     = "diagtest2"
+      log_analytics_destination_type           = "Dedicated"
+      event_hub_name                           = "brytesthub"
+      event_hub_authorization_rule_resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.EventHub/namespaces/${local.event_hub_namespace}/authorizationRules/RootManageSharedAccessKey"
+    }
+
+    diagnostic3 = {
+      log_categories = ["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"]
+      metric_groups  = ["AllMetrics"]
+
+      name                           = "diagtest3"
+      log_analytics_destination_type = "Dedicated"
+      storage_account_resource_id    = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/module-dependencies/providers/Microsoft.Storage/storageAccounts/${local.storage_account_name}"
+    }
+  }
 }
 ```
 

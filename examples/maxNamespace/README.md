@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example
+# Max example
 
-This deploys the module in its simplest form.
+This deploys the module with all the configuration that the namespace has which doesnt have their own test case
 
 ```hcl
 terraform {
@@ -31,9 +31,8 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix = "default"
-
-  skus = ["Basic", "Standard", "Premium"]
+  prefix = "max"
+  skus   = ["Basic", "Standard", "Premium"]
 }
 
 module "regions" {
@@ -61,8 +60,45 @@ module "servicebus" {
 
   for_each = toset(local.skus)
 
-  resource_group_name = azurerm_resource_group.this.name
-  name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
+  sku                                     = each.value
+  resource_group_name                     = azurerm_resource_group.this.name
+  location                                = module.regions.regions[random_integer.region_index.result].name
+  name                                    = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
+  capacity                                = 2
+  local_auth_enabled                      = true
+  minimum_tls_version                     = "1.2"
+  public_network_access_enabled           = true
+  premium_messaging_partitions            = 2
+  zone_redundant                          = true
+  enable_telemetry                        = true
+  private_endpoints_manage_dns_zone_group = true
+
+  authorization_rules = {
+    testRule = {
+      send   = true
+      listen = true
+      manage = true
+    }
+  }
+
+  tags = {
+    environment = "testing"
+    department  = "engineering"
+  }
+
+  role_assignments = {
+    key = {
+      skip_service_principal_aad_check = false
+      role_definition_id_or_name       = "Contributor"
+      description                      = "This is a test role assignment"
+      principal_id                     = data.azurerm_client_config.current.object_id
+    }
+  }
+
+  # lock = {
+  #   kind = "CanNotDelete"
+  #   name = "Testing name CanNotDelete"
+  # }
 }
 ```
 
