@@ -25,7 +25,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix   = "cmk"
+  prefix   = "cmk-pin"
   key_name = "customermanagedkey"
 }
 
@@ -60,9 +60,9 @@ module "key_vault" {
   version = "0.5.3"
 
   resource_group_name           = azurerm_resource_group.example.name
-  name                          = module.naming.key_vault.name_unique
   location                      = azurerm_resource_group.example.location
   tenant_id                     = data.azurerm_client_config.current.tenant_id
+  name                          = "${module.naming.key_vault.name_unique}${local.prefix}"
   purge_protection_enabled      = true
   public_network_access_enabled = true
 
@@ -108,7 +108,7 @@ module "servicebus" {
     infrastructure_encryption_enabled  = true
     key_name                           = local.key_name
     key_vault_resource_id              = module.key_vault.resource.id
-    #key_version                        = module.key_vault.resource_keys.cmk.version
+    key_version                        = module.key_vault.resource_keys.cmk.version
     user_assigned_identity_resource_id = azurerm_user_assigned_identity.example.id
   }
 
