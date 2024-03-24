@@ -26,7 +26,6 @@ variable "role_assignments" {
     > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
     Example Inputs:
-    ```hcl
     role_assignments = {
       "key" = {
         skip_service_principal_aad_check = false
@@ -35,7 +34,6 @@ variable "role_assignments" {
         principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
       }
     }
-    ```
   DESCRIPTION
 
   validation {

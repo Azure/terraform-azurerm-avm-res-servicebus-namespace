@@ -84,17 +84,14 @@ Description:     Defaults to `{}`. Manages a ServiceBus Namespace authorization 
       manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
     }))
 
-    Example Inputs:
-    ```hcl
-    authorization_rules = {
-      testRule = {
-        send   = true
-        listen = true
+    Example Inputs:  
+    authorization\_rules = {  
+      testRule = {  
+        send   = true  
+        listen = true  
         manage = true
       }
     }
-    
-```
 
 Type:
 
@@ -131,17 +128,14 @@ Description:     Defaults to `null`. Ignored for Basic and Standard. Defines a c
 
     > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
 
-    Example Inputs:
-    ```hcl
-    customer_managed_key = {
-      infrastructure_encryption_enabled  = true
-      key_name                           = "sample-customer-key"
-      key_version                        = 03c89971825b4a0d84905c3597512260
-      key_vault_resource_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
-      user_assigned_identity_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
+    Example Inputs:  
+    customer\_managed\_key = {  
+      infrastructure\_encryption\_enabled  = true  
+      key\_name                           = "sample-customer-key"  
+      key\_version                        = 03c89971825b4a0d84905c3597512260  
+      key\_vault\_resource\_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"  
+      user\_assigned\_identity\_resource\_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
     }
-    
-```
 
 Type:
 
@@ -259,14 +253,11 @@ Description:     Defaults to `null`. Controls the Resource Lock configuration fo
       name = (Optional) - The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
     })
 
-    Example Inputs:
-    ```hcl
-    lock = {
-      kind = "CanNotDelete"
+    Example Inputs:  
+    lock = {  
+      kind = "CanNotDelete"  
       name = "This resource cannot be deleted easily"
     }
-    
-```
 
 Type:
 
@@ -288,14 +279,11 @@ Description:     Defaults to `{}`. Controls the Managed Identity configuration o
       user\_assigned\_resource\_ids = (Optional) - Defaults to `[]`. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
     })
 
-    Example Inputs:
-    ```hcl
-    managed_identities = {
-      system_assigned            = true
-      user_assigned_resource_ids = ["/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"]
+    Example Inputs:  
+    managed\_identities = {  
+      system\_assigned            = true  
+      user\_assigned\_resource\_ids = ["/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"]
     }
-    
-```
 
 Type:
 
@@ -334,22 +322,19 @@ Description:     Defaults to `{}`. Ignored for Basic and Standard. Defines the n
 
     > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore\_missing\_vnet\_service\_endpoint is set to `false`.
 
-    Example Inputs:
-    ```hcl
-    network_rule_config = {
-      trusted_services_allowed = true
-      default_action           = "Allow"
-      cidr_or_ip_rules         = ["79.0.0.0", "80.0.0.0/24"]
+    Example Inputs:  
+    network\_rule\_config = {  
+      trusted\_services\_allowed = true  
+      default\_action           = "Allow"  
+      cidr\_or\_ip\_rules         = ["79.0.0.0", "80.0.0.0/24"]
 
-      network_rules = [
-        {
-          ignore_missing_vnet_service_endpoint = false
-          subnet_id                            = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
+      network\_rules = [
+        {  
+          ignore\_missing\_vnet\_service\_endpoint = false  
+          subnet\_id                            = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
         }
       ]
     }
-    
-```
 
 Type:
 
@@ -500,47 +485,44 @@ Description:     Defaults to `{}`. A map of queues to create. The map key is use
       })
     )
 
-    Example Inputs:
-    ```hcl
-    queues = {
-      testQueue = {
-        auto_delete_on_idle                     = "P7D"
-        dead_lettering_on_message_expiration    = true
-        default_message_ttl                     = "PT5M"
-        duplicate_detection_history_time_window = "PT5M"
-        enable_batched_operations               = true
-        enable_express                          = true
-        enable_partitioning                     = true
-        lock_duration                           = "PT5M"
-        requires_duplicate_detection            = true
-        requires_session                        = false
-        max_delivery_count                      = 10
-        max_message_size_in_kilobytes           = 1024
-        max_size_in_megabytes                   = 1024
-        status                                  = "Active"
-        forward_to                              = "forwardQueue"
-        forward_dead_lettered_messages_to       = "forwardQueue"
+    Example Inputs:  
+    queues = {  
+      testQueue = {  
+        auto\_delete\_on\_idle                     = "P7D"  
+        dead\_lettering\_on\_message\_expiration    = true  
+        default\_message\_ttl                     = "PT5M"  
+        duplicate\_detection\_history\_time\_window = "PT5M"  
+        enable\_batched\_operations               = true  
+        enable\_express                          = true  
+        enable\_partitioning                     = true  
+        lock\_duration                           = "PT5M"  
+        requires\_duplicate\_detection            = true  
+        requires\_session                        = false  
+        max\_delivery\_count                      = 10  
+        max\_message\_size\_in\_kilobytes           = 1024  
+        max\_size\_in\_megabytes                   = 1024  
+        status                                  = "Active"  
+        forward\_to                              = "forwardQueue"  
+        forward\_dead\_lettered\_messages\_to       = "forwardQueue"
 
-        role_assignments = {
-          "key" = {
-            skip_service_principal_aad_check = false
-            role_definition_id_or_name       = "Contributor"
-            description                      = "This is a test role assignment"
-            principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
+        role\_assignments = {
+          "key" = {  
+            skip\_service\_principal\_aad\_check = false  
+            role\_definition\_id\_or\_name       = "Contributor"  
+            description                      = "This is a test role assignment"  
+            principal\_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
           }
         }
 
-        authorization_rules = {
-          testRule = {
-            send   = true
-            listen = true
+        authorization\_rules = {  
+          testRule = {  
+            send   = true  
+            listen = true  
             manage = true
           }
         }
       }
     }
-    
-```
 
 Type:
 
@@ -598,18 +580,15 @@ Description:     Defaults to `{}`. A map of role assignments to create. The map 
 
     > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
-    Example Inputs:
-    ```hcl
-    role_assignments = {
-      "key" = {
-        skip_service_principal_aad_check = false
-        role_definition_id_or_name       = "Contributor"
-        description                      = "This is a test role assignment"
-        principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
+    Example Inputs:  
+    role\_assignments = {
+      "key" = {  
+        skip\_service\_principal\_aad\_check = false  
+        role\_definition\_id\_or\_name       = "Contributor"  
+        description                      = "This is a test role assignment"  
+        principal\_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
       }
     }
-    
-```
 
 Type:
 
@@ -639,13 +618,10 @@ Default: `"Standard"`
 
 Description:     Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 
-    Example Inputs:
-    ```hcl
-    tags = {
+    Example Inputs:  
+    tags = {  
       environment = "testing"
     }
-    
-```
 
 Type: `map(string)`
 
@@ -709,58 +685,55 @@ Description:     Defaults to `{}`. Ignored for Basic. A map of topics to create.
       })
     )
 
-    Example Inputs:
-    ```hcl
-    topics = {
-      testTopic = {
-        auto_delete_on_idle                     = "P7D"
-        default_message_ttl                     = "PT5M"
-        duplicate_detection_history_time_window = "PT5M"
-        enable_batched_operations               = true
-        enable_express                          = false
-        enable_partitioning                     = true
-        requires_duplicate_detection            = true
-        max_message_size_in_kilobytes           = 1024
-        max_size_in_megabytes                   = 1024
-        status                                  = "Active"
-        support_ordering                        = true
+    Example Inputs:  
+    topics = {  
+      testTopic = {  
+        auto\_delete\_on\_idle                     = "P7D"  
+        default\_message\_ttl                     = "PT5M"  
+        duplicate\_detection\_history\_time\_window = "PT5M"  
+        enable\_batched\_operations               = true  
+        enable\_express                          = false  
+        enable\_partitioning                     = true  
+        requires\_duplicate\_detection            = true  
+        max\_message\_size\_in\_kilobytes           = 1024  
+        max\_size\_in\_megabytes                   = 1024  
+        status                                  = "Active"  
+        support\_ordering                        = true
 
-        subscriptions = {
-          testSubscription = {
-            dead_lettering_on_filter_evaluation_error = true
-            dead_lettering_on_message_expiration      = true
-            default_message_ttl                       = "PT5M"
-            enable_batched_operations                 = true
-            lock_duration                             = "PT1M"
-            max_delivery_count                        = 100
-            status                                    = "Active"
-            auto_delete_on_idle                       = "P7D"
-            requires_session                          = false
-            forward_dead_lettered_messages_to         = "forwardTopic"
-            forward_to                                = "forwardTopic"
+        subscriptions = {  
+          testSubscription = {  
+            dead\_lettering\_on\_filter\_evaluation\_error = true  
+            dead\_lettering\_on\_message\_expiration      = true  
+            default\_message\_ttl                       = "PT5M"  
+            enable\_batched\_operations                 = true  
+            lock\_duration                             = "PT1M"  
+            max\_delivery\_count                        = 100  
+            status                                    = "Active"  
+            auto\_delete\_on\_idle                       = "P7D"  
+            requires\_session                          = false  
+            forward\_dead\_lettered\_messages\_to         = "forwardTopic"  
+            forward\_to                                = "forwardTopic"
           }
         }
 
-        role_assignments = {
-          "key" = {
-            skip_service_principal_aad_check = false
-            role_definition_id_or_name       = "Contributor"
-            description                      = "This is a test role assignment"
-            principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
+        role\_assignments = {
+          "key" = {  
+            skip\_service\_principal\_aad\_check = false  
+            role\_definition\_id\_or\_name       = "Contributor"  
+            description                      = "This is a test role assignment"  
+            principal\_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
           }
-        }
-        
-        authorization_rules = {
-          testRule = {
-            send   = true
-            listen = true
+        }  
+      
+        authorization\_rules = {  
+          testRule = {  
+            send   = true  
+            listen = true  
             manage = true
           }
         }
       }
     }
-    
-```
 
 Type:
 

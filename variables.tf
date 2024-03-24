@@ -156,12 +156,10 @@ variable "managed_identities" {
     })
 
     Example Inputs:
-    ```hcl
     managed_identities = {
       system_assigned            = true
       user_assigned_resource_ids = ["/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"]
     }
-    ```
   DESCRIPTION
 
   validation {
@@ -194,13 +192,11 @@ variable "managed_identities" {
 #       If primary namespace has configured a customer managed key the identity of the secondary namespace must be able to access the key
 
 #     Example Inputs:
-#     ```hcl
 #     disaster_recovery_config = {
 #       dns_alias_name              = "global-alias-name"
 #       partner_namespace_id        = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{serviceBusNamespaceName}"
 #       alias_authorization_rule_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{serviceBusNamespaceName}/authorizationrules/{authorizationRuleName}"
 #     }
-#     ```
 #   DESCRIPTION
 # }
 
@@ -221,7 +217,6 @@ variable "authorization_rules" {
     }))
 
     Example Inputs:
-    ```hcl
     authorization_rules = {
       testRule = {
         send   = true
@@ -229,7 +224,6 @@ variable "authorization_rules" {
         manage = true
       }
     }
-    ```
   DESCRIPTION
 }
 
@@ -256,7 +250,6 @@ variable "customer_managed_key" {
     > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
 
     Example Inputs:
-    ```hcl
     customer_managed_key = {
       infrastructure_encryption_enabled  = true
       key_name                           = "sample-customer-key"
@@ -264,7 +257,6 @@ variable "customer_managed_key" {
       key_vault_resource_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
       user_assigned_identity_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
     }
-    ```
    DESCRIPTION
 
   validation {
@@ -314,7 +306,6 @@ variable "network_rule_config" {
     > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore_missing_vnet_service_endpoint is set to `false`.
 
     Example Inputs:
-    ```hcl
     network_rule_config = {
       trusted_services_allowed = true
       default_action           = "Allow"
@@ -327,7 +318,6 @@ variable "network_rule_config" {
         }
       ]
     }
-    ```
    DESCRIPTION
 
   validation {
@@ -368,10 +358,8 @@ variable "tags" {
     Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 
     Example Inputs:
-    ```hcl
     tags = {
       environment = "testing"
     }
-    ```
   DESCRIPTION
 }

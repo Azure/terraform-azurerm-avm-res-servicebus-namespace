@@ -28,8 +28,6 @@ provider "azurerm" {
   }
 }
 
-data "azurerm_client_config" "current" {}
-
 locals {
   prefix = "mi"
   skus   = ["Basic", "Standard", "Premium"]
@@ -103,7 +101,6 @@ The following resources are used by this module:
 - [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_user_assigned_identity.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
-- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs

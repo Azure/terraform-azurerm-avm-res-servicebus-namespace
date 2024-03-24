@@ -15,12 +15,10 @@ variable "lock" {
     })
 
     Example Inputs:
-    ```hcl
     lock = {
       kind = "CanNotDelete"
       name = "This resource cannot be deleted easily"
     }
-    ```
   DESCRIPTION
 
   validation {

@@ -34,7 +34,6 @@ variable "diagnostic_settings" {
     > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
     Example Inputs:
-    ```hcl
     diagnostic_settings = {
       diagnostic1 = {
         event_hub_name                           = "hub-name"
@@ -50,7 +49,6 @@ variable "diagnostic_settings" {
         storage_account_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}"
       }
     }
-    ```
     
   DESCRIPTION
 

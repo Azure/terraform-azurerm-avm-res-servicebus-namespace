@@ -79,7 +79,6 @@ variable "queues" {
     )
 
     Example Inputs:
-    ```hcl
     queues = {
       testQueue = {
         auto_delete_on_idle                     = "P7D"
@@ -117,7 +116,6 @@ variable "queues" {
         }
       }
     }
-    ```
   DESCRIPTION
 
   validation {

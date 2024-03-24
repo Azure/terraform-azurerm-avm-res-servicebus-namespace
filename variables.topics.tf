@@ -100,7 +100,6 @@ variable "topics" {
     )
 
     Example Inputs:
-    ```hcl
     topics = {
       testTopic = {
         auto_delete_on_idle                     = "P7D"
@@ -149,7 +148,6 @@ variable "topics" {
         }
       }
     }
-    ```
   DESCRIPTION
 
   validation {
