@@ -155,11 +155,13 @@ variable "managed_identities" {
       user_assigned_resource_ids = (Optional) - Defaults to `[]`. Specifies a set of User Assigned Managed Identity resource IDs to be assigned to this resource.
     })
 
-    Example Inputs:
-    managed_identities = {
-      system_assigned            = true
-      user_assigned_resource_ids = ["/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"]
-    }
+  Example Inputs:
+  ```hcl
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = ["/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"]
+  }
+  ```
   DESCRIPTION
 
   validation {
@@ -216,14 +218,16 @@ variable "authorization_rules" {
       manage = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
     }))
 
-    Example Inputs:
-    authorization_rules = {
-      testRule = {
-        send   = true
-        listen = true
-        manage = true
-      }
+  Example Inputs:
+  ```hcl
+  authorization_rules = {
+    testRule = {
+      send   = true
+      listen = true
+      manage = true
     }
+  }
+  ```
   DESCRIPTION
 }
 
@@ -249,15 +253,17 @@ variable "customer_managed_key" {
 
     > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
 
-    Example Inputs:
-    customer_managed_key = {
-      infrastructure_encryption_enabled  = true
-      key_name                           = "sample-customer-key"
-      key_version                        = 03c89971825b4a0d84905c3597512260
-      key_vault_resource_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
-      user_assigned_identity_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
-    }
-   DESCRIPTION
+  Example Inputs:
+  ```hcl
+  customer_managed_key = {
+    infrastructure_encryption_enabled  = true
+    key_name                           = "sample-customer-key"
+    key_version                        = 03c89971825b4a0d84905c3597512260
+    key_vault_resource_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
+    user_assigned_identity_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
+  }
+  ```
+  DESCRIPTION
 
   validation {
     condition     = var.customer_managed_key == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$", var.customer_managed_key.user_assigned_identity_resource_id))
@@ -305,20 +311,22 @@ variable "network_rule_config" {
 
     > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore_missing_vnet_service_endpoint is set to `false`.
 
-    Example Inputs:
-    network_rule_config = {
-      trusted_services_allowed = true
-      default_action           = "Allow"
-      cidr_or_ip_rules         = ["79.0.0.0", "80.0.0.0/24"]
+  Example Inputs:
+  ```hcl
+  network_rule_config = {
+    trusted_services_allowed = true
+    default_action           = "Allow"
+    cidr_or_ip_rules         = ["79.0.0.0", "80.0.0.0/24"]
 
-      network_rules = [
-        {
-          ignore_missing_vnet_service_endpoint = false
-          subnet_id                            = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
-        }
-      ]
-    }
-   DESCRIPTION
+    network_rules = [
+      {
+        ignore_missing_vnet_service_endpoint = false
+        subnet_id                            = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
+      }
+    ]
+  }
+  ```
+  DESCRIPTION
 
   validation {
     condition     = contains(["Allow", "Deny"], var.network_rule_config.default_action)
@@ -357,9 +365,11 @@ variable "tags" {
   description = <<DESCRIPTION
     Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 
-    Example Inputs:
-    tags = {
-      environment = "testing"
-    }
+  Example Inputs:
+  ```hcl
+  tags = {
+    environment = "testing"
+  }
+  ```
   DESCRIPTION
 }

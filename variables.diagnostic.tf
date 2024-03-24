@@ -33,23 +33,24 @@ variable "diagnostic_settings" {
 
     > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
-    Example Inputs:
-    diagnostic_settings = {
-      diagnostic1 = {
-        event_hub_name                           = "hub-name"
-        log_analytics_destination_type           = "Dedicated"
-        name                                     = "diagnostics"
-        event_hub_authorization_rule_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{eventHubNamespaceName}/authorizationRules/{authorizationRuleName}"
+  Example Inputs:
+  ```hcl
+  diagnostic_settings = {
+    diagnostic1 = {
+      event_hub_name                           = "hub-name"
+      log_analytics_destination_type           = "Dedicated"
+      name                                     = "diagnostics"
+      event_hub_authorization_rule_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{eventHubNamespaceName}/authorizationRules/{authorizationRuleName}"
 
-        #log_categories = ["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"]
+      #log_categories = ["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"]
 
-        metric_groups               = ["AllMetrics"]
-        log_groups                  = ["allLogs", "audit"]
-        workspace_resource_id       = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}"
-        storage_account_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}"
-      }
+      metric_groups               = ["AllMetrics"]
+      log_groups                  = ["allLogs", "audit"]
+      workspace_resource_id       = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}"
+      storage_account_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}"
     }
-    
+  }
+  ```  
   DESCRIPTION
 
   validation {

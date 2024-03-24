@@ -79,43 +79,45 @@ variable "queues" {
     )
 
     Example Inputs:
-    queues = {
-      testQueue = {
-        auto_delete_on_idle                     = "P7D"
-        dead_lettering_on_message_expiration    = true
-        default_message_ttl                     = "PT5M"
-        duplicate_detection_history_time_window = "PT5M"
-        enable_batched_operations               = true
-        enable_express                          = true
-        enable_partitioning                     = true
-        lock_duration                           = "PT5M"
-        requires_duplicate_detection            = true
-        requires_session                        = false
-        max_delivery_count                      = 10
-        max_message_size_in_kilobytes           = 1024
-        max_size_in_megabytes                   = 1024
-        status                                  = "Active"
-        forward_to                              = "forwardQueue"
-        forward_dead_lettered_messages_to       = "forwardQueue"
+  ```hcl
+  queues = {
+    testQueue = {
+      auto_delete_on_idle                     = "P7D"
+      dead_lettering_on_message_expiration    = true
+      default_message_ttl                     = "PT5M"
+      duplicate_detection_history_time_window = "PT5M"
+      enable_batched_operations               = true
+      enable_express                          = true
+      enable_partitioning                     = true
+      lock_duration                           = "PT5M"
+      requires_duplicate_detection            = true
+      requires_session                        = false
+      max_delivery_count                      = 10
+      max_message_size_in_kilobytes           = 1024
+      max_size_in_megabytes                   = 1024
+      status                                  = "Active"
+      forward_to                              = "forwardQueue"
+      forward_dead_lettered_messages_to       = "forwardQueue"
 
-        role_assignments = {
-          "key" = {
-            skip_service_principal_aad_check = false
-            role_definition_id_or_name       = "Contributor"
-            description                      = "This is a test role assignment"
-            principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
-          }
+      role_assignments = {
+        "key" = {
+          skip_service_principal_aad_check = false
+          role_definition_id_or_name       = "Contributor"
+          description                      = "This is a test role assignment"
+          principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
         }
+      }
 
-        authorization_rules = {
-          testRule = {
-            send   = true
-            listen = true
-            manage = true
-          }
+      authorization_rules = {
+        testRule = {
+          send   = true
+          listen = true
+          manage = true
         }
       }
     }
+  }
+  ```
   DESCRIPTION
 
   validation {

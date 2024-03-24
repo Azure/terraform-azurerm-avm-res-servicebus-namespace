@@ -99,55 +99,57 @@ variable "topics" {
       })
     )
 
-    Example Inputs:
-    topics = {
-      testTopic = {
-        auto_delete_on_idle                     = "P7D"
-        default_message_ttl                     = "PT5M"
-        duplicate_detection_history_time_window = "PT5M"
-        enable_batched_operations               = true
-        enable_express                          = false
-        enable_partitioning                     = true
-        requires_duplicate_detection            = true
-        max_message_size_in_kilobytes           = 1024
-        max_size_in_megabytes                   = 1024
-        status                                  = "Active"
-        support_ordering                        = true
+  Example Inputs:
+  ```hcl
+  topics = {
+    testTopic = {
+      auto_delete_on_idle                     = "P7D"
+      default_message_ttl                     = "PT5M"
+      duplicate_detection_history_time_window = "PT5M"
+      enable_batched_operations               = true
+      enable_express                          = false
+      enable_partitioning                     = true
+      requires_duplicate_detection            = true
+      max_message_size_in_kilobytes           = 1024
+      max_size_in_megabytes                   = 1024
+      status                                  = "Active"
+      support_ordering                        = true
 
-        subscriptions = {
-          testSubscription = {
-            dead_lettering_on_filter_evaluation_error = true
-            dead_lettering_on_message_expiration      = true
-            default_message_ttl                       = "PT5M"
-            enable_batched_operations                 = true
-            lock_duration                             = "PT1M"
-            max_delivery_count                        = 100
-            status                                    = "Active"
-            auto_delete_on_idle                       = "P7D"
-            requires_session                          = false
-            forward_dead_lettered_messages_to         = "forwardTopic"
-            forward_to                                = "forwardTopic"
-          }
+      subscriptions = {
+        testSubscription = {
+          dead_lettering_on_filter_evaluation_error = true
+          dead_lettering_on_message_expiration      = true
+          default_message_ttl                       = "PT5M"
+          enable_batched_operations                 = true
+          lock_duration                             = "PT1M"
+          max_delivery_count                        = 100
+          status                                    = "Active"
+          auto_delete_on_idle                       = "P7D"
+          requires_session                          = false
+          forward_dead_lettered_messages_to         = "forwardTopic"
+          forward_to                                = "forwardTopic"
         }
+      }
 
-        role_assignments = {
-          "key" = {
-            skip_service_principal_aad_check = false
-            role_definition_id_or_name       = "Contributor"
-            description                      = "This is a test role assignment"
-            principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
-          }
+      role_assignments = {
+        "key" = {
+          skip_service_principal_aad_check = false
+          role_definition_id_or_name       = "Contributor"
+          description                      = "This is a test role assignment"
+          principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
         }
-        
-        authorization_rules = {
-          testRule = {
-            send   = true
-            listen = true
-            manage = true
-          }
+      }
+      
+      authorization_rules = {
+        testRule = {
+          send   = true
+          listen = true
+          manage = true
         }
       }
     }
+  }
+  ```
   DESCRIPTION
 
   validation {

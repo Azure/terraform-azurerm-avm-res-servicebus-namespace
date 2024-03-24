@@ -14,11 +14,13 @@ variable "lock" {
       name = (Optional) - The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
     })
 
-    Example Inputs:
-    lock = {
-      kind = "CanNotDelete"
-      name = "This resource cannot be deleted easily"
-    }
+  Example Inputs:
+  ```hcl
+  lock = {
+    kind = "CanNotDelete"
+    name = "This resource cannot be deleted easily"
+  }
+  ```
   DESCRIPTION
 
   validation {

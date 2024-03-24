@@ -25,15 +25,17 @@ variable "role_assignments" {
 
     > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
-    Example Inputs:
-    role_assignments = {
-      "key" = {
-        skip_service_principal_aad_check = false
-        role_definition_id_or_name       = "Contributor"
-        description                      = "This is a test role assignment"
-        principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
-      }
+  Example Inputs:
+  ```hcl
+  role_assignments = {
+    "key" = {
+      skip_service_principal_aad_check = false
+      role_definition_id_or_name       = "Contributor"
+      description                      = "This is a test role assignment"
+      principal_id                     = "eb5260bd-41f3-4019-9e03-606a617aec13"
     }
+  }
+  ```
   DESCRIPTION
 
   validation {
