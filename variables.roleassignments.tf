@@ -26,7 +26,7 @@ variable "role_assignments" {
     > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
     Example Inputs:
-    ```terraform
+    ```hcl
     role_assignments = {
       "key" = {
         skip_service_principal_aad_check = false

@@ -100,7 +100,7 @@ variable "topics" {
     )
 
     Example Inputs:
-    ```terraform
+    ```hcl
     topics = {
       testTopic = {
         auto_delete_on_idle                     = "P7D"

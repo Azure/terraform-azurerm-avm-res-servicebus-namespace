@@ -15,7 +15,7 @@ variable "lock" {
     })
 
     Example Inputs:
-    ```terraform
+    ```hcl
     lock = {
       kind = "CanNotDelete"
       name = "This resource cannot be deleted easily"

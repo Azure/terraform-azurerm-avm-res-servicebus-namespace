@@ -34,7 +34,7 @@ variable "diagnostic_settings" {
     > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
     Example Inputs:
-    ```terraform
+    ```hcl
     diagnostic_settings = {
       diagnostic1 = {
         event_hub_name                           = "hub-name"

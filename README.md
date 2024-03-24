@@ -85,7 +85,7 @@ Description:     Defaults to `{}`. Manages a ServiceBus Namespace authorization 
     }))
 
     Example Inputs:
-    ```terraform
+    ```hcl
     authorization_rules = {
       testRule = {
         send   = true
@@ -132,7 +132,7 @@ Description:     Defaults to `null`. Ignored for Basic and Standard. Defines a c
     > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
 
     Example Inputs:
-    ```terraform
+    ```hcl
     customer_managed_key = {
       infrastructure_encryption_enabled  = true
       key_name                           = "sample-customer-key"
@@ -179,7 +179,7 @@ Description:     Defaults to `{}`. A map of diagnostic settings to create. The m
     > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
     Example Inputs:
-    ```terraform
+    ```hcl
     diagnostic_settings = {
       diagnostic1 = {
         event_hub_name                           = "hub-name"
@@ -260,7 +260,7 @@ Description:     Defaults to `null`. Controls the Resource Lock configuration fo
     })
 
     Example Inputs:
-    ```terraform
+    ```hcl
     lock = {
       kind = "CanNotDelete"
       name = "This resource cannot be deleted easily"
@@ -289,7 +289,7 @@ Description:     Defaults to `{}`. Controls the Managed Identity configuration o
     })
 
     Example Inputs:
-    ```terraform
+    ```hcl
     managed_identities = {
       system_assigned            = true
       user_assigned_resource_ids = ["/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"]
@@ -335,7 +335,7 @@ Description:     Defaults to `{}`. Ignored for Basic and Standard. Defines the n
     > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore\_missing\_vnet\_service\_endpoint is set to `false`.
 
     Example Inputs:
-    ```terraform
+    ```hcl
     network_rule_config = {
       trusted_services_allowed = true
       default_action           = "Allow"
@@ -501,7 +501,7 @@ Description:     Defaults to `{}`. A map of queues to create. The map key is use
     )
 
     Example Inputs:
-    ```terraform
+    ```hcl
     queues = {
       testQueue = {
         auto_delete_on_idle                     = "P7D"
@@ -599,7 +599,7 @@ Description:     Defaults to `{}`. A map of role assignments to create. The map 
     > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
     Example Inputs:
-    ```terraform
+    ```hcl
     role_assignments = {
       "key" = {
         skip_service_principal_aad_check = false
@@ -640,7 +640,7 @@ Default: `"Standard"`
 Description:     Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 
     Example Inputs:
-    ```terraform
+    ```hcl
     tags = {
       environment = "testing"
     }
@@ -710,7 +710,7 @@ Description:     Defaults to `{}`. Ignored for Basic. A map of topics to create.
     )
 
     Example Inputs:
-    ```terraform
+    ```hcl
     topics = {
       testTopic = {
         auto_delete_on_idle                     = "P7D"

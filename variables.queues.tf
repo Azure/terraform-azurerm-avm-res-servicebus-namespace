@@ -79,7 +79,7 @@ variable "queues" {
     )
 
     Example Inputs:
-    ```terraform
+    ```hcl
     queues = {
       testQueue = {
         auto_delete_on_idle                     = "P7D"
