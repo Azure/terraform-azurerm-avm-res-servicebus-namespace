@@ -78,8 +78,7 @@ module "servicebus" {
 
     network_rules = [
       {
-        ignore_missing_vnet_service_endpoint = false
-        subnet_id                            = module.vnet.subnets.default.id
+        subnet_id = module.vnet.subnets.default.id
       }
     ]
   }

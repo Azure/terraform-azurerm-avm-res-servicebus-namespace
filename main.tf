@@ -49,8 +49,7 @@ resource "azurerm_servicebus_namespace" "this" {
         for_each = var.network_rule_config.network_rules
 
         content {
-          subnet_id                            = network_rules.value.subnet_id
-          ignore_missing_vnet_service_endpoint = network_rules.value.ignore_missing_vnet_service_endpoint
+          subnet_id = network_rules.value.subnet_id
         }
       }
     }

@@ -310,9 +310,8 @@ Description:   Defaults to `{}`. Ignored for Basic and Standard. Defines the net
 
   - `network_rules` - (Optional) - Defaults to `[]`.
     - `subnet_id`                            - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
-    - `ignore_missing_vnet_service_endpoint` - (Optional) - Defaults to `false`. Should the ServiceBus Namespace Network Rule Set ignore missing Virtual Network Service Endpoint option in the Subnet?
 
-  > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet if ignore\_missing\_vnet\_service\_endpoint is set to `false`.
+  > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet.
 
   Example Inputs:
   ```hcl
@@ -323,7 +322,6 @@ Description:   Defaults to `{}`. Ignored for Basic and Standard. Defines the net
 
     network_rules = [
       {
-        ignore_missing_vnet_service_endpoint = false
         subnet_id                            = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
       }
     ]
@@ -339,8 +337,7 @@ object({
     default_action           = optional(string, "Allow")
 
     network_rules = optional(set(object({
-      subnet_id                            = string
-      ignore_missing_vnet_service_endpoint = optional(bool, false)
+      subnet_id = string
     })), [])
   })
 ```
