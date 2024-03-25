@@ -10,8 +10,7 @@ variable "private_endpoints" {
     tags = optional(map(string), {})
 
     lock = optional(object({
-      inherit_lock_from_namespace = optional(bool, true)
-      kind                        = optional(string, null)
+      kind                        = optional(string, "Inherit")
       name                        = optional(string, null)
     }), {})
 

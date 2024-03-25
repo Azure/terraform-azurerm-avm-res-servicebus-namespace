@@ -4,14 +4,14 @@ locals {
     "PrivateEndpoint|${pe_name}" => {
       scope_type = "PrivateEndpoint"
       pe_name    = pe_name
-      lock       = pe_params.lock.inherit_lock_from_namespace ? var.lock : pe_params.lock
+      lock       = pe_params.lock.kind == "Inherit" ? var.lock : pe_params.lock
     }
   }
 
   filtered_pe_locks = {
     for k, v in local.pe_locks :
     k => v
-    if v.lock != null
+    if try(v.lock.kind, "None") != "None"
   }
 
   namespace_lock = var.lock != null ? {
