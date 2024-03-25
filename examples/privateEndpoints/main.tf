@@ -107,10 +107,10 @@ module "servicebus" {
         }
       }
 
-      # lock = {
-      #   kind = "CanNotDelete"
-      #   name = "Testing name CanNotDelete"
-      # }
+      lock = {
+        kind = "CanNotDelete"
+        name = "Testing name CanNotDelete"
+      }
 
       tags = {
         environment = "testing"
