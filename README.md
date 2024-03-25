@@ -306,7 +306,7 @@ Description:   Defaults to `{}`. Ignored for Basic and Standard. Defines the net
 
   - `trusted_services_allowed` - (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration?
   - `cidr_or_ip_rules`         - (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
-  - `default_action`           - (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set. Possible values are Allow and Deny.
+  - `default_action`           - (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set when a rule (IP, CIDR or subnet) doesn't match. Possible values are `Allow` and `Deny`.
 
   - `network_rules` - (Optional) - Defaults to `[]`.
     - `subnet_id`                            - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
