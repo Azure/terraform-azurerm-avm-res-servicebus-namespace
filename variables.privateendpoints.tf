@@ -10,8 +10,8 @@ variable "private_endpoints" {
     tags = optional(map(string), {})
 
     lock = optional(object({
-      kind                        = optional(string, "Inherit")
-      name                        = optional(string, null)
+      kind = optional(string, "Inherit")
+      name = optional(string, null)
     }), {})
 
     role_assignments = optional(map(object({

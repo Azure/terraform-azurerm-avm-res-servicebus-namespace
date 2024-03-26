@@ -247,6 +247,8 @@ Description:   Defaults to `null`. Controls the Resource Lock configuration for 
   - `kind` - (Required) - The type of lock. Possible values are `CanNotDelete` and `ReadOnly`.
   - `name` - (Optional) - The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
 
+  > Note: If you use `ReadOnly` kind lock, you must configure Terraform to use EntraId authentication, as the access of the namespace keys will be blocked thus terraform won't be to do its job.
+
   Example Inputs:
   ```hcl
   lock = {
@@ -380,9 +382,8 @@ map(object({
     tags = optional(map(string), {})
 
     lock = optional(object({
-      inherit_lock_from_namespace = optional(bool, true)
-      kind                        = optional(string, null)
-      name                        = optional(string, null)
+      kind = optional(string, "Inherit")
+      name = optional(string, null)
     }), {})
 
     role_assignments = optional(map(object({

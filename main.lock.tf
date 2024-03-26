@@ -13,10 +13,12 @@ resource "azurerm_management_lock" "this" {
   notes      = each.value.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
 
   depends_on = [
-    azurerm_monitor_diagnostic_setting.this, azurerm_role_assignment.this, 
+    azurerm_servicebus_namespace.this,
+    azurerm_monitor_diagnostic_setting.this, azurerm_role_assignment.this,
     azurerm_private_endpoint_application_security_group_association.this,
-    azurerm_servicebus_namespace_authorization_rule.this, 
+    azurerm_servicebus_namespace_authorization_rule.this,
     azurerm_servicebus_queue.this, azurerm_servicebus_queue_authorization_rule.this,
-    azurerm_servicebus_topic.this, azurerm_servicebus_topic_authorization_rule.this, azurerm_servicebus_subscription.this
+    azurerm_servicebus_topic.this, azurerm_servicebus_topic_authorization_rule.this, azurerm_servicebus_subscription.this,
+    azurerm_private_endpoint.this_managed_dns_zone_groups, azurerm_private_endpoint.this_unmanaged_dns_zone_groups
   ]
 }
