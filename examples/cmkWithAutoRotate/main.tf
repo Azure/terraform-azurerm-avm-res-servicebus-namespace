@@ -32,6 +32,8 @@ locals {
 module "regions" {
   source  = "Azure/regions/azurerm"
   version = ">= 0.3.0"
+
+  recommended_regions_only = true
 }
 
 resource "random_integer" "region_index" {
@@ -85,8 +87,13 @@ module "key_vault" {
   }
 
   role_assignments = {
-    cmk_user_mi = {
-      role_definition_id_or_name = "Key Vault Crypto User"
+    cmk_tf = {
+      role_definition_id_or_name = "Key Vault Crypto Officer"
+      principal_id               = data.azurerm_client_config.current.object_id
+    }
+
+    cmk_sb_user_mi = {
+      role_definition_id_or_name = "Key Vault Crypto Service Encryption User"
       principal_id               = azurerm_user_assigned_identity.example.principal_id
     }
   }

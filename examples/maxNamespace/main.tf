@@ -32,6 +32,8 @@ locals {
 module "regions" {
   source  = "Azure/regions/azurerm"
   version = ">= 0.3.0"
+
+  recommended_regions_only = true
 }
 
 resource "random_integer" "region_index" {
