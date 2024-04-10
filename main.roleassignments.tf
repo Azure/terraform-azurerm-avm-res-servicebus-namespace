@@ -2,8 +2,8 @@ resource "azurerm_role_assignment" "this" {
   for_each = local.total_role_assignments
 
   scope = (
-    each.value.scope_type == "Queue" ? azurerm_servicebus_queue.this[each.value.queue_name].id :
-    each.value.scope_type == "Topic" ? azurerm_servicebus_topic.this[each.value.topic_name].id :
+    each.value.scope_type == "Queue" ? try(azurerm_servicebus_queue.base_queues[each.value.queue_name].id, azurerm_servicebus_queue.forward_queues[each.value.queue_name].id) :
+    each.value.scope_type == "Topic" ? try(azurerm_servicebus_topic.this[each.value.topic_name].id) :
     each.value.scope_type == "PrivateEndpoint" && var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this_managed_dns_zone_groups[each.value.pe_name].id :
     each.value.scope_type == "PrivateEndpoint" && var.private_endpoints_manage_dns_zone_group == false ? azurerm_private_endpoint.this_unmanaged_dns_zone_groups[each.value.pe_name].id :
     azurerm_servicebus_namespace.this.id

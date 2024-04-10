@@ -36,7 +36,7 @@ output "resource_private_endpoints_application_security_group_association" {
 }
 
 output "resource_queues" {
-  value       = azurerm_servicebus_queue.this
+  value       = merge(azurerm_servicebus_queue.base_queues, azurerm_servicebus_queue.forward_queues)
   description = "The service bus queues created"
 }
 
@@ -58,6 +58,6 @@ output "resource_topics_authorization_rules" {
 }
 
 output "resource_topics_subscriptions" {
-  value       = azurerm_servicebus_subscription.this
+  value       = merge(azurerm_servicebus_subscription.base_topics, azurerm_servicebus_subscription.forward_topics)
   description = "The service bus topic subscriptions created"
 }
