@@ -26,8 +26,6 @@ variable "diagnostic_settings" {
   - `event_hub_authorization_rule_resource_id` - (Optional) - The resource ID of the event hub authorization rule to send logs and metrics to.
   - `event_hub_name`                           - (Optional) - The name of the event hub. If none is specified, the default event hub will be selected.
   - `marketplace_partner_resource_id`          - (Optional) - The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
-  
-  - `metric_categories`                        - (Unsupported)
 
   > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
@@ -42,7 +40,7 @@ variable "diagnostic_settings" {
 
       #log_categories = ["ApplicationMetricsLogs", "RuntimeAuditLogs", "VNetAndIPFilteringLogs", "OperationalLogs"]
 
-      metric_groups               = ["AllMetrics"]
+      metric_categories           = ["AllMetrics"]
       log_groups                  = ["allLogs", "audit"]
       workspace_resource_id       = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}"
       storage_account_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}"
@@ -55,11 +53,11 @@ variable "diagnostic_settings" {
     condition = alltrue([
       for _, v in var.diagnostic_settings :
       alltrue([
-        for c in v.metric_groups :
+        for c in v.metric_categories :
         c == null ? false : contains(["AllMetrics"], c)
       ])
     ])
-    error_message = "The metric_groups parameter if specified can only be `AllMetrics`."
+    error_message = "The metric_categories parameter if specified can only be `AllMetrics`."
   }
 
   validation {
@@ -105,9 +103,9 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for _, v in var.diagnostic_settings :
-      v.log_categories != null || v.log_groups != null || v.metric_groups != null
+      v.log_categories != null || v.log_groups != null || v.metric_categories != null
     ])
-    error_message = "At least one of `log_categories`, `log_groups`, or `metric_groups` must be set."
+    error_message = "At least one of `log_categories`, `log_groups`, or `metric_categories` must be set."
   }
 
   validation {
