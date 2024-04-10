@@ -44,8 +44,8 @@ resource "azurerm_servicebus_topic_authorization_rule" "this" {
   listen = each.value.rule_params.manage ? true : each.value.rule_params.listen
 }
 
-resource "azurerm_servicebus_subscription" "this" {
-  for_each = local.topic_subscriptions
+resource "azurerm_servicebus_subscription" "base_topics" {
+  for_each = { for k, v in local.topic_subscriptions : k => v if v.forward_to == null && v.forward_dead_lettered_messages_to == null }
 
   name = each.value.subscription_name
 
@@ -62,4 +62,26 @@ resource "azurerm_servicebus_subscription" "this" {
   forward_dead_lettered_messages_to         = each.value.subscription_params.forward_dead_lettered_messages_to
   dead_lettering_on_message_expiration      = each.value.subscription_params.dead_lettering_on_message_expiration
   dead_lettering_on_filter_evaluation_error = each.value.subscription_params.dead_lettering_on_filter_evaluation_error
+}
+
+resource "azurerm_servicebus_subscription" "forward_topics" {
+  for_each = { for k, v in local.topic_subscriptions : k => v if v.forward_to != null || v.forward_dead_lettered_messages_to != null }
+
+  name = each.value.subscription_name
+
+  topic_id = azurerm_servicebus_topic.this[each.value.topic_name].id
+
+  status                                    = each.value.subscription_params.status
+  forward_to                                = each.value.subscription_params.forward_to
+  lock_duration                             = each.value.subscription_params.lock_duration
+  requires_session                          = each.value.subscription_params.requires_session
+  max_delivery_count                        = each.value.subscription_params.max_delivery_count
+  auto_delete_on_idle                       = each.value.subscription_params.auto_delete_on_idle
+  default_message_ttl                       = each.value.subscription_params.default_message_ttl
+  enable_batched_operations                 = each.value.subscription_params.enable_batched_operations
+  forward_dead_lettered_messages_to         = each.value.subscription_params.forward_dead_lettered_messages_to
+  dead_lettering_on_message_expiration      = each.value.subscription_params.dead_lettering_on_message_expiration
+  dead_lettering_on_filter_evaluation_error = each.value.subscription_params.dead_lettering_on_filter_evaluation_error
+
+  depends_on = [azurerm_servicebus_subscription.base_topics, azurerm_servicebus_queue.base_queues]
 }

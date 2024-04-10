@@ -38,6 +38,8 @@ locals {
 module "regions" {
   source  = "Azure/regions/azurerm"
   version = ">= 0.3.0"
+
+  recommended_regions_only = true
 }
 
 resource "random_integer" "region_index" {
@@ -91,8 +93,13 @@ module "key_vault" {
   }
 
   role_assignments = {
-    cmk_user_mi = {
-      role_definition_id_or_name = "Key Vault Crypto User"
+    cmk_tf = {
+      role_definition_id_or_name = "Key Vault Crypto Officer"
+      principal_id               = data.azurerm_client_config.current.object_id
+    }
+
+    cmk_sb_user_mi = {
+      role_definition_id_or_name = "Key Vault Crypto Service Encryption User"
       principal_id               = azurerm_user_assigned_identity.example.principal_id
     }
   }
@@ -103,13 +110,14 @@ module "servicebus" {
 
   sku                 = "Premium"
   resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
 
   managed_identities = {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
   }
 
-  customer_managed_key = {
+  sb_customer_managed_key = {
     infrastructure_encryption_enabled  = true
     key_name                           = local.key_name
     key_vault_resource_id              = module.key_vault.resource.id

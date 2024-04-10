@@ -51,7 +51,6 @@ variable "resource_group_name" {
 
 variable "location" {
   type        = string
-  default     = null
   description = <<DESCRIPTION
   Azure region where the resource should be deployed.
   If null, the location will be inferred from the resource group location.
@@ -228,7 +227,7 @@ variable "authorization_rules" {
   DESCRIPTION
 }
 
-variable "customer_managed_key" {
+variable "sb_customer_managed_key" {
   type = object({
     key_vault_resource_id              = string
     key_name                           = string
@@ -261,17 +260,17 @@ variable "customer_managed_key" {
   DESCRIPTION
 
   validation {
-    condition     = var.customer_managed_key == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$", var.customer_managed_key.user_assigned_identity_resource_id))
+    condition     = var.sb_customer_managed_key == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$", var.sb_customer_managed_key.user_assigned_identity_resource_id))
     error_message = "Managed identity resource IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
   }
 
   validation {
-    condition     = var.customer_managed_key == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.KeyVault/vaults/.+$", var.customer_managed_key.key_vault_resource_id))
+    condition     = var.sb_customer_managed_key == null || can(regex("^/subscriptions/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/resourceGroups/.+/providers/Microsoft.KeyVault/vaults/.+$", var.sb_customer_managed_key.key_vault_resource_id))
     error_message = "Key vault resource IDs must be in the format /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
   }
 
   validation {
-    condition     = var.customer_managed_key == null ? true : var.customer_managed_key.key_name != null
+    condition     = var.sb_customer_managed_key == null ? true : var.sb_customer_managed_key.key_name != null
     error_message = "key_name must have a value"
   }
 }
@@ -349,8 +348,7 @@ variable "network_rule_config" {
 
 variable "tags" {
   type        = map(string)
-  default     = {}
-  nullable    = false
+  default     = null
   description = <<DESCRIPTION
   Defaults to `{}`. A mapping of tags to assign to the resource. These tags will propagate to any child resource unless overriden when creating the child resource
 

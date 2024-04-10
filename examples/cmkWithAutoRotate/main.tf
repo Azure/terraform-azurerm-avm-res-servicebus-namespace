@@ -104,13 +104,14 @@ module "servicebus" {
 
   sku                 = "Premium"
   resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
 
   managed_identities = {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
   }
 
-  customer_managed_key = {
+  sb_customer_managed_key = {
     infrastructure_encryption_enabled  = true
     key_name                           = local.key_name
     key_vault_resource_id              = module.key_vault.resource.id

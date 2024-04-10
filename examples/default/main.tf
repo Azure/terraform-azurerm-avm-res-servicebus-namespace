@@ -56,5 +56,6 @@ module "servicebus" {
   for_each = toset(local.skus)
 
   resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
 }

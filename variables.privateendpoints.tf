@@ -7,12 +7,12 @@ variable "private_endpoints_manage_dns_zone_group" {
 
 variable "private_endpoints" {
   type = map(object({
-    tags = optional(map(string), {})
+    tags = optional(map(string), null)
 
     lock = optional(object({
-      kind = optional(string, "Inherit")
+      kind = string
       name = optional(string, null)
-    }), {})
+    }), null)
 
     role_assignments = optional(map(object({
       role_definition_id_or_name = string
@@ -21,6 +21,9 @@ variable "private_endpoints" {
       description                            = optional(string, null)
       skip_service_principal_aad_check       = optional(bool, false)
       delegated_managed_identity_resource_id = optional(string, null)
+
+      condition         = optional(string, null) # forced to be here by lint, not supported
+      condition_version = optional(string, null) # forced to be here by lint, not supported
     })), {})
 
     subnet_resource_id = string

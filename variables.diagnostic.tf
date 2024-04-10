@@ -1,15 +1,15 @@
 variable "diagnostic_settings" {
   type = map(object({
     name                                     = optional(string, null)
+    log_categories                           = optional(set(string), [])
+    log_groups                               = optional(set(string), ["allLogs"])
+    metric_categories                        = optional(set(string), ["AllMetrics"])
+    log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_analytics_destination_type           = optional(string, "Dedicated")
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_groups                            = optional(set(string), ["AllMetrics"])
   }))
   default     = {}
   nullable    = false
@@ -19,13 +19,15 @@ variable "diagnostic_settings" {
   - `name`                                     - (Optional) - The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
   - `log_categories`                           - (Optional) - Defaults to `[]`. A set of log categories to export. Possible values are: `ApplicationMetricsLogs`, `RuntimeAuditLogs`, `VNetAndIPFilteringLogs` or `OperationalLogs`.
   - `log_groups`                               - (Optional) - Defaults to `[]` if log_categories is set, if not it defaults to `["allLogs", "audit"]`. A set of log groups to send to export. Possible values are `allLogs` and `audit`.
-  - `metric_groups`                            - (Optional) - Defaults to `["AllMetrics"]`. A set of metric groups to export.
+  - `metric_categories`                        - (Optional) - Defaults to `["AllMetrics"]`. A set of metric groups to export.
   - `log_analytics_destination_type`           - (Optional) - Defaults to `Dedicated`. The destination log analytics workspace table for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
   - `workspace_resource_id`                    - (Optional) - The resource ID of the log analytics workspace to send logs and metrics to.
   - `storage_account_resource_id`              - (Optional) - The resource ID of the storage account to send logs and metrics to.
   - `event_hub_authorization_rule_resource_id` - (Optional) - The resource ID of the event hub authorization rule to send logs and metrics to.
   - `event_hub_name`                           - (Optional) - The name of the event hub. If none is specified, the default event hub will be selected.
   - `marketplace_partner_resource_id`          - (Optional) - The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+  
+  - `metric_categories`                        - (Unsupported)
 
   > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 

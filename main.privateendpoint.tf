@@ -6,9 +6,9 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
 
   subnet_id                     = each.value.subnet_resource_id
   custom_network_interface_name = each.value.network_interface_name
-  location                      = coalesce(each.value.location, local.normalized_location)
+  location                      = coalesce(each.value.location, var.location)
   resource_group_name           = coalesce(each.value.resource_group_name, var.resource_group_name)
-  tags                          = each.value.tags == null ? {} : each.value.tags == {} ? var.tags : each.value.tags
+  tags                          = each.value.tags == null ? var.tags : each.value.tags == {} ? {} : each.value.tags
 
   private_service_connection {
     name = coalesce(each.value.private_service_connection_name, "pse-${var.name}")
@@ -47,9 +47,9 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
 
   subnet_id                     = each.value.subnet_resource_id
   custom_network_interface_name = each.value.network_interface_name
-  location                      = coalesce(each.value.location, local.normalized_location)
+  location                      = coalesce(each.value.location, var.location)
   resource_group_name           = coalesce(each.value.resource_group_name, var.resource_group_name)
-  tags                          = each.value.tags == null ? {} : each.value.tags == {} ? var.tags : each.value.tags
+  tags                          = each.value.tags == null ? var.tags : each.value.tags == {} ? {} : each.value.tags
 
   private_service_connection {
     name = coalesce(each.value.private_service_connection_name, "pse-${var.name}")

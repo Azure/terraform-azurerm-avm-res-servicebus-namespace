@@ -4,7 +4,7 @@ locals {
     "PrivateEndpoint|${pe_name}" => {
       scope_type = "PrivateEndpoint"
       pe_name    = pe_name
-      lock       = pe_params.lock.kind == "Inherit" ? var.lock : pe_params.lock
+      lock       = coalesce(pe_params.lock, var.lock)
     }
   }
 

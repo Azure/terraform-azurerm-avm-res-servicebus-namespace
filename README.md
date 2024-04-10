@@ -35,18 +35,30 @@ The following resources are used by this module:
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_servicebus_namespace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace) (resource)
 - [azurerm_servicebus_namespace_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace_authorization_rule) (resource)
-- [azurerm_servicebus_queue.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue) (resource)
+- [azurerm_servicebus_queue.base_queues](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue) (resource)
+- [azurerm_servicebus_queue.forward_queues](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue) (resource)
 - [azurerm_servicebus_queue_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue_authorization_rule) (resource)
-- [azurerm_servicebus_subscription.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_subscription) (resource)
+- [azurerm_servicebus_subscription.base_topics](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_subscription) (resource)
+- [azurerm_servicebus_subscription.forward_topics](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_subscription) (resource)
 - [azurerm_servicebus_topic.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_topic) (resource)
 - [azurerm_servicebus_topic_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_topic_authorization_rule) (resource)
 - [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
-- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
 The following input variables are required:
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description:   Azure region where the resource should be deployed.  
+  If null, the location will be inferred from the resource group location.  
+  Changing this forces a new resource to be created.  
+
+  Example Inputs: eastus  
+  See more in CLI: az account list-locations -o table --query "[].name"
+
+Type: `string`
 
 ### <a name="input_name"></a> [name](#input\_name)
 
@@ -115,43 +127,6 @@ Type: `number`
 
 Default: `null`
 
-### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
-
-Description:   Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
-
-  - `key_name`                           - (Required) - The key name for the customer managed key in the key vault.
-  - `user_assigned_identity_resource_id` - (Required) - The user assigned identity to use when access the key vault
-  - `key_vault_resource_id`              - (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.
-  - `key_version`                        - (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use
-  - `infrastructure_encryption_enabled`  - (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
-
-  > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
-
-  Example Inputs:
-  ```hcl
-  customer_managed_key = {
-    infrastructure_encryption_enabled  = true
-    key_name                           = "sample-customer-key"
-    key_version                        = 03c89971825b4a0d84905c3597512260
-    key_vault_resource_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
-    user_assigned_identity_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
-  }
-```
-
-Type:
-
-```hcl
-object({
-    key_vault_resource_id              = string
-    key_name                           = string
-    user_assigned_identity_resource_id = string
-    infrastructure_encryption_enabled  = optional(bool, true)
-    key_version                        = optional(string, null)
-  })
-```
-
-Default: `null`
-
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
 Description:   Defaults to `{}`. A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -159,13 +134,15 @@ Description:   Defaults to `{}`. A map of diagnostic settings to create. The map
   - `name`                                     - (Optional) - The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
   - `log_categories`                           - (Optional) - Defaults to `[]`. A set of log categories to export. Possible values are: `ApplicationMetricsLogs`, `RuntimeAuditLogs`, `VNetAndIPFilteringLogs` or `OperationalLogs`.
   - `log_groups`                               - (Optional) - Defaults to `[]` if log\_categories is set, if not it defaults to `["allLogs", "audit"]`. A set of log groups to send to export. Possible values are `allLogs` and `audit`.
-  - `metric_groups`                            - (Optional) - Defaults to `["AllMetrics"]`. A set of metric groups to export.
+  - `metric_categories`                        - (Optional) - Defaults to `["AllMetrics"]`. A set of metric groups to export.
   - `log_analytics_destination_type`           - (Optional) - Defaults to `Dedicated`. The destination log analytics workspace table for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
   - `workspace_resource_id`                    - (Optional) - The resource ID of the log analytics workspace to send logs and metrics to.
   - `storage_account_resource_id`              - (Optional) - The resource ID of the storage account to send logs and metrics to.
   - `event_hub_authorization_rule_resource_id` - (Optional) - The resource ID of the event hub authorization rule to send logs and metrics to.
   - `event_hub_name`                           - (Optional) - The name of the event hub. If none is specified, the default event hub will be selected.
   - `marketplace_partner_resource_id`          - (Optional) - The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+
+  - `metric_categories`                        - (Unsupported)
 
   > Note: See more in CLI: az monitor diagnostic-settings categories list --resource {serviceBusNamespaceResourceId}
 
@@ -193,15 +170,15 @@ Type:
 ```hcl
 map(object({
     name                                     = optional(string, null)
+    log_categories                           = optional(set(string), [])
+    log_groups                               = optional(set(string), ["allLogs"])
+    metric_categories                        = optional(set(string), ["AllMetrics"])
+    log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_analytics_destination_type           = optional(string, "Dedicated")
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_groups                            = optional(set(string), ["AllMetrics"])
   }))
 ```
 
@@ -224,19 +201,6 @@ Description: Defaults to `true`. Whether or not SAS authentication is enabled fo
 Type: `bool`
 
 Default: `true`
-
-### <a name="input_location"></a> [location](#input\_location)
-
-Description:   Azure region where the resource should be deployed.  
-  If null, the location will be inferred from the resource group location.  
-  Changing this forces a new resource to be created.  
-
-  Example Inputs: eastus  
-  See more in CLI: az account list-locations -o table --query "[].name"
-
-Type: `string`
-
-Default: `null`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
@@ -379,12 +343,12 @@ Type:
 
 ```hcl
 map(object({
-    tags = optional(map(string), {})
+    tags = optional(map(string), null)
 
     lock = optional(object({
-      kind = optional(string, "Inherit")
+      kind = string
       name = optional(string, null)
-    }), {})
+    }), null)
 
     role_assignments = optional(map(object({
       role_definition_id_or_name = string
@@ -393,6 +357,9 @@ map(object({
       description                            = optional(string, null)
       skip_service_principal_aad_check       = optional(bool, false)
       delegated_managed_identity_resource_id = optional(string, null)
+
+      condition         = optional(string, null) # forced to be here by lint, not supported
+      condition_version = optional(string, null) # forced to be here by lint, not supported
     })), {})
 
     subnet_resource_id = string
@@ -556,6 +523,9 @@ Description:   Defaults to `{}`. A map of role assignments to create. The map ke
   - `delegated_managed_identity_resource_id` - (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
   - `skip_service_principal_aad_check`       - (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
 
+  - `condition`                              - (Unsupported)
+  - `condition_version`                      - (Unsupported)
+
   > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
   Example Inputs:
@@ -580,10 +550,50 @@ map(object({
     description                            = optional(string, null)
     skip_service_principal_aad_check       = optional(bool, false)
     delegated_managed_identity_resource_id = optional(string, null)
+
+    condition         = optional(string, null) # forced to be here by lint, not supported
+    condition_version = optional(string, null) # forced to be here by lint, not supported
   }))
 ```
 
 Default: `{}`
+
+### <a name="input_sb_customer_managed_key"></a> [sb\_customer\_managed\_key](#input\_sb\_customer\_managed\_key)
+
+Description:   Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
+
+  - `key_name`                           - (Required) - The key name for the customer managed key in the key vault.
+  - `user_assigned_identity_resource_id` - (Required) - The user assigned identity to use when access the key vault
+  - `key_vault_resource_id`              - (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.
+  - `key_version`                        - (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use
+  - `infrastructure_encryption_enabled`  - (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
+
+  > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
+
+  Example Inputs:
+  ```hcl
+  customer_managed_key = {
+    infrastructure_encryption_enabled  = true
+    key_name                           = "sample-customer-key"
+    key_version                        = 03c89971825b4a0d84905c3597512260
+    key_vault_resource_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
+    user_assigned_identity_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
+  }
+```
+
+Type:
+
+```hcl
+object({
+    key_vault_resource_id              = string
+    key_name                           = string
+    user_assigned_identity_resource_id = string
+    infrastructure_encryption_enabled  = optional(bool, true)
+    key_version                        = optional(string, null)
+  })
+```
+
+Default: `null`
 
 ### <a name="input_sku"></a> [sku](#input\_sku)
 
@@ -607,7 +617,7 @@ Description:   Defaults to `{}`. A mapping of tags to assign to the resource. Th
 
 Type: `map(string)`
 
-Default: `{}`
+Default: `null`
 
 ### <a name="input_topics"></a> [topics](#input\_topics)
 

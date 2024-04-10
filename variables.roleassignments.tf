@@ -6,6 +6,9 @@ variable "role_assignments" {
     description                            = optional(string, null)
     skip_service_principal_aad_check       = optional(bool, false)
     delegated_managed_identity_resource_id = optional(string, null)
+
+    condition         = optional(string, null) # forced to be here by lint, not supported
+    condition_version = optional(string, null) # forced to be here by lint, not supported
   }))
   default  = {}
   nullable = false
@@ -18,6 +21,9 @@ variable "role_assignments" {
   - `description`                            - (Optional) - Defaults to `null`. The description of the role assignment.
   - `delegated_managed_identity_resource_id` - (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
   - `skip_service_principal_aad_check`       - (Optional) - Defaults to `false`. If the principal_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal_id is a Service Principal identity. 
+  
+  - `condition`                              - (Unsupported)
+  - `condition_version`                      - (Unsupported)
 
   > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 

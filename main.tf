@@ -1,16 +1,12 @@
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
-}
-
 resource "azurerm_servicebus_namespace" "this" {
   name = var.name
 
   sku                           = var.sku
   tags                          = var.tags
+  location                      = var.location
   local_auth_enabled            = var.local_auth_enabled
   resource_group_name           = var.resource_group_name
   minimum_tls_version           = var.minimum_tls_version
-  location                      = local.normalized_location
   public_network_access_enabled = var.public_network_access_enabled
 
   capacity                     = local.normalized_capacity
@@ -27,12 +23,12 @@ resource "azurerm_servicebus_namespace" "this" {
   }
 
   dynamic "customer_managed_key" {
-    for_each = var.sku == "Premium" && var.customer_managed_key != null ? [1] : []
+    for_each = var.sku == "Premium" && var.sb_customer_managed_key != null ? [1] : []
 
     content {
-      infrastructure_encryption_enabled = var.customer_managed_key.infrastructure_encryption_enabled
-      identity_id                       = var.customer_managed_key.user_assigned_identity_resource_id
-      key_vault_key_id                  = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${var.customer_managed_key.key_version != null ? var.customer_managed_key.key_version : ""}"
+      infrastructure_encryption_enabled = var.sb_customer_managed_key.infrastructure_encryption_enabled
+      identity_id                       = var.sb_customer_managed_key.user_assigned_identity_resource_id
+      key_vault_key_id                  = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.sb_customer_managed_key.key_name}/${var.sb_customer_managed_key.key_version != null ? var.sb_customer_managed_key.key_version : ""}"
     }
   }
 

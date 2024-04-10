@@ -19,13 +19,11 @@ locals {
     } : {}
   }
 
-  normalized_location = coalesce(var.location, data.azurerm_resource_group.rg.location)
-
   normalized_capacity = var.sku != "Premium" ? 0 : coalesce(var.capacity, 1)
 
   normalized_zone_redundant = var.sku != "Premium" ? false : coalesce(var.zone_redundant, true)
 
   normalized_premium_messaging_partitions = var.sku != "Premium" ? 0 : coalesce(var.premium_messaging_partitions, 1)
 
-  customer_managed_key_keyvault_name = var.customer_managed_key != null ? element(split("/", var.customer_managed_key.key_vault_resource_id), 8) : null
+  customer_managed_key_keyvault_name = var.sb_customer_managed_key != null ? element(split("/", var.sb_customer_managed_key.key_vault_resource_id), 8) : null
 }

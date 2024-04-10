@@ -35,6 +35,8 @@ locals {
 module "regions" {
   source  = "Azure/regions/azurerm"
   version = ">= 0.3.0"
+
+  recommended_regions_only = true
 }
 
 resource "random_integer" "region_index" {
@@ -74,6 +76,7 @@ module "servicebus" {
 
   sku                           = "Premium"
   resource_group_name           = azurerm_resource_group.example.name
+  location                      = azurerm_resource_group.example.location
   name                          = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
   public_network_access_enabled = true
 
