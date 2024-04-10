@@ -4,7 +4,7 @@ locals {
     "PrivateEndpoint|${pe_name}" => {
       scope_type = "PrivateEndpoint"
       pe_name    = pe_name
-      lock       = coalesce(pe_params.lock, var.lock)
+      lock       = pe_params.lock != null ? pe_params.lock : var.lock
     }
   }
 
