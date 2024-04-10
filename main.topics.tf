@@ -45,7 +45,7 @@ resource "azurerm_servicebus_topic_authorization_rule" "this" {
 }
 
 resource "azurerm_servicebus_subscription" "base_topics" {
-  for_each = { for k, v in local.topic_subscriptions : k => v if v.forward_to == null && v.forward_dead_lettered_messages_to == null }
+  for_each = { for k, v in local.topic_subscriptions : k => v if v.subscription_params.forward_to == null && v.subscription_params.forward_dead_lettered_messages_to == null }
 
   name = each.value.subscription_name
 
@@ -65,7 +65,7 @@ resource "azurerm_servicebus_subscription" "base_topics" {
 }
 
 resource "azurerm_servicebus_subscription" "forward_topics" {
-  for_each = { for k, v in local.topic_subscriptions : k => v if v.forward_to != null || v.forward_dead_lettered_messages_to != null }
+  for_each = { for k, v in local.topic_subscriptions : k => v if v.subscription_params.forward_to != null || v.subscription_params.forward_dead_lettered_messages_to != null }
 
   name = each.value.subscription_name
 
