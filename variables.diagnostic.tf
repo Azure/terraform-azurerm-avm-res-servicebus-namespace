@@ -19,7 +19,7 @@ variable "diagnostic_settings" {
   - `name`                                     - (Optional) - The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
   - `log_categories`                           - (Optional) - Defaults to `[]`. A set of log categories to export. Possible values are: `ApplicationMetricsLogs`, `RuntimeAuditLogs`, `VNetAndIPFilteringLogs` or `OperationalLogs`.
   - `log_groups`                               - (Optional) - Defaults to `[]` if log_categories is set, if not it defaults to `["allLogs", "audit"]`. A set of log groups to send to export. Possible values are `allLogs` and `audit`.
-  - `metric_categories`                        - (Optional) - Defaults to `["AllMetrics"]`. A set of metric groups to export.
+  - `metric_categories`                        - (Optional) - Defaults to `["AllMetrics"]`. A set of metric categories to export.
   - `log_analytics_destination_type`           - (Optional) - Defaults to `Dedicated`. The destination log analytics workspace table for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
   - `workspace_resource_id`                    - (Optional) - The resource ID of the log analytics workspace to send logs and metrics to.
   - `storage_account_resource_id`              - (Optional) - The resource ID of the storage account to send logs and metrics to.
