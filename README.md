@@ -127,6 +127,50 @@ Type: `number`
 
 Default: `null`
 
+### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
+
+Description:   Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
+
+  - `key_name`               - (Required) - The key name for the customer managed key in the key vault.
+  - `key_vault_resource_id`  - (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.
+  - `key_version`            - (Optional) - Defaults to `null`. The version of the key to use if it is null it will use the latest version of the key. It will also auto rotate when the key in the key vault is rotated.
+
+  - `user_assigned_identity` - (Required) - The user assigned identity to use when access the key vault
+    - `resource_id`          - (Required) - The full Azure Resource ID of the user assigned identity.
+
+  > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection. The minimun required permissions is "Key Vault Crypto Service Encryption User"
+  > Note: If you require to control "infrastructure encryption" use the parameter `infrastructure_encryption_enabled` in the module configuration.
+
+  Example Inputs:
+  ```hcl
+  customer_managed_key = {
+    key_name               = "sample-customer-key"
+    key_version            = 03c89971825b4a0d84905c3597512260
+    key_vault_resource_id  = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
+    
+    user_assigned_identity {
+      resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
+    }
+  }
+```
+
+Type:
+
+```hcl
+object({
+    key_name              = string
+    key_vault_resource_id = string
+
+    key_version = optional(string, null)
+
+    user_assigned_identity = optional(object({
+      resource_id = string
+    }), null)
+  })
+```
+
+Default: `null`
+
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
 Description:   Defaults to `{}`. A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -192,6 +236,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_infrastructure_encryption_enabled"></a> [infrastructure\_encryption\_enabled](#input\_infrastructure\_encryption\_enabled)
+
+Description: Defaults to true. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created. Requires customer\_managed\_key.
+
+Type: `bool`
+
+Default: `true`
+
 ### <a name="input_local_auth_enabled"></a> [local\_auth\_enabled](#input\_local\_auth\_enabled)
 
 Description: Defaults to `true`. Whether or not SAS authentication is enabled for the Service Bus namespace.
@@ -241,7 +293,9 @@ Description:   Defaults to `{}`. Controls the Managed Identity configuration on 
   ```hcl
   managed_identities = {
     system_assigned            = true
-    user_assigned_resource_ids = ["/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"]
+    user_assigned_resource_ids = [
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
+    ]
   }
 ```
 
@@ -555,43 +609,6 @@ map(object({
 ```
 
 Default: `{}`
-
-### <a name="input_sb_customer_managed_key"></a> [sb\_customer\_managed\_key](#input\_sb\_customer\_managed\_key)
-
-Description:   Defaults to `null`. Ignored for Basic and Standard. Defines a customer managed key to use for encryption.
-
-  - `key_name`                           - (Required) - The key name for the customer managed key in the key vault.
-  - `user_assigned_identity_resource_id` - (Required) - The user assigned identity to use when access the key vault
-  - `key_vault_resource_id`              - (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.
-  - `key_version`                        - (Optional) - Defaults to `null` which is the latest version of the key. The version of the key to use
-  - `infrastructure_encryption_enabled`  - (Optional) - Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created.
-
-  > Note: Remember to assign permission to the managed identity to access the key vault key. The Key vault used must have enabled soft delete and purge protection
-
-  Example Inputs:
-  ```hcl
-  customer_managed_key = {
-    infrastructure_encryption_enabled  = true
-    key_name                           = "sample-customer-key"
-    key_version                        = 03c89971825b4a0d84905c3597512260
-    key_vault_resource_id              = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
-    user_assigned_identity_resource_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managedIdentityName}"
-  }
-```
-
-Type:
-
-```hcl
-object({
-    key_vault_resource_id              = string
-    key_name                           = string
-    user_assigned_identity_resource_id = string
-    infrastructure_encryption_enabled  = optional(bool, true)
-    key_version                        = optional(string, null)
-  })
-```
-
-Default: `null`
 
 ### <a name="input_sku"></a> [sku](#input\_sku)
 

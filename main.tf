@@ -23,12 +23,12 @@ resource "azurerm_servicebus_namespace" "this" {
   }
 
   dynamic "customer_managed_key" {
-    for_each = var.sku == "Premium" && var.sb_customer_managed_key != null ? [1] : []
+    for_each = var.sku == "Premium" && var.customer_managed_key != null ? [1] : []
 
     content {
-      infrastructure_encryption_enabled = var.sb_customer_managed_key.infrastructure_encryption_enabled
-      identity_id                       = var.sb_customer_managed_key.user_assigned_identity_resource_id
-      key_vault_key_id                  = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.sb_customer_managed_key.key_name}/${var.sb_customer_managed_key.key_version != null ? var.sb_customer_managed_key.key_version : ""}"
+      infrastructure_encryption_enabled = var.infrastructure_encryption_enabled
+      identity_id                       = var.customer_managed_key.user_assigned_identity.resource_id
+      key_vault_key_id                  = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${var.customer_managed_key.key_version != null ? var.customer_managed_key.key_version : ""}"
     }
   }
 

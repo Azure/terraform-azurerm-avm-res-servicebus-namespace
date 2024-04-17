@@ -102,21 +102,24 @@ module "key_vault" {
 module "servicebus" {
   source = "../../"
 
-  sku                 = "Premium"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  name                = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
+  infrastructure_encryption_enabled = false
+  sku                               = "Premium"
+  resource_group_name               = azurerm_resource_group.example.name
+  location                          = azurerm_resource_group.example.location
+  name                              = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
 
   managed_identities = {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
   }
 
-  sb_customer_managed_key = {
-    infrastructure_encryption_enabled  = true
-    key_name                           = local.key_name
-    key_vault_resource_id              = module.key_vault.resource.id
-    key_version                        = module.key_vault.resource_keys.cmk.version
-    user_assigned_identity_resource_id = azurerm_user_assigned_identity.example.id
+  customer_managed_key = {
+    key_name              = local.key_name
+    key_vault_resource_id = module.key_vault.resource.id
+    key_version           = module.key_vault.resource_keys.cmk.version
+
+    user_assigned_identity = {
+      resource_id = azurerm_user_assigned_identity.example.id
+    }
   }
 
   depends_on = [module.key_vault]

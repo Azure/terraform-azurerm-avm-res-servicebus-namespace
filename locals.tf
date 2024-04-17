@@ -25,5 +25,5 @@ locals {
 
   normalized_premium_messaging_partitions = var.sku != "Premium" ? 0 : coalesce(var.premium_messaging_partitions, 1)
 
-  customer_managed_key_keyvault_name = var.sb_customer_managed_key != null ? element(split("/", var.sb_customer_managed_key.key_vault_resource_id), 8) : null
+  customer_managed_key_keyvault_name = var.customer_managed_key != null ? element(split("/", var.customer_managed_key.key_vault_resource_id), 8) : null
 }
