@@ -125,7 +125,7 @@ module "servicebus" {
     }
   }
 
-  depends_on = [azurerm_role_assignment.crypto_officer, azurerm_role_assignment.crype_service_encryption_user]
+  depends_on = [azurerm_role_assignment.crypto_officer, azurerm_role_assignment.crypto_service_encryption_user]
 }
 ```
 
