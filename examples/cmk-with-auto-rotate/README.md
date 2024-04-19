@@ -91,6 +91,8 @@ resource "azurerm_key_vault_key" "example" {
     "wrapKey",
     "unwrapKey"
   ]
+
+  depends_on = [time_sleep.wait_for_rbac_before_key_operations]
 }
 
 resource "azurerm_role_assignment" "crypto_officer" {
