@@ -97,7 +97,7 @@ resource "azurerm_role_assignment" "crypto_service_encryption_user" {
 }
 
 resource "time_sleep" "wait_for_rbac_before_key_operations" {
-  create_duration = 90
+  create_duration = "90s"
 
   depends_on = [azurerm_role_assignment.crypto_officer, azurerm_role_assignment.crypto_service_encryption_user]
 }
