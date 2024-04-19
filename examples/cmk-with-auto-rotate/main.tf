@@ -13,7 +13,7 @@ terraform {
     }
 
     time = {
-      source = "hashicorp/time"
+      source  = "hashicorp/time"
       version = "~> 0.11"
     }
   }
@@ -30,7 +30,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix   = "cmk-auto"
+  prefix = "cmk-auto"
 }
 
 module "regions" {
