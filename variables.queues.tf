@@ -1,5 +1,6 @@
 variable "queues" {
   type = map(object({
+    name                                    = optional(string, null)
     max_delivery_count                      = optional(number, 10)
     enable_batched_operations               = optional(bool, true)
     requires_duplicate_detection            = optional(bool, false)
@@ -18,6 +19,7 @@ variable "queues" {
     status                                  = optional(string, "Active")
 
     authorization_rules = optional(map(object({
+      name   = optional(string, null)
       send   = optional(bool, false)
       listen = optional(bool, false)
       manage = optional(bool, false)
@@ -35,9 +37,10 @@ variable "queues" {
   default     = {}
   nullable    = false
   description = <<DESCRIPTION
-  Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.
+  Defaults to `{}`. A map of queues to create.
   The name of the queue must be unique among topics and queues within the namespace.
-    
+
+  - `name`                                    - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Queue resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
   - `lock_duration`                           - (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
   - `max_message_size_in_kilobytes`           - (Optional) - Always set to `256` for Standard and Basic by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the queue.
   - `max_size_in_megabytes`                   - (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the queue.
@@ -55,17 +58,18 @@ variable "queues" {
   - `forward_to`                              - (Optional) - Always set to `false` for Basic by Azure. It Defaults to `null` for the rest of skus. The name of a Queue or Topic to automatically forward messages to. It cannot be enabled if requires_session is enabled.
   - `forward_dead_lettered_messages_to`       - (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
 
-  - `authorization_rules` - (Optional) - Defaults to `{}`. Map key is used as the name of the authorizaton rule.
-    - `send`   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Queue?
-    - `listen` = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Queue? 
-    - `manage` = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Queue?
+  - `authorization_rules` - (Optional) - Defaults to `{}`. 
+    - `name`   - (Optional) - Defaults to `null`. Specifies the name of the Authorization Rule. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
+    - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Queue?
+    - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Queue? 
+    - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Queue?
   
   - `role_assignments` - (Optional) - Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-    - `role_definition_id_or_name`             = (Required) - The ID or name of the role definition to assign to the principal.
-    - `principal_id`                           = (Required) - It's a GUID - The ID of the principal to assign the role to. 
-    - `description`                            = (Optional) - Defaults to `null`. The description of the role assignment.
-    - `delegated_managed_identity_resource_id` = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
-    - `skip_service_principal_aad_check`       = (Optional) - Defaults to `false`. If the principal_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal_id is a Service Principal identity. 
+    - `role_definition_id_or_name`             - (Required) - The ID or name of the role definition to assign to the principal.
+    - `principal_id`                           - (Required) - It's a GUID - The ID of the principal to assign the role to. 
+    - `description`                            - (Optional) - Defaults to `null`. The description of the role assignment.
+    - `delegated_managed_identity_resource_id` - (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
+    - `skip_service_principal_aad_check`       - (Optional) - Defaults to `false`. If the principal_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal_id is a Service Principal identity. 
 
   Example Inputs:
   ```hcl

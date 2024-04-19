@@ -50,41 +50,40 @@ resource "azurerm_resource_group" "example" {
   location = module.regions.regions[random_integer.region_index.result].name
 }
 
-module "vnet" {
-  source  = "Azure/avm-res-network-virtualnetwork/azurerm"
-  version = "0.1.4"
+resource "azurerm_virtual_network" "example" {
+  name = "${module.naming.virtual_network.name_unique}-${local.prefix}"
 
-  virtual_network_address_space = ["10.0.0.0/16"]
-  resource_group_name           = azurerm_resource_group.example.name
-  location                      = azurerm_resource_group.example.location
-  name                          = "${module.naming.virtual_network.name_unique}-${local.prefix}"
-
-  subnets = {
-    default = {
-      address_prefixes = ["10.0.0.0/24"]
-    }
-  }
+  address_space       = ["10.0.0.0/16"]
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
 }
 
-module "private_dns_zone" {
-  source  = "Azure/avm-res-network-privatednszone/azurerm"
-  version = "0.1.1"
+resource "azurerm_subnet" "example" {
+  name = module.naming.subnet.name_unique
 
-  domain_name         = "privatelink.servicebus.windows.net"
+  address_prefixes     = ["10.0.0.0/24"]
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.example.name
+}
+
+resource "azurerm_private_dns_zone" "example" {
+  name                = "privatelink.servicebus.core.windows.net"
   resource_group_name = azurerm_resource_group.example.name
+}
 
-  virtual_network_links = {
-    vnet = {
-      vnetlinkname = "vnet-link"
-      vnetid       = module.vnet.vnet_resource.id
-    }
-  }
+resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
+  name = "vnet-link"
+
+  resource_group_name   = azurerm_resource_group.example.name
+  virtual_network_id    = azurerm_virtual_network.example.id
+  private_dns_zone_name = azurerm_private_dns_zone.example.name
 }
 
 resource "azurerm_application_security_group" "example" {
-  name                = "tf-appsecuritygroup-${local.prefix}"
-  location            = azurerm_resource_group.example.location
+  name = "tf-appsecuritygroup-${local.prefix}"
+
   resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
 }
 
 module "servicebus" {
@@ -100,7 +99,7 @@ module "servicebus" {
     max = {
       name                        = "max"
       private_dns_zone_group_name = "max_group"
-      subnet_resource_id          = module.vnet.subnets.default.id
+      subnet_resource_id          = azurerm_subnet.example.id
 
       role_assignments = {
         key = {
@@ -128,7 +127,7 @@ module "servicebus" {
     staticIp = {
       name                   = "staticIp"
       network_interface_name = "nic1"
-      subnet_resource_id     = module.vnet.subnets.default.id
+      subnet_resource_id     = azurerm_subnet.example.id
 
       ip_configurations = {
         ipconfig1 = {
@@ -140,15 +139,15 @@ module "servicebus" {
 
     noDnsGroup = {
       name               = "noDnsGroup"
-      subnet_resource_id = module.vnet.subnets.default.id
+      subnet_resource_id = azurerm_subnet.example.id
     }
 
     withDnsGroup = {
       name                        = "withDnsGroup"
       private_dns_zone_group_name = "withDnsGroup_group"
 
-      subnet_resource_id            = module.vnet.subnets.default.id
-      private_dns_zone_resource_ids = [module.private_dns_zone.private_dnz_zone_output.id]
+      subnet_resource_id            = azurerm_subnet.example.id
+      private_dns_zone_resource_ids = [azurerm_private_dns_zone.example.id]
     }
   }
 }

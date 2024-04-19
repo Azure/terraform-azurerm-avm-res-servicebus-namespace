@@ -88,12 +88,12 @@ The following input variables are optional (have default values):
 
 ### <a name="input_authorization_rules"></a> [authorization\_rules](#input\_authorization\_rules)
 
-Description:   Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. The following properties can be specified:
+Description:   Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus.
 
-  - `authorization_rules` - Map key is used as the name of the authorizaton rule.
-    - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
-    - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace?
-    - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
+  - `name`   - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Namespace Authorization Rule resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
+  - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
+  - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace?
+  - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
 
   Example Inputs:
   ```hcl
@@ -110,6 +110,7 @@ Type:
 
 ```hcl
 map(object({
+    name   = optional(string, null)
     send   = optional(bool, false)
     listen = optional(bool, false)
     manage = optional(bool, false)
@@ -452,9 +453,10 @@ Default: `true`
 
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
-Description:   Defaults to `{}`. A map of queues to create. The map key is used as the name of the queue.  
+Description:   Defaults to `{}`. A map of queues to create.  
   The name of the queue must be unique among topics and queues within the namespace.
 
+  - `name`                                    - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Queue resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
   - `lock_duration`                           - (Optional) - Its minimum and default value is `PT1M` (1 minute). Maximum value is `PT5M` (5 minutes). The ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers.
   - `max_message_size_in_kilobytes`           - (Optional) - Always set to `256` for Standard and Basic by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the queue.
   - `max_size_in_megabytes`                   - (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the queue.
@@ -472,17 +474,18 @@ Description:   Defaults to `{}`. A map of queues to create. The map key is used 
   - `forward_to`                              - (Optional) - Always set to `false` for Basic by Azure. It Defaults to `null` for the rest of skus. The name of a Queue or Topic to automatically forward messages to. It cannot be enabled if requires\_session is enabled.
   - `forward_dead_lettered_messages_to`       - (Optional) - Defaults to `null`. The name of a Queue or Topic to automatically forward dead lettered messages to
 
-  - `authorization_rules` - (Optional) - Defaults to `{}`. Map key is used as the name of the authorizaton rule.
-    - `send`   = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Queue?
-    - `listen` = (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Queue?
-    - `manage` = (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Queue?
+  - `authorization_rules` - (Optional) - Defaults to `{}`.
+    - `name`   - (Optional) - Defaults to `null`. Specifies the name of the Authorization Rule. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
+    - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Queue?
+    - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Queue?
+    - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Queue?
 
   - `role_assignments` - (Optional) - Defaults to `{}`. A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-    - `role_definition_id_or_name`             = (Required) - The ID or name of the role definition to assign to the principal.
-    - `principal_id`                           = (Required) - It's a GUID - The ID of the principal to assign the role to.
-    - `description`                            = (Optional) - Defaults to `null`. The description of the role assignment.
-    - `delegated_managed_identity_resource_id` = (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
-    - `skip_service_principal_aad_check`       = (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
+    - `role_definition_id_or_name`             - (Required) - The ID or name of the role definition to assign to the principal.
+    - `principal_id`                           - (Required) - It's a GUID - The ID of the principal to assign the role to.
+    - `description`                            - (Optional) - Defaults to `null`. The description of the role assignment.
+    - `delegated_managed_identity_resource_id` - (Optional) - Defaults to `null`. The delegated Azure Resource Id which contains a Managed Identity. This field is only used in cross tenant scenario. Changing this forces a new resource to be created.
+    - `skip_service_principal_aad_check`       - (Optional) - Defaults to `false`. If the principal\_id is a newly provisioned Service Principal set this value to true to skip the Azure Active Directory check which may fail due to replication lag. This argument is only valid if the principal\_id is a Service Principal identity.
 
   Example Inputs:
   ```hcl
@@ -529,6 +532,7 @@ Type:
 
 ```hcl
 map(object({
+    name                                    = optional(string, null)
     max_delivery_count                      = optional(number, 10)
     enable_batched_operations               = optional(bool, true)
     requires_duplicate_detection            = optional(bool, false)
@@ -547,6 +551,7 @@ map(object({
     status                                  = optional(string, "Active")
 
     authorization_rules = optional(map(object({
+      name   = optional(string, null)
       send   = optional(bool, false)
       listen = optional(bool, false)
       manage = optional(bool, false)
@@ -636,9 +641,10 @@ Default: `null`
 
 ### <a name="input_topics"></a> [topics](#input\_topics)
 
-Description:   Defaults to `{}`. Ignored for Basic. A map of topics to create. The map key is used as the name of the topic.  
+Description:   Defaults to `{}`. Ignored for Basic. A map of topics to create.  
   The name of the topic must be unique among topics and queues within the namespace.
 
+  - `name`                                    - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Topic resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
   - `max_message_size_in_kilobytes`           - (Optional) - Always set to `256` for Standard by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the Topic.
   - `max_size_in_megabytes`                   - (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the Topic.
   - `requires_duplicate_detection`            - (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic requires duplicate detection. Changing this forces a new resource to be created.
@@ -651,12 +657,14 @@ Description:   Defaults to `{}`. Ignored for Basic. A map of topics to create. T
   - `enable_express`                          - (Optional) - Defaults to `false` for Standard. Always set to `false` for Premium. Boolean flag which controls whether Express Entities are enabled. An express topic holds a message in memory temporarily before writing it to persistent storage.
   - `support_ordering`                        - (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic supports ordering.
 
-  - `authorization_rules` - (Optional) - Defaults to `{}`. Map key is used as the name of the authorizaton rule.
+  - `authorization_rules` - (Optional) - Defaults to `{}`.
+    - `name`   - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Topic Authorization Rule resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
     - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Topic?
     - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Topic?
     - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Topic?
 
-  - `subscriptions - (Optional) - Defaults to `{}`. Map key is used as the name of the subscription.
+  - `subscriptions - (Optional) - Defaults to `{}`.
+    - `name`                                      - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Subscription resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
     - `max\_delivery\_count`                        - (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.
     - `dead\_lettering\_on\_filter\_evaluation\_error` - (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription has dead letter support on filter evaluation exceptions
     - `dead\_lettering\_on\_message\_expiration`      - (Optional) - Defaults to `false`. Boolean flag which controls whether the Subscription has dead letter support when a message expires.
@@ -732,6 +740,7 @@ Type:
 
 ```hcl
 map(object({
+    name                                    = optional(string, null)
     enable_batched_operations               = optional(bool, true)
     requires_duplicate_detection            = optional(bool, false)
     enable_partitioning                     = optional(bool, null)
@@ -745,12 +754,14 @@ map(object({
     status                                  = optional(string, "Active")
 
     authorization_rules = optional(map(object({
+      name   = optional(string, null)
       send   = optional(bool, false)
       listen = optional(bool, false)
       manage = optional(bool, false)
     })), {})
 
     subscriptions = optional(map(object({
+      name                                      = optional(string, null)
       max_delivery_count                        = optional(number, 10)
       dead_lettering_on_filter_evaluation_error = optional(bool, true)
       enable_batched_operations                 = optional(bool, true)
@@ -792,23 +803,23 @@ The following outputs are exported:
 
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
-Description: The service bus namespace created
+Description: The service bus namespace created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace.html#attributes-reference
 
 ### <a name="output_resource_authorization_rules"></a> [resource\_authorization\_rules](#output\_resource\_authorization\_rules)
 
-Description: The service bus namespace authorization rules created
+Description: The service bus namespace authorization rules created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace_authorization_rule#attributes-reference
 
 ### <a name="output_resource_diagnostic_settings"></a> [resource\_diagnostic\_settings](#output\_resource\_diagnostic\_settings)
 
-Description: The diagnostic settings created
+Description: The diagnostic settings created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting#attributes-reference
 
 ### <a name="output_resource_locks"></a> [resource\_locks](#output\_resource\_locks)
 
-Description: The management locks created
+Description: The management locks created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock#attributes-reference
 
 ### <a name="output_resource_private_endpoints"></a> [resource\_private\_endpoints](#output\_resource\_private\_endpoints)
 
-Description: A map of the private endpoints created.
+Description: A map of the private endpoints created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint#attributes-reference
 
 ### <a name="output_resource_private_endpoints_application_security_group_association"></a> [resource\_private\_endpoints\_application\_security\_group\_association](#output\_resource\_private\_endpoints\_application\_security\_group\_association)
 
@@ -816,27 +827,27 @@ Description: The private endpoint application security group associations create
 
 ### <a name="output_resource_queues"></a> [resource\_queues](#output\_resource\_queues)
 
-Description: The service bus queues created
+Description: The service bus queues created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association#attributes-reference
 
 ### <a name="output_resource_queues_authorization_rules"></a> [resource\_queues\_authorization\_rules](#output\_resource\_queues\_authorization\_rules)
 
-Description: The service bus queues authorization rules created
+Description: The service bus queues authorization rules created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue_authorization_rule#attributes-reference
 
 ### <a name="output_resource_role_assignments"></a> [resource\_role\_assignments](#output\_resource\_role\_assignments)
 
-Description: The role assignments created
+Description: The role assignments created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment#attributes-reference
 
 ### <a name="output_resource_topics"></a> [resource\_topics](#output\_resource\_topics)
 
-Description: The service bus topics created
+Description: The service bus topics created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_topic.html#attributes-reference
 
 ### <a name="output_resource_topics_authorization_rules"></a> [resource\_topics\_authorization\_rules](#output\_resource\_topics\_authorization\_rules)
 
-Description: The service bus topics authorization rules created
+Description: The service bus topics authorization rules created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_topic_authorization_rule#attributes-reference
 
 ### <a name="output_resource_topics_subscriptions"></a> [resource\_topics\_subscriptions](#output\_resource\_topics\_subscriptions)
 
-Description: The service bus topic subscriptions created
+Description: The service bus topic subscriptions created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_subscription#attributes-reference
 
 ## Modules
 

@@ -50,37 +50,36 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_storage_account" "example" {
+  name = "${module.naming.storage_account.name_unique}${local.prefix}"
 
-  resource_group_name      = azurerm_resource_group.example.name
-  name                     = "${module.naming.storage_account.name_unique}${local.prefix}"
-  location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
   account_replication_type = "ZRS"
+  account_tier             = "Standard"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
 }
 
-module "log_analytics_workspace" {
-  source  = "Azure/avm-res-operationalinsights-workspace/azurerm"
-  version = "0.1.3"
+resource "azurerm_log_analytics_workspace" "example" {
+  name = "${module.naming.log_analytics_workspace.name_unique}-${local.prefix}"
 
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  name                = "${module.naming.log_analytics_workspace.name_unique}-${local.prefix}"
 }
 
 resource "azurerm_eventhub_namespace" "example" {
-  sku = "Basic"
+  name = "${module.naming.eventhub_namespace.name_unique}-${local.prefix}"
 
+  sku                 = "Basic"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  name                = "${module.naming.eventhub_namespace.name_unique}-${local.prefix}"
 }
 
 resource "azurerm_eventhub" "example" {
-  name                = "diagnosticshub"
-  resource_group_name = azurerm_resource_group.example.name
-  namespace_name      = azurerm_eventhub_namespace.example.name
+  name = "diagnosticshub"
+
   partition_count     = 2
   message_retention   = 1
+  resource_group_name = azurerm_resource_group.example.name
+  namespace_name      = azurerm_eventhub_namespace.example.name
 }
 
 module "servicebus" {
@@ -100,7 +99,7 @@ module "servicebus" {
 
       name                           = "diagtest1"
       log_analytics_destination_type = "Dedicated"
-      workspace_resource_id          = module.log_analytics_workspace.resource.id
+      workspace_resource_id          = azurerm_log_analytics_workspace.example.id
     }
 
     diagnostic2 = {

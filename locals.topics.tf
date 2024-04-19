@@ -1,12 +1,14 @@
 locals {
-  normalized_topics = var.sku != local.basic_sku_name ? var.topics : {}
+  normalized_topics = var.sku != local.basic_sku_name ? {
+    for topic_key, topic_params in var.topics : coalesce(topic_params.name, topic_key) => topic_params
+  } : {}
 
   flatten_topic_rules = flatten([
     for topic_name, topic_params in local.normalized_topics : [
-      for rule_name, rule_params in topic_params.authorization_rules : {
-        rule_name   = rule_name
+      for rule_key, rule_params in topic_params.authorization_rules : {
         topic_name  = topic_name
         rule_params = rule_params
+        rule_name   = coalesce(rule_params.name, rule_key)
       }
     ]
   ])
@@ -18,10 +20,10 @@ locals {
 
   flatten_topic_subscription = flatten([
     for topic_name, topic_params in local.normalized_topics : [
-      for subscription_name, subscription_params in topic_params.subscriptions : {
+      for subscription_key, subscription_params in topic_params.subscriptions : {
         topic_name          = topic_name
-        subscription_name   = subscription_name
         subscription_params = subscription_params
+        subscription_name   = coalesce(subscription_params.name, subscription_key)
       }
     ]
   ])

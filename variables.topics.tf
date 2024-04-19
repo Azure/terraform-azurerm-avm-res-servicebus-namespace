@@ -1,5 +1,6 @@
 variable "topics" {
   type = map(object({
+    name                                    = optional(string, null)
     enable_batched_operations               = optional(bool, true)
     requires_duplicate_detection            = optional(bool, false)
     enable_partitioning                     = optional(bool, null)
@@ -13,12 +14,14 @@ variable "topics" {
     status                                  = optional(string, "Active")
 
     authorization_rules = optional(map(object({
+      name   = optional(string, null)
       send   = optional(bool, false)
       listen = optional(bool, false)
       manage = optional(bool, false)
     })), {})
 
     subscriptions = optional(map(object({
+      name                                      = optional(string, null)
       max_delivery_count                        = optional(number, 10)
       dead_lettering_on_filter_evaluation_error = optional(bool, true)
       enable_batched_operations                 = optional(bool, true)
@@ -44,9 +47,10 @@ variable "topics" {
   default     = {}
   nullable    = false
   description = <<DESCRIPTION
-  Defaults to `{}`. Ignored for Basic. A map of topics to create. The map key is used as the name of the topic.
+  Defaults to `{}`. Ignored for Basic. A map of topics to create.
   The name of the topic must be unique among topics and queues within the namespace.
 
+  - `name`                                    - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Topic resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
   - `max_message_size_in_kilobytes`           - (Optional) - Always set to `256` for Standard by Azure. It's mininum and also defaults is `1024` with maximum value of `102400` for Premium. Integer value which controls the maximum size of a message allowed on the Topic.
   - `max_size_in_megabytes`                   - (Optional) - Defaults to `1024`. Possible values are `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960` and `81920`. Integer value which controls the size of memory allocated for the Topic.
   - `requires_duplicate_detection`            - (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic requires duplicate detection. Changing this forces a new resource to be created.
@@ -59,12 +63,14 @@ variable "topics" {
   - `enable_express`                          - (Optional) - Defaults to `false` for Standard. Always set to `false` for Premium. Boolean flag which controls whether Express Entities are enabled. An express topic holds a message in memory temporarily before writing it to persistent storage.
   - `support_ordering`                        - (Optional) - Defaults to `false`. Boolean flag which controls whether the Topic supports ordering.
 
-  - `authorization_rules` - (Optional) - Defaults to `{}`. Map key is used as the name of the authorizaton rule.
+  - `authorization_rules` - (Optional) - Defaults to `{}`. 
+    - `name`   - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Topic Authorization Rule resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
     - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Topic?
     - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Topic? 
     - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Topic?
 
-  - `subscriptions - (Optional) - Defaults to `{}`. Map key is used as the name of the subscription.
+  - `subscriptions - (Optional) - Defaults to `{}`.
+    - `name`                                      - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Subscription resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
     - `max_delivery_count`                        - (Optional) - Defaults to `10`. Minimum of `1` and Maximun of `2147483647`. Integer value which controls when a message is automatically dead lettered.
     - `dead_lettering_on_filter_evaluation_error` - (Optional) - Defaults to `true`. Boolean flag which controls whether the Subscription has dead letter support on filter evaluation exceptions
     - `dead_lettering_on_message_expiration`      - (Optional) - Defaults to `false`. Boolean flag which controls whether the Subscription has dead letter support when a message expires.

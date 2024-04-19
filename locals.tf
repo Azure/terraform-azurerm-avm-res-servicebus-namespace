@@ -33,5 +33,5 @@ locals {
 
   customer_managed_key_keyvault_name = var.customer_managed_key != null ? element(split("/", var.customer_managed_key.key_vault_resource_id), 8) : null
 
-  normalized_cmk_key_url = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${var.customer_managed_key.key_version != null ? var.customer_managed_key.key_version : ""}"
+  normalized_cmk_key_url = var.customer_managed_key != null ? "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${var.customer_managed_key.key_version != null ? var.customer_managed_key.key_version : ""}" : null
 }

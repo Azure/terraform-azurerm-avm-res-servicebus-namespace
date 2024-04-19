@@ -1,5 +1,5 @@
 resource "azurerm_servicebus_queue" "base_queues" {
-  for_each = { for k, v in var.queues : k => v if v.forward_to == null && v.forward_dead_lettered_messages_to == null }
+  for_each = local.base_queues
 
   name = each.key
 
@@ -38,7 +38,7 @@ resource "azurerm_servicebus_queue" "base_queues" {
 }
 
 resource "azurerm_servicebus_queue" "forward_queues" {
-  for_each = { for k, v in var.queues : k => v if v.forward_to != null || v.forward_dead_lettered_messages_to != null }
+  for_each = local.forward_queues
 
   name = each.key
 

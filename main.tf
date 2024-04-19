@@ -73,7 +73,7 @@ resource "azurerm_servicebus_namespace" "this" {
 resource "azurerm_servicebus_namespace_authorization_rule" "this" {
   for_each = var.authorization_rules
 
-  name = each.key
+  name = coalesce(each.value.name, each.key)
 
   namespace_id = azurerm_servicebus_namespace.this.id
 

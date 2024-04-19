@@ -48,21 +48,21 @@ resource "azurerm_resource_group" "example" {
   location = module.regions.regions[random_integer.region_index.result].name
 }
 
-module "vnet" {
-  source  = "Azure/avm-res-network-virtualnetwork/azurerm"
-  version = "0.1.4"
+resource "azurerm_virtual_network" "example" {
+  name = "${module.naming.virtual_network.name_unique}-${local.prefix}"
 
-  virtual_network_address_space = ["10.0.0.0/16"]
-  resource_group_name           = azurerm_resource_group.example.name
-  location                      = azurerm_resource_group.example.location
-  name                          = "${module.naming.virtual_network.name_unique}-${local.prefix}"
+  address_space       = ["10.0.0.0/16"]
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+}
 
-  subnets = {
-    default = {
-      address_prefixes  = ["10.0.0.0/24"]
-      service_endpoints = ["Microsoft.ServiceBus"]
-    }
-  }
+resource "azurerm_subnet" "example" {
+  name = module.naming.subnet.name_unique
+
+  address_prefixes     = ["10.0.0.0/24"]
+  service_endpoints    = ["Microsoft.ServiceBus"]
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.example.name
 }
 
 module "servicebus" {
@@ -81,7 +81,7 @@ module "servicebus" {
 
     network_rules = [
       {
-        subnet_id = module.vnet.subnets.default.id
+        subnet_id = azurerm_subnet.example.id
       }
     ]
   }

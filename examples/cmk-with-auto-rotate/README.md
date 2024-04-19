@@ -58,51 +58,49 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_user_assigned_identity" "example" {
-  name                = "example-${local.prefix}"
+  name = "example-${local.prefix}"
+
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 }
 
-module "key_vault" {
-  source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.3"
+resource "azurerm_key_vault" "example" {
+  name = "${module.naming.key_vault.name_unique}${local.prefix}"
 
-  resource_group_name           = azurerm_resource_group.example.name
-  location                      = azurerm_resource_group.example.location
-  tenant_id                     = data.azurerm_client_config.current.tenant_id
-  name                          = "${module.naming.key_vault.name_unique}${local.prefix}"
-  purge_protection_enabled      = true
-  public_network_access_enabled = true
+  soft_delete_retention_days = 7
+  enable_rbac_authorization  = true
+  purge_protection_enabled   = true
+  sku_name                   = "standard"
+  resource_group_name        = azurerm_resource_group.example.name
+  location                   = azurerm_resource_group.example.location
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+}
 
-  network_acls = {
-    default_action = "Allow"
-  }
+resource "azurerm_key_vault_key" "example" {
+  name = local.key_name
 
-  keys = {
-    cmk = {
-      key_opts = [
-        "wrapKey",
-        "unwrapKey"
-      ]
+  key_size     = 4096
+  key_type     = "RSA"
+  key_vault_id = azurerm_key_vault.example.id
 
-      key_size     = 4096
-      key_type     = "RSA"
-      name         = local.key_name
-      key_vault_id = module.key_vault.resource.id
-    }
-  }
+  key_opts = [
+    "wrapKey",
+    "unwrapKey"
+  ]
+}
 
-  role_assignments = {
-    cmk_tf = {
-      role_definition_id_or_name = "Key Vault Crypto Officer"
-      principal_id               = data.azurerm_client_config.current.object_id
-    }
+resource "azurerm_role_assignment" "crypto_officer" {
+  role_definition_name = "Key Vault Crypto Officer"
 
-    cmk_sb_user_mi = {
-      role_definition_id_or_name = "Key Vault Crypto Service Encryption User"
-      principal_id               = azurerm_user_assigned_identity.example.principal_id
-    }
-  }
+  scope        = azurerm_key_vault.example.id
+  principal_id = data.azurerm_client_config.current.object_id
+}
+
+resource "azurerm_role_assignment" "crypto_service_encryption_user" {
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+
+  scope        = azurerm_key_vault.example.id
+  principal_id = azurerm_user_assigned_identity.example.principal_id
 }
 
 module "servicebus" {
@@ -120,14 +118,14 @@ module "servicebus" {
 
   customer_managed_key = {
     key_name              = local.key_name
-    key_vault_resource_id = module.key_vault.resource.id
+    key_vault_resource_id = azurerm_key_vault.example.id
 
     user_assigned_identity = {
       resource_id = azurerm_user_assigned_identity.example.id
     }
   }
 
-  depends_on = [module.key_vault]
+  depends_on = [azurerm_role_assignment.crypto_officer, azurerm_role_assignment.crype_service_encryption_user]
 }
 ```
 
@@ -154,7 +152,11 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
+- [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) (resource)
+- [azurerm_key_vault_key.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) (resource)
 - [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_role_assignment.crypto_officer](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [azurerm_role_assignment.crypto_service_encryption_user](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_user_assigned_identity.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
@@ -175,12 +177,6 @@ No outputs.
 ## Modules
 
 The following Modules are called:
-
-### <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault)
-
-Source: Azure/avm-res-keyvault-vault/azurerm
-
-Version: 0.5.3
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 

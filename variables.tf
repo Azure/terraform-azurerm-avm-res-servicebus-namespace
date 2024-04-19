@@ -175,6 +175,7 @@ variable "managed_identities" {
 
 variable "authorization_rules" {
   type = map(object({
+    name   = optional(string, null)
     send   = optional(bool, false)
     listen = optional(bool, false)
     manage = optional(bool, false)
@@ -182,12 +183,12 @@ variable "authorization_rules" {
   default     = {}
   nullable    = false
   description = <<DESCRIPTION
-  Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. The following properties can be specified:
+  Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus.
 
-  - `authorization_rules` - Map key is used as the name of the authorizaton rule. 
-    - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
-    - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace? 
-    - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
+  - `name`   - (Optional) - Defaults to `null`. Specifies the name of the ServiceBus Namespace Authorization Rule resource. Changing this forces a new resource to be created. If it is null it will use the map key as the name.
+  - `send`   - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Listen permissions to the ServiceBus Namespace?
+  - `listen` - (Optional) - Always set to `true` when manage is `true` if not it will default to `false`. Does this Authorization Rule have Send permissions to the ServiceBus Namespace? 
+  - `manage` - (Optional) - Defaults to `false`. Does this Authorization Rule have Manage permissions to the ServiceBus Namespace?
 
   Example Inputs:
   ```hcl
@@ -285,7 +286,6 @@ variable "network_rule_config" {
 
   - `network_rules` - (Optional) - Defaults to `[]`.
     - `subnet_id`                            - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
-  
 
   > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet.
 
