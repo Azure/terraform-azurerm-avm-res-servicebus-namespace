@@ -13,18 +13,18 @@ resource "azurerm_servicebus_topic" "this" {
   enable_batched_operations               = each.value.enable_batched_operations
   requires_duplicate_detection            = each.value.requires_duplicate_detection
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
-  enable_express                          = var.sku == "Standard" ? each.value.enable_express : false
-  max_message_size_in_kilobytes           = var.sku == "Premium" ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
-  enable_partitioning                     = var.sku != "Premium" ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
+  enable_express                          = var.sku == local.standard_sku_name ? each.value.enable_express : false
+  max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
+  enable_partitioning                     = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
 
   lifecycle {
     precondition {
-      condition     = var.sku != "Premium" || each.value.max_message_size_in_kilobytes == null ? true : var.sku == "Premium" && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
+      condition     = var.sku != local.premium_sku_name || each.value.max_message_size_in_kilobytes == null ? true : var.sku == local.premium_sku_name && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
       error_message = "The max_message_size_in_kilobytes parameter if specified must be between 1024 and 102400 for Premium"
     }
 
     precondition {
-      condition     = var.sku == "Standard" && coalesce(each.value.enable_express, false) && coalesce(each.value.requires_duplicate_detection, false) ? false : true
+      condition     = var.sku == local.standard_sku_name && coalesce(each.value.enable_express, false) && coalesce(each.value.requires_duplicate_detection, false) ? false : true
       error_message = "The requires_duplicate_detection parameter must be false when enable_express is true for Standard"
     }
   }
@@ -45,7 +45,7 @@ resource "azurerm_servicebus_topic_authorization_rule" "this" {
 }
 
 resource "azurerm_servicebus_subscription" "base_topics" {
-  for_each = { for k, v in local.topic_subscriptions : k => v if v.subscription_params.forward_to == null && v.subscription_params.forward_dead_lettered_messages_to == null }
+  for_each = local.base_topics
 
   name = each.value.subscription_name
 
@@ -65,7 +65,7 @@ resource "azurerm_servicebus_subscription" "base_topics" {
 }
 
 resource "azurerm_servicebus_subscription" "forward_topics" {
-  for_each = { for k, v in local.topic_subscriptions : k => v if v.subscription_params.forward_to != null || v.subscription_params.forward_dead_lettered_messages_to != null }
+  for_each = local.forward_topics
 
   name = each.value.subscription_name
 

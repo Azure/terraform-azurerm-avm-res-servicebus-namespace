@@ -1,5 +1,5 @@
 locals {
-  normalized_topics = var.sku != "Basic" ? var.topics : {}
+  normalized_topics = var.sku != local.basic_sku_name ? var.topics : {}
 
   flatten_topic_rules = flatten([
     for topic_name, topic_params in local.normalized_topics : [
@@ -30,4 +30,8 @@ locals {
     for topic_subscription in local.flatten_topic_subscription :
     "${topic_subscription.topic_name}|${topic_subscription.subscription_name}" => topic_subscription
   }
+
+  base_topics = { for k, v in local.topic_subscriptions : k => v if v.subscription_params.forward_to == null && v.subscription_params.forward_dead_lettered_messages_to == null }
+
+  forward_topics = { for k, v in local.topic_subscriptions : k => v if v.subscription_params.forward_to != null || v.subscription_params.forward_dead_lettered_messages_to != null }
 }

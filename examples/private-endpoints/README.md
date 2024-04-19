@@ -1,19 +1,9 @@
-terraform {
-  required_version = ">= 1.5.0"
+<!-- BEGIN_TF_DOCS -->
+# Private endpoint example
 
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.71"
-    }
+This deploys the module without public network access and multiple private endpoints combinations
 
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
-    }
-  }
-}
-
+```hcl
 provider "azurerm" {
   features {
     resource_group {
@@ -152,3 +142,79 @@ module "servicebus" {
     }
   }
 }
+```
+
+<!-- markdownlint-disable MD033 -->
+## Requirements
+
+No requirements.
+
+## Providers
+
+The following providers are used by this module:
+
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm)
+
+- <a name="provider_random"></a> [random](#provider\_random)
+
+## Resources
+
+The following resources are used by this module:
+
+- [azurerm_application_security_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_security_group) (resource)
+- [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
+
+<!-- markdownlint-disable MD013 -->
+## Required Inputs
+
+No required inputs.
+
+## Optional Inputs
+
+No optional inputs.
+
+## Outputs
+
+No outputs.
+
+## Modules
+
+The following Modules are called:
+
+### <a name="module_naming"></a> [naming](#module\_naming)
+
+Source: Azure/naming/azurerm
+
+Version: >= 0.3.0
+
+### <a name="module_private_dns_zone"></a> [private\_dns\_zone](#module\_private\_dns\_zone)
+
+Source: Azure/avm-res-network-privatednszone/azurerm
+
+Version: 0.1.1
+
+### <a name="module_regions"></a> [regions](#module\_regions)
+
+Source: Azure/regions/azurerm
+
+Version: >= 0.3.0
+
+### <a name="module_servicebus"></a> [servicebus](#module\_servicebus)
+
+Source: ../../
+
+Version:
+
+### <a name="module_vnet"></a> [vnet](#module\_vnet)
+
+Source: Azure/avm-res-network-virtualnetwork/azurerm
+
+Version: 0.1.4
+
+<!-- markdownlint-disable-next-line MD041 -->
+## Data Collection
+
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
+<!-- END_TF_DOCS -->

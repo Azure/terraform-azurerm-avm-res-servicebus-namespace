@@ -19,11 +19,19 @@ locals {
     } : {}
   }
 
-  normalized_capacity = var.sku != "Premium" ? 0 : coalesce(var.capacity, 1)
+  basic_sku_name = "Basic"
 
-  normalized_zone_redundant = var.sku != "Premium" ? false : coalesce(var.zone_redundant, true)
+  premium_sku_name = "Premium"
 
-  normalized_premium_messaging_partitions = var.sku != "Premium" ? 0 : coalesce(var.premium_messaging_partitions, 1)
+  standard_sku_name = "Standard"
+
+  normalized_capacity = var.sku != local.premium_sku_name ? 0 : coalesce(var.capacity, 1)
+
+  normalized_zone_redundant = var.sku != local.premium_sku_name ? false : coalesce(var.zone_redundant, true)
+
+  normalized_premium_messaging_partitions = var.sku != local.premium_sku_name ? 0 : coalesce(var.premium_messaging_partitions, 1)
 
   customer_managed_key_keyvault_name = var.customer_managed_key != null ? element(split("/", var.customer_managed_key.key_vault_resource_id), 8) : null
+
+  normalized_cmk_key_url = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${var.customer_managed_key.key_version != null ? var.customer_managed_key.key_version : ""}"
 }

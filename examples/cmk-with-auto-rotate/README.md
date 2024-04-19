@@ -1,25 +1,9 @@
 <!-- BEGIN_TF_DOCS -->
-# Managed identity example
+# Customer managed key without pinned version example
 
-This deploys the module with a system and user assigned managed identity
+This deploys the module with a customer managed key configured without specifying a version which will support auto rotate of keys
 
 ```hcl
-terraform {
-  required_version = ">= 1.5.0"
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.71"
-    }
-
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
-    }
-  }
-}
-
 provider "azurerm" {
   features {
     resource_group {
@@ -28,9 +12,11 @@ provider "azurerm" {
   }
 }
 
+data "azurerm_client_config" "current" {}
+
 locals {
-  prefix = "mi"
-  skus   = ["Basic", "Standard", "Premium"]
+  prefix   = "cmk-auto"
+  key_name = "customermanagedkey"
 }
 
 module "regions" {
@@ -61,41 +47,86 @@ resource "azurerm_user_assigned_identity" "example" {
   location            = azurerm_resource_group.example.location
 }
 
+module "key_vault" {
+  source  = "Azure/avm-res-keyvault-vault/azurerm"
+  version = "0.5.3"
+
+  resource_group_name           = azurerm_resource_group.example.name
+  location                      = azurerm_resource_group.example.location
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  name                          = "${module.naming.key_vault.name_unique}${local.prefix}"
+  purge_protection_enabled      = true
+  public_network_access_enabled = true
+
+  network_acls = {
+    default_action = "Allow"
+  }
+
+  keys = {
+    cmk = {
+      key_opts = [
+        "wrapKey",
+        "unwrapKey"
+      ]
+
+      key_size     = 4096
+      key_type     = "RSA"
+      name         = local.key_name
+      key_vault_id = module.key_vault.resource.id
+    }
+  }
+
+  role_assignments = {
+    cmk_tf = {
+      role_definition_id_or_name = "Key Vault Crypto Officer"
+      principal_id               = data.azurerm_client_config.current.object_id
+    }
+
+    cmk_sb_user_mi = {
+      role_definition_id_or_name = "Key Vault Crypto Service Encryption User"
+      principal_id               = azurerm_user_assigned_identity.example.principal_id
+    }
+  }
+}
+
 module "servicebus" {
   source = "../../"
 
-  for_each = toset(local.skus)
-
-  sku                 = each.value
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
+  infrastructure_encryption_enabled = true
+  sku                               = "Premium"
+  resource_group_name               = azurerm_resource_group.example.name
+  location                          = azurerm_resource_group.example.location
+  name                              = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
 
   managed_identities = {
-    system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
   }
+
+  customer_managed_key = {
+    key_name              = local.key_name
+    key_vault_resource_id = module.key_vault.resource.id
+
+    user_assigned_identity = {
+      resource_id = azurerm_user_assigned_identity.example.id
+    }
+  }
+
+  depends_on = [module.key_vault]
 }
 ```
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
-The following requirements are needed by this module:
-
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
-
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
-
-- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
+No requirements.
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.71)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm)
 
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
+- <a name="provider_random"></a> [random](#provider\_random)
 
 ## Resources
 
@@ -104,6 +135,7 @@ The following resources are used by this module:
 - [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_user_assigned_identity.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -121,6 +153,12 @@ No outputs.
 ## Modules
 
 The following Modules are called:
+
+### <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault)
+
+Source: Azure/avm-res-keyvault-vault/azurerm
+
+Version: 0.5.3
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 

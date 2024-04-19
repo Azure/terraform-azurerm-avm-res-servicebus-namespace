@@ -23,17 +23,17 @@ resource "azurerm_servicebus_namespace" "this" {
   }
 
   dynamic "customer_managed_key" {
-    for_each = var.sku == "Premium" && var.customer_managed_key != null ? [1] : []
+    for_each = var.sku == local.premium_sku_name && var.customer_managed_key != null ? [1] : []
 
     content {
+      key_vault_key_id                  = local.normalized_cmk_key_url
       infrastructure_encryption_enabled = var.infrastructure_encryption_enabled
       identity_id                       = var.customer_managed_key.user_assigned_identity.resource_id
-      key_vault_key_id                  = "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${var.customer_managed_key.key_version != null ? var.customer_managed_key.key_version : ""}"
     }
   }
 
   dynamic "network_rule_set" {
-    for_each = var.sku == "Premium" ? [1] : []
+    for_each = var.sku == local.premium_sku_name ? [1] : []
 
     content {
       public_network_access_enabled = var.public_network_access_enabled
@@ -54,17 +54,17 @@ resource "azurerm_servicebus_namespace" "this" {
   # These cases are handled in the normalized_xxx variables. Serves as unit testing in case of future changes to those variables
   lifecycle {
     precondition {
-      condition     = var.sku != "Premium" ? local.normalized_zone_redundant == false : true
+      condition     = var.sku != local.premium_sku_name ? local.normalized_zone_redundant == false : true
       error_message = "Zone redundant requires Premium SKU"
     }
 
     precondition {
-      condition     = var.sku != "Premium" ? local.normalized_premium_messaging_partitions == 0 : true
+      condition     = var.sku != local.premium_sku_name ? local.normalized_premium_messaging_partitions == 0 : true
       error_message = "Premium messaging partitions requires Premium SKU"
     }
 
     precondition {
-      condition     = var.sku != "Premium" ? local.normalized_capacity == 0 : true
+      condition     = var.sku != local.premium_sku_name ? local.normalized_capacity == 0 : true
       error_message = "Capacity parameter requires Premium SKU"
     }
   }
@@ -81,13 +81,3 @@ resource "azurerm_servicebus_namespace_authorization_rule" "this" {
   send   = each.value.manage ? true : each.value.send
   listen = each.value.manage ? true : each.value.listen
 }
-
-# Commented as it is currently bugged. https://github.com/hashicorp/terraform-provider-azurerm/issues/22287
-# resource "azurerm_servicebus_namespace_disaster_recovery_config" "this" {
-#   count = var.sku == "Premium" && var.disaster_recovery_config != null ? 1 : 0
-
-#   primary_namespace_id        = azurerm_servicebus_namespace.this.id
-#   name                        = var.disaster_recovery_config.dns_alias_name
-#   partner_namespace_id        = var.disaster_recovery_config.partner_namespace_id
-#   alias_authorization_rule_id = var.disaster_recovery_config.alias_authorization_rule_id
-# }

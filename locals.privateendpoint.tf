@@ -1,7 +1,7 @@
 locals {
   service_name = "namespace"
 
-  private_endpoint_application_security_group_associations = var.sku == "Premium" ? {
+  private_endpoint_application_security_group_associations = var.sku == local.premium_sku_name ? {
     for assoc in flatten([
       for pe_k, pe_v in var.private_endpoints : [
         for asg_k, asg_v in pe_v.application_security_group_associations : {
@@ -13,5 +13,5 @@ locals {
     ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc
   } : {}
 
-  normalized_private_endpoints = var.sku == "Premium" ? var.private_endpoints : {}
+  normalized_private_endpoints = var.sku == local.premium_sku_name ? var.private_endpoints : {}
 }

@@ -51,6 +51,7 @@ variable "resource_group_name" {
 
 variable "location" {
   type        = string
+  nullable    = false
   description = <<DESCRIPTION
   Azure region where the resource should be deployed.
   If null, the location will be inferred from the resource group location.
@@ -71,7 +72,7 @@ variable "sku" {
   DESCRIPTION
 
   validation {
-    condition     = can(index(["Basic", "Standard", "Premium"], var.sku))
+    condition     = contains(["Basic", "Standard", "Premium"], var.sku)
     error_message = "The sku variable must be either Basic, Standard, or Premium."
   }
 }
@@ -172,35 +173,6 @@ variable "managed_identities" {
   }
 }
 
-# Commented as it is currently bugged. https://github.com/hashicorp/terraform-provider-azurerm/issues/22287
-# variable "disaster_recovery_config" {
-#   type = object({
-#     dns_alias_name              = string
-#     partner_namespace_id        = string
-#     alias_authorization_rule_id = optional(string, null)
-#   })
-#   default = null
-#   description = <<DESCRIPTION
-#     Defaults to `null`. Ignored for Basic and Standard. Controls if two service bus namespaces should be configured in a disaster recovery way. The following properties can be specified:
-
-#     object({
-#       dns_alias_name              = (Required) - Specifies the name of the Disaster Recovery Config. This is the alias DNS name that will be created. Changing this forces a new resource to be created.
-#       partner_namespace_id        = (Required) - Second service bus namespace id to pair with this namespace. This will be treated as a secondary replica
-#       alias_authorization_rule_id = (Optional) - Defaults to `null`. The Shared access policies used to access the connection string for the alias.
-#     })
-
-#     > Note: Primary and secondary namespace cannot be in the same region and both should have either private endpoints or none. 
-#       If primary namespace has configured a customer managed key the identity of the secondary namespace must be able to access the key
-
-#     Example Inputs:
-#     disaster_recovery_config = {
-#       dns_alias_name              = "global-alias-name"
-#       partner_namespace_id        = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{serviceBusNamespaceName}"
-#       alias_authorization_rule_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{serviceBusNamespaceName}/authorizationrules/{authorizationRuleName}"
-#     }
-#   DESCRIPTION
-# }
-
 variable "authorization_rules" {
   type = map(object({
     send   = optional(bool, false)
@@ -208,6 +180,7 @@ variable "authorization_rules" {
     manage = optional(bool, false)
   }))
   default     = {}
+  nullable    = false
   description = <<DESCRIPTION
   Defaults to `{}`. Manages a ServiceBus Namespace authorization Rule within a ServiceBus. The following properties can be specified:
 

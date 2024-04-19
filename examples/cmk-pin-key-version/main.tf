@@ -1,19 +1,3 @@
-terraform {
-  required_version = ">= 1.5.0"
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.71"
-    }
-
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
-    }
-  }
-}
-
 provider "azurerm" {
   features {
     resource_group {
@@ -25,7 +9,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix   = "cmk-auto"
+  prefix   = "cmk-pin"
   key_name = "customermanagedkey"
 }
 
@@ -102,7 +86,7 @@ module "key_vault" {
 module "servicebus" {
   source = "../../"
 
-  infrastructure_encryption_enabled = true
+  infrastructure_encryption_enabled = false
   sku                               = "Premium"
   resource_group_name               = azurerm_resource_group.example.name
   location                          = azurerm_resource_group.example.location
@@ -115,6 +99,7 @@ module "servicebus" {
   customer_managed_key = {
     key_name              = local.key_name
     key_vault_resource_id = module.key_vault.resource.id
+    key_version           = module.key_vault.resource_keys.cmk.version
 
     user_assigned_identity = {
       resource_id = azurerm_user_assigned_identity.example.id

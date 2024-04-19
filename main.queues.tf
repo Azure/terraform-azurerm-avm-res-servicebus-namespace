@@ -14,22 +14,22 @@ resource "azurerm_servicebus_queue" "base_queues" {
   forward_dead_lettered_messages_to       = each.value.forward_dead_lettered_messages_to
   dead_lettering_on_message_expiration    = each.value.dead_lettering_on_message_expiration
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
-  forward_to                              = var.sku != "Basic" ? each.value.forward_to : null
-  requires_session                        = var.sku != "Basic" ? each.value.requires_session : null
-  enable_express                          = var.sku == "Standard" ? each.value.enable_express : null
-  auto_delete_on_idle                     = var.sku != "Basic" ? each.value.auto_delete_on_idle : null
-  requires_duplicate_detection            = var.sku != "Basic" ? each.value.requires_duplicate_detection : null
-  max_message_size_in_kilobytes           = var.sku == "Premium" ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
-  enable_partitioning                     = var.sku != "Premium" ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
+  forward_to                              = var.sku != local.basic_sku_name ? each.value.forward_to : null
+  requires_session                        = var.sku != local.basic_sku_name ? each.value.requires_session : null
+  enable_express                          = var.sku == local.standard_sku_name ? each.value.enable_express : null
+  auto_delete_on_idle                     = var.sku != local.basic_sku_name ? each.value.auto_delete_on_idle : null
+  requires_duplicate_detection            = var.sku != local.basic_sku_name ? each.value.requires_duplicate_detection : null
+  max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
+  enable_partitioning                     = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
 
   lifecycle {
     precondition {
-      condition     = var.sku != "Premium" || each.value.max_message_size_in_kilobytes == null ? true : var.sku == "Premium" && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
+      condition     = var.sku != local.premium_sku_name || each.value.max_message_size_in_kilobytes == null ? true : var.sku == local.premium_sku_name && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
       error_message = "The max_message_size_in_kilobytes parameter if specified must be between 1024 and 102400 for Premium"
     }
 
     precondition {
-      condition     = var.sku == "Standard" && coalesce(each.value.enable_express, false) && coalesce(each.value.requires_duplicate_detection, false) ? false : true
+      condition     = var.sku == local.standard_sku_name && coalesce(each.value.enable_express, false) && coalesce(each.value.requires_duplicate_detection, false) ? false : true
       error_message = "The requires_duplicate_detection parameter must be false when enable_express is true for Standard"
     }
   }
@@ -53,22 +53,22 @@ resource "azurerm_servicebus_queue" "forward_queues" {
   forward_dead_lettered_messages_to       = each.value.forward_dead_lettered_messages_to
   dead_lettering_on_message_expiration    = each.value.dead_lettering_on_message_expiration
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
-  forward_to                              = var.sku != "Basic" ? each.value.forward_to : null
-  requires_session                        = var.sku != "Basic" ? each.value.requires_session : null
-  enable_express                          = var.sku == "Standard" ? each.value.enable_express : null
-  auto_delete_on_idle                     = var.sku != "Basic" ? each.value.auto_delete_on_idle : null
-  requires_duplicate_detection            = var.sku != "Basic" ? each.value.requires_duplicate_detection : null
-  max_message_size_in_kilobytes           = var.sku == "Premium" ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
-  enable_partitioning                     = var.sku != "Premium" ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
+  forward_to                              = var.sku != local.basic_sku_name ? each.value.forward_to : null
+  requires_session                        = var.sku != local.basic_sku_name ? each.value.requires_session : null
+  enable_express                          = var.sku == local.standard_sku_name ? each.value.enable_express : null
+  auto_delete_on_idle                     = var.sku != local.basic_sku_name ? each.value.auto_delete_on_idle : null
+  requires_duplicate_detection            = var.sku != local.basic_sku_name ? each.value.requires_duplicate_detection : null
+  max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
+  enable_partitioning                     = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
 
   lifecycle {
     precondition {
-      condition     = var.sku != "Premium" || each.value.max_message_size_in_kilobytes == null ? true : var.sku == "Premium" && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
+      condition     = var.sku != local.premium_sku_name || each.value.max_message_size_in_kilobytes == null ? true : var.sku == local.premium_sku_name && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
       error_message = "The max_message_size_in_kilobytes parameter if specified must be between 1024 and 102400 for Premium"
     }
 
     precondition {
-      condition     = var.sku == "Standard" && coalesce(each.value.enable_express, false) && coalesce(each.value.requires_duplicate_detection, false) ? false : true
+      condition     = var.sku == local.standard_sku_name && coalesce(each.value.enable_express, false) && coalesce(each.value.requires_duplicate_detection, false) ? false : true
       error_message = "The requires_duplicate_detection parameter must be false when enable_express is true for Standard"
     }
   }
