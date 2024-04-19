@@ -77,7 +77,7 @@ resource "azurerm_key_vault" "example" {
 }
 
 resource "azurerm_key_vault_key" "example" {
-  name = local.key_name
+  name = "customermanagedkey"
 
   key_size     = 4096
   key_type     = "RSA"
@@ -103,6 +103,12 @@ resource "azurerm_role_assignment" "crypto_service_encryption_user" {
   principal_id = azurerm_user_assigned_identity.example.principal_id
 }
 
+resource "time_sleep" "wait_for_rbac_before_key_operations" {
+  create_duration = 90
+
+  depends_on = [azurerm_role_assignment.crypto_officer, azurerm_role_assignment.crypto_service_encryption_user]
+}
+
 module "servicebus" {
   source = "../../"
 
@@ -117,15 +123,15 @@ module "servicebus" {
   }
 
   customer_managed_key = {
-    key_name              = local.key_name
     key_vault_resource_id = azurerm_key_vault.example.id
+    key_name              = azurerm_key_vault_key.example.name
 
     user_assigned_identity = {
       resource_id = azurerm_user_assigned_identity.example.id
     }
   }
 
-  depends_on = [azurerm_role_assignment.crypto_officer, azurerm_role_assignment.crypto_service_encryption_user]
+  depends_on = [time_sleep.wait_for_rbac_before_key_operations]
 }
 ```
 
@@ -148,6 +154,8 @@ The following providers are used by this module:
 
 - <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
+- <a name="provider_time"></a> [time](#provider\_time)
+
 ## Resources
 
 The following resources are used by this module:
@@ -159,6 +167,7 @@ The following resources are used by this module:
 - [azurerm_role_assignment.crypto_service_encryption_user](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_user_assigned_identity.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
+- [time_sleep.wait_for_rbac_before_key_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->

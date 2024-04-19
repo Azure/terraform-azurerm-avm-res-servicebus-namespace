@@ -71,7 +71,7 @@ resource "azurerm_key_vault" "example" {
 }
 
 resource "azurerm_key_vault_key" "example" {
-  name = local.key_name
+  name = "customermanagedkey"
 
   key_size     = 4096
   key_type     = "RSA"
@@ -97,6 +97,12 @@ resource "azurerm_role_assignment" "crypto_service_encryption_user" {
   principal_id = azurerm_user_assigned_identity.example.principal_id
 }
 
+resource "time_sleep" "wait_for_rbac_before_key_operations" {
+  create_duration = 90
+
+  depends_on = [azurerm_role_assignment.crypto_officer, azurerm_role_assignment.crypto_service_encryption_user]
+}
+
 module "servicebus" {
   source = "../../"
 
@@ -111,13 +117,13 @@ module "servicebus" {
   }
 
   customer_managed_key = {
-    key_name              = local.key_name
     key_vault_resource_id = azurerm_key_vault.example.id
+    key_name              = azurerm_key_vault_key.example.name
 
     user_assigned_identity = {
       resource_id = azurerm_user_assigned_identity.example.id
     }
   }
 
-  depends_on = [azurerm_role_assignment.crypto_officer, azurerm_role_assignment.crypto_service_encryption_user]
+  depends_on = [time_sleep.wait_for_rbac_before_key_operations]
 }
