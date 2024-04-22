@@ -1,3 +1,3 @@
 # Private endpoint example
 
-This deploys the module without public network access and multiple private endpoints combinations 
+This example deploys the module with public network access restricted and multiple private endpoint combinations.

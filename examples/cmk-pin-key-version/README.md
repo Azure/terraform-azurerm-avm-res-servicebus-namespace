@@ -1,11 +1,11 @@
 <!-- BEGIN_TF_DOCS -->
 # Customer managed with pinned key version key example
 
-This deploys the module with a customer managed key configured to point to an specific key version which doesnt support auto rotate policy
+This example deploys the module with a customer managed key configured to point to an specific key version, which doesn't support an auto rotate policy.
 
 ```hcl
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = "~> 1.5"
 
   required_providers {
     azurerm = {
@@ -147,7 +147,7 @@ module "servicebus" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
 

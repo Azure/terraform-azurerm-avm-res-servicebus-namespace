@@ -1,11 +1,11 @@
 <!-- BEGIN_TF_DOCS -->
 # Diagnostic settings example
 
-This deploys the module configured its diagnostic settings with multiple combinations
+This example deploys the module configured with multiple combinations of diagnostic settings.
 
 ```hcl
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = "~> 1.5"
 
   required_providers {
     azurerm = {
@@ -135,7 +135,7 @@ module "servicebus" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
 

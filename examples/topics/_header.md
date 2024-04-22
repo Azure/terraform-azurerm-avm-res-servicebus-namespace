@@ -1,3 +1,3 @@
 # Topics example
 
-This deploys the module with multiple combinations of topics
+This example deploys the module with multiple combinations of topics.

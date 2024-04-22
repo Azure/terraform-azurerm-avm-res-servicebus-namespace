@@ -1,11 +1,11 @@
 <!-- BEGIN_TF_DOCS -->
 # Max example
 
-This deploys the module with all the configuration that the namespace has which doesnt have their own test case
+This example deploys the module with all configurations of namespace that haven't been covered in other examples.
 
 ```hcl
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = "~> 1.5"
 
   required_providers {
     azurerm = {
@@ -109,7 +109,7 @@ module "servicebus" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
 

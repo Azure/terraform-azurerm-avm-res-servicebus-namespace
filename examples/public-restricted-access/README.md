@@ -1,11 +1,11 @@
 <!-- BEGIN_TF_DOCS -->
 # Public restricted access example
 
-This deploys the module with public network access enabled but restricted to some ips and subnets ids using service endpoints
+This example deploys the module with public network access enabled, but restricted to specific IP addresses and subnets using service endpoints.
 
 ```hcl
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = "~> 1.5"
 
   required_providers {
     azurerm = {
@@ -99,7 +99,7 @@ module "servicebus" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
 

@@ -1,11 +1,11 @@
 <!-- BEGIN_TF_DOCS -->
 # Private endpoint example
 
-This deploys the module without public network access and multiple private endpoints combinations
+This example deploys the module with public network access restricted and multiple private endpoint combinations.
 
 ```hcl
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = "~> 1.5"
 
   required_providers {
     azurerm = {
@@ -164,7 +164,7 @@ module "servicebus" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
 

@@ -1,9 +1,11 @@
 locals {
+  none_lock_kind = "None"
+
   pe_locks = {
     for pe_name, pe_params in local.normalized_private_endpoints :
-    "PrivateEndpoint|${pe_name}" => {
-      scope_type = "PrivateEndpoint"
+    "${local.private_endpoint_scope_type}|${pe_name}" => {
       pe_name    = pe_name
+      scope_type = local.private_endpoint_scope_type
       lock       = pe_params.lock != null ? pe_params.lock : var.lock
     }
   }
@@ -11,13 +13,13 @@ locals {
   filtered_pe_locks = {
     for k, v in local.pe_locks :
     k => v
-    if try(v.lock.kind, "None") != "None"
+    if try(v.lock.kind, local.none_lock_kind) != local.none_lock_kind
   }
 
   namespace_lock = var.lock != null ? {
-    "Namespace" = {
-      scope_type = "Namespace"
+    local.namespace_scope_type = {
       lock       = var.lock
+      scope_type = local.namespace_scope_type
     }
   } : {}
 

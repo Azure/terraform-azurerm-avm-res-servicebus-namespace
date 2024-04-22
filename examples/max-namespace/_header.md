@@ -1,3 +1,3 @@
 # Max example
 
-This deploys the module with all the configuration that the namespace has which doesnt have their own test case
+This example deploys the module with all configurations of namespace that haven't been covered in other examples.

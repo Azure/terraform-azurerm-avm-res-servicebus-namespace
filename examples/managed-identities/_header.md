@@ -1,3 +1,3 @@
 # Managed identity example
 
-This deploys the module with a system and user assigned managed identity
+This example deploys the module with system and user assigned managed identities.

@@ -15,7 +15,7 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
 
     is_manual_connection           = false
     private_connection_resource_id = azurerm_servicebus_namespace.this.id
-    subresource_names              = ["namespace"] # map to each.value.subresource_name if there are multiple services.
+    subresource_names              = [local.service_name]
   }
 
   dynamic "private_dns_zone_group" {
@@ -32,8 +32,8 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
 
     content {
       name               = ip_configuration.value.name
-      subresource_name   = local.service_name # map to each.value.subresource_name if there are multiple services.
-      member_name        = local.service_name # map to each.value.subresource_name if there are multiple services.
+      subresource_name   = local.service_name
+      member_name        = local.service_name
       private_ip_address = ip_configuration.value.private_ip_address
     }
   }
@@ -56,7 +56,7 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
 
     is_manual_connection           = false
     private_connection_resource_id = azurerm_servicebus_namespace.this.id
-    subresource_names              = [local.service_name] # map to each.value.subresource_name if there are multiple services.
+    subresource_names              = [local.service_name]
   }
 
   dynamic "ip_configuration" {
@@ -65,8 +65,8 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
     content {
       name = ip_configuration.value.name
 
-      subresource_name   = local.service_name # map to each.value.subresource_name if there are multiple services.
-      member_name        = local.service_name # map to each.value.subresource_name if there are multiple services.
+      subresource_name   = local.service_name
+      member_name        = local.service_name
       private_ip_address = ip_configuration.value.private_ip_address
     }
   }

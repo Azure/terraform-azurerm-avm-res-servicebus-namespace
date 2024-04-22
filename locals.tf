@@ -19,11 +19,17 @@ locals {
     } : {}
   }
 
-  basic_sku_name = "Basic"
+  topic_scope_type            = "Topic"
+  queue_scope_type            = "Queue"
+  namespace_scope_type        = "Namespace"
+  private_endpoint_scope_type = "PrivateEndpoint"
 
-  premium_sku_name = "Premium"
-
+  basic_sku_name    = "Basic"
+  premium_sku_name  = "Premium"
   standard_sku_name = "Standard"
+
+  smallest_premium_max_message_size_in_kilobytes = 1024
+  biggest_premium_max_message_size_in_kilobytes  = 102400
 
   normalized_capacity = var.sku != local.premium_sku_name ? 0 : coalesce(var.capacity, 1)
 

@@ -19,13 +19,13 @@ resource "azurerm_servicebus_queue" "base_queues" {
   enable_express                          = var.sku == local.standard_sku_name ? each.value.enable_express : null
   auto_delete_on_idle                     = var.sku != local.basic_sku_name ? each.value.auto_delete_on_idle : null
   requires_duplicate_detection            = var.sku != local.basic_sku_name ? each.value.requires_duplicate_detection : null
-  max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
   enable_partitioning                     = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
+  max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, local.smallest_premium_max_message_size_in_kilobytes) : null
 
   lifecycle {
     precondition {
-      condition     = var.sku != local.premium_sku_name || each.value.max_message_size_in_kilobytes == null ? true : var.sku == local.premium_sku_name && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
-      error_message = "The max_message_size_in_kilobytes parameter if specified must be between 1024 and 102400 for Premium"
+      condition     = var.sku != local.premium_sku_name || each.value.max_message_size_in_kilobytes == null ? true : var.sku == local.premium_sku_name && each.value.max_message_size_in_kilobytes >= local.smallest_premium_max_message_size_in_kilobytes && each.value.max_message_size_in_kilobytes <= local.biggest_premium_max_message_size_in_kilobytes
+      error_message = "The max_message_size_in_kilobytes parameter if specified must be between ${local.smallest_premium_max_message_size_in_kilobytes} and ${local.biggest_premium_max_message_size_in_kilobytes} for Premium"
     }
 
     precondition {
@@ -33,8 +33,6 @@ resource "azurerm_servicebus_queue" "base_queues" {
       error_message = "The requires_duplicate_detection parameter must be false when enable_express is true for Standard"
     }
   }
-
-  # depends_on = [ azurerm_servicebus_namespace_disaster_recovery_config.this ]
 }
 
 resource "azurerm_servicebus_queue" "forward_queues" {
@@ -58,13 +56,13 @@ resource "azurerm_servicebus_queue" "forward_queues" {
   enable_express                          = var.sku == local.standard_sku_name ? each.value.enable_express : null
   auto_delete_on_idle                     = var.sku != local.basic_sku_name ? each.value.auto_delete_on_idle : null
   requires_duplicate_detection            = var.sku != local.basic_sku_name ? each.value.requires_duplicate_detection : null
-  max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, 1024) : null
   enable_partitioning                     = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
+  max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, local.smallest_premium_max_message_size_in_kilobytes) : null
 
   lifecycle {
     precondition {
-      condition     = var.sku != local.premium_sku_name || each.value.max_message_size_in_kilobytes == null ? true : var.sku == local.premium_sku_name && each.value.max_message_size_in_kilobytes >= 1024 && each.value.max_message_size_in_kilobytes <= 102400
-      error_message = "The max_message_size_in_kilobytes parameter if specified must be between 1024 and 102400 for Premium"
+      condition     = var.sku != local.premium_sku_name || each.value.max_message_size_in_kilobytes == null ? true : var.sku == local.premium_sku_name && each.value.max_message_size_in_kilobytes >= local.smallest_premium_max_message_size_in_kilobytes && each.value.max_message_size_in_kilobytes <= local.biggest_premium_max_message_size_in_kilobytes
+      error_message = "The max_message_size_in_kilobytes parameter if specified must be between ${local.smallest_premium_max_message_size_in_kilobytes} and ${local.biggest_premium_max_message_size_in_kilobytes} for Premium"
     }
 
     precondition {

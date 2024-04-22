@@ -4,10 +4,10 @@ locals {
   flatten_queue_role_assignments = flatten([
     for queue_name, queue_params in var.queues : [
       for role_key, role_params in queue_params.role_assignments : {
-        scope_type  = "Queue"
         role_key    = role_key
         queue_name  = queue_name
         role_params = role_params
+        scope_type  = local.queue_scope_type
       }
     ]
   ])
@@ -20,10 +20,10 @@ locals {
   flatten_topic_role_assignments = flatten([
     for topic_name, topic_params in local.normalized_topics : [
       for role_key, role_params in topic_params.role_assignments : {
-        scope_type  = "Topic"
         role_key    = role_key
         topic_name  = topic_name
         role_params = role_params
+        scope_type  = local.topic_role_assignments
       }
     ]
   ])
@@ -35,19 +35,19 @@ locals {
 
   namespace_role_assignments = {
     for role_key, role_params in var.role_assignments :
-    "Namespace|${role_key}" => {
-      scope_type  = "Namespace"
+    "${local.namespace_scope_type}|${role_key}" => {
       role_params = role_params
+      scope_type  = local.namespace_scope_type
     }
   }
 
   flatten_pe_role_assignments = flatten([
     for pe_name, pe_params in local.normalized_private_endpoints : [
       for role_key, role_params in pe_params.role_assignments : {
-        scope_type  = "PrivateEndpoint"
         role_key    = role_key
         pe_name     = pe_name
         role_params = role_params
+        scope_type  = local.private_endpoint_scope_type
       }
     ]
   ])
