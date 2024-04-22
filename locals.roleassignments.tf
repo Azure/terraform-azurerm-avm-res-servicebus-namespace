@@ -23,7 +23,7 @@ locals {
         role_key    = role_key
         topic_name  = topic_name
         role_params = role_params
-        scope_type  = local.topic_role_assignments
+        scope_type  = local.topic_scope_type
       }
     ]
   ])
