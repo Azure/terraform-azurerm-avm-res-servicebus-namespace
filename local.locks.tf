@@ -17,7 +17,7 @@ locals {
   }
 
   namespace_lock = var.lock != null ? {
-    "${local.namespace_scope_type}" = {
+    (local.namespace_scope_type) = {
       lock       = var.lock
       scope_type = local.namespace_scope_type
     }
