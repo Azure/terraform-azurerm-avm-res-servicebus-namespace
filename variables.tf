@@ -285,9 +285,9 @@ variable "network_rule_config" {
   - `default_action`           - (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set when a rule (IP, CIDR or subnet) doesn't match. Possible values are `Allow` and `Deny`.
 
   - `network_rules` - (Optional) - Defaults to `[]`.
-    - `subnet_id`                            - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
+    - `subnet_id` - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
 
-  > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet.
+  > Note: Remember to enable Microsoft.ServiceBus service endpoint on the subnet.
 
   Example Inputs:
   ```hcl
