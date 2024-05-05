@@ -148,7 +148,7 @@ variable "topics" {
       for _, v in var.topics :
       contains(["Active", "Creating", "Deleting", "Disabled", "ReceiveDisabled", "Renaming", "SendDisabled", "Unknown"], v.status)
     ])
-    error_message = "The status parameter can only be `Active`, `Creating`, `Deleting`, `Disabled`, `ReceiveDisabled`, `Renaming`, `SendDisabled`, `Unknown`."
+    error_message = "The 'status' parameter can only be 'Active', 'Creating', 'Deleting', 'Disabled', 'ReceiveDisabled', 'Renaming', 'SendDisabled', 'Unknown'."
   }
 
   validation {
@@ -156,7 +156,7 @@ variable "topics" {
       for _, v in var.topics :
       contains([1024, 2048, 3072, 4096, 5120, 10240, 20480, 40960, 81920], v.max_size_in_megabytes)
     ])
-    error_message = "The max_size_in_megabytes parameter must be one of `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960`, `81920`."
+    error_message = "The 'max_size_in_megabytes' parameter must be one of 1024, 2048, 3072, 4096, 5120, 10240, 20480, 40960, 81920."
   }
 
   validation {
@@ -167,7 +167,7 @@ variable "topics" {
         1 <= subscription.max_delivery_count && 2147483647 >= subscription.max_delivery_count
       ]
     ]))
-    error_message = "value of max_delivery_count of the topic subscription must be between 1 and 2147483647."
+    error_message = "value of 'max_delivery_count' of the topic subscription must be between 1 and 2147483647."
   }
 
   validation {
@@ -178,6 +178,6 @@ variable "topics" {
         contains(["Active", "Disabled", "ReceiveDisabled"], subscription.status)
       ]
     ]))
-    error_message = "value of max_delivery_count of the topic subscription must be between 1 and 2147483647."
+    error_message = "The 'status' parameter can only be 'Active', 'Disabled', 'ReceiveDisabled'."
   }
 }

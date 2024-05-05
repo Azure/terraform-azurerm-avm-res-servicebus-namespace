@@ -118,7 +118,7 @@ variable "queues" {
       for _, v in var.queues :
       v.forward_to != null && v.requires_session ? false : true
     ])
-    error_message = "Forwarding to another queue or topic is not supported when requires_session is set to true."
+    error_message = "Forwarding to another queue ('forward_to' parameter) or topic is not supported when 'requires_session' is set to 'true'."
   }
 
   validation {
@@ -126,7 +126,7 @@ variable "queues" {
       for _, v in var.queues :
       contains(["Active", "Creating", "Deleting", "Disabled", "ReceiveDisabled", "Renaming", "SendDisabled", "Unknown"], v.status)
     ])
-    error_message = "The status parameter can only be `Active`, `Creating`, `Deleting`, `Disabled`, `ReceiveDisabled`, `Renaming`, `SendDisabled`, `Unknown`."
+    error_message = "'status' can only be 'Active', 'Creating', 'Deleting', 'Disabled', 'ReceiveDisabled', 'Renaming', 'SendDisabled', 'Unknown'."
   }
 
   validation {
@@ -134,7 +134,7 @@ variable "queues" {
       for _, v in var.queues :
       contains([1024, 2048, 3072, 4096, 5120, 10240, 20480, 40960, 81920], v.max_size_in_megabytes)
     ])
-    error_message = "The max_size_in_megabytes parameter must be one of `1024`, `2048`, `3072`, `4096`, `5120`, `10240`, `20480`, `40960`, `81920`."
+    error_message = "The 'max_size_in_megabytes' parameter must be one of 1024, 2048, 3072, 4096, 5120, 10240, 20480, 40960, 81920."
   }
 
   validation {
@@ -142,7 +142,7 @@ variable "queues" {
       for _, v in var.queues :
       1 <= v.max_delivery_count && 2147483647 >= v.max_delivery_count
     ])
-    error_message = "value of max_delivery_count must be between 1 and 2147483647."
+    error_message = "value of 'max_delivery_count' must be between 1 and 2147483647."
   }
 
   validation {
@@ -150,10 +150,10 @@ variable "queues" {
       for queue_name, queue_params in var.queues :
       [
         for k, v in queue_params.role_assignments :
-        v.role_definition_id_or_name != null
+        trimspace(v.role_definition_id_or_name) != null
       ]
     ]))
-    error_message = "Role definition id or name must be set"
+    error_message = "'role_definition_id_or_name' or name must be set"
   }
 
   validation {
@@ -164,6 +164,6 @@ variable "queues" {
         can(regex("^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$", v.principal_id))
       ]
     ]))
-    error_message = "principal_id must be a valid GUID"
+    error_message = "'principal_id' must be a valid GUID"
   }
 }
