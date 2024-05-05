@@ -89,11 +89,12 @@ resource "azurerm_application_security_group" "example" {
 module "servicebus" {
   source = "../../"
 
-  sku                           = "Premium"
-  resource_group_name           = azurerm_resource_group.example.name
-  location                      = azurerm_resource_group.example.location
-  name                          = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
-  public_network_access_enabled = false
+  sku                                     = "Premium"
+  resource_group_name                     = azurerm_resource_group.example.name
+  location                                = azurerm_resource_group.example.location
+  name                                    = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
+  public_network_access_enabled           = false
+  private_endpoints_manage_dns_zone_group = true
 
   private_endpoints = {
     max = {
