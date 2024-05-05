@@ -43,9 +43,9 @@ variable "role_assignments" {
   validation {
     condition = alltrue([
       for k, v in var.role_assignments :
-      v.role_definition_id_or_name != null
+      trimspace(v.role_definition_id_or_name) != null
     ])
-    error_message = "Role definition id or name must be set"
+    error_message = "role_definition_id_or_name must be set and not empty value"
   }
 
   validation {
