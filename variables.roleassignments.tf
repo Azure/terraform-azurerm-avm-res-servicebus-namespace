@@ -45,7 +45,7 @@ variable "role_assignments" {
       for k, v in var.role_assignments :
       trimspace(v.role_definition_id_or_name) != null
     ])
-    error_message = "role_definition_id_or_name must be set and not empty value"
+    error_message = "'role_definition_id_or_name' must be set and not empty value"
   }
 
   validation {
