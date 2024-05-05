@@ -53,6 +53,6 @@ variable "role_assignments" {
       for k, v in var.role_assignments :
       can(regex("^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$", v.principal_id))
     ])
-    error_message = "principal_id must be a valid GUID"
+    error_message = "'principal_id' must be a valid GUID"
   }
 }
