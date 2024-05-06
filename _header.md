@@ -31,5 +31,5 @@ This Terraform module is designed to create Azure Service bus namespaces and its
 * [Customer managed key using auto rotation](examples/cmk-with-auto-rotate/main.tf)
 * [Enable diagnostic settings](examples/diagnostic-settings/main.tf)
 * [Enable managed identities](examples/managed-identities/main.tf)
-* [Enable private endpoints](examples/private-endpoints/main.tf)
+* [Enable private endpoints with auto management of dns records](examples/private-endpoints-managed-dns-records/main.tf)
 * [Restrict public network access with access control list and service endpoints](examples/public-restricted-access/main.tf)
