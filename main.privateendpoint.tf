@@ -2,7 +2,7 @@
 resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
   for_each = var.private_endpoints_manage_dns_zone_group ? local.normalized_private_endpoints : {}
 
-  name = coalesce(each.value.name, "pep-${var.name}")
+  name = coalesce(each.value.name, "pep-${each.key}")
 
   subnet_id                     = each.value.subnet_resource_id
   custom_network_interface_name = each.value.network_interface_name
@@ -11,7 +11,7 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
   tags                          = each.value.tags == null ? var.tags : each.value.tags == {} ? {} : each.value.tags
 
   private_service_connection {
-    name = coalesce(each.value.private_service_connection_name, "pse-${var.name}")
+    name = coalesce(each.value.private_service_connection_name, "pse-${each.key}")
 
     is_manual_connection           = false
     private_connection_resource_id = azurerm_servicebus_namespace.this.id
@@ -43,7 +43,7 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
 resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
   for_each = var.private_endpoints_manage_dns_zone_group == false ? local.normalized_private_endpoints : {}
 
-  name = coalesce(each.value.name, "pep-${var.name}")
+  name = coalesce(each.value.name, "pep-${each.key}")
 
   subnet_id                     = each.value.subnet_resource_id
   custom_network_interface_name = each.value.network_interface_name
@@ -52,7 +52,7 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
   tags                          = each.value.tags == null ? var.tags : each.value.tags == {} ? {} : each.value.tags
 
   private_service_connection {
-    name = coalesce(each.value.private_service_connection_name, "pse-${var.name}")
+    name = coalesce(each.value.private_service_connection_name, "pse-${each.key}")
 
     is_manual_connection           = false
     private_connection_resource_id = azurerm_servicebus_namespace.this.id
