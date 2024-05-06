@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Private endpoint with managed dns records example
+# Private endpoint with unmanaged dns records example
 
-This example deploys the module with public network access restricted and multiple private endpoint combinations. It also configures the auto management of dns records
+This example deploys the module with public network access restricted and multiple private endpoint combinations. It doesn't configure the auto management of dns records
 
 ```hcl
 terraform {
@@ -31,7 +31,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix = "pe-mng"
+  prefix = "pe-umg"
 }
 
 module "regions" {
@@ -100,7 +100,7 @@ module "servicebus" {
   location                                = azurerm_resource_group.example.location
   name                                    = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
   public_network_access_enabled           = false
-  private_endpoints_manage_dns_zone_group = true
+  private_endpoints_manage_dns_zone_group = false
 
   private_endpoints = {
     max = {

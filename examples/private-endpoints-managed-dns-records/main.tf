@@ -25,7 +25,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  prefix = "pe"
+  prefix = "pe-mng"
 }
 
 module "regions" {
