@@ -32,7 +32,7 @@ This Terraform module is designed to create Azure Service bus namespaces and its
 * [Customer managed key using auto rotation](examples/cmk-with-auto-rotate/main.tf)
 * [Enable diagnostic settings](examples/diagnostic-settings/main.tf)
 * [Enable managed identities](examples/managed-identities/main.tf)
-* [Enable private endpoints](examples/private-endpoints/main.tf)
+* [Enable private endpoints with auto management of dns records](examples/private-endpoints-managed-dns-records/main.tf)
 * [Restrict public network access with access control list and service endpoints](examples/public-restricted-access/main.tf)
 
 <!-- markdownlint-disable MD033 -->
@@ -271,7 +271,7 @@ Default: `true`
 
 ### <a name="input_infrastructure_encryption_enabled"></a> [infrastructure\_encryption\_enabled](#input\_infrastructure\_encryption\_enabled)
 
-Description: Defaults to true. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created. Requires customer\_managed\_key.
+Description: Defaults to `true`. Used to specify whether enable Infrastructure Encryption (Double Encryption). Changing this forces a new resource to be created. Requires `customer_managed_key`.
 
 Type: `bool`
 
@@ -355,14 +355,14 @@ Default: `"1.2"`
 
 Description:   Defaults to `{}`. Ignored for Basic and Standard. Defines the network rules configuration for the resource.
 
-  - `trusted_services_allowed` - (Optional) - Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration?
+  - `trusted_services_allowed` - (Optional) - Defaults to `false`. Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration?
   - `cidr_or_ip_rules`         - (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
   - `default_action`           - (Optional) - Defaults to `Allow`. Specifies the default action for the Network Rule Set when a rule (IP, CIDR or subnet) doesn't match. Possible values are `Allow` and `Deny`.
 
   - `network_rules` - (Optional) - Defaults to `[]`.
-    - `subnet_id`                            - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
+    - `subnet_id` - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
 
-  > Note: Remember to enable Microsoft.KeyVault service endpoint on the subnet.
+  > Note: Remember to enable Microsoft.ServiceBus service endpoint on the subnet.
 
   Example Inputs:
   ```hcl
@@ -373,7 +373,7 @@ Description:   Defaults to `{}`. Ignored for Basic and Standard. Defines the net
 
     network_rules = [
       {
-        subnet_id                            = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
+        subnet_id = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}"
       }
     ]
   }
@@ -408,26 +408,44 @@ Default: `null`
 
 Description:   Default to `{}`. Ignored for Basic and Standard. A map of private endpoints to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-  - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-  - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-  - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-  - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-  - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-  - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-  - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-  - `application_security_group_associations` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-  - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-  - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-  - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
-  - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-    - `name` - The name of the IP configuration.
-    - `private_ip_address` - The private IP address of the IP configuration.
+  - `subnet_resource_id`                      - (Required) - The resource ID of the subnet to deploy the private endpoint in.
+  - `name`                                    - (Optional) - The name of the private endpoint. One will be generated if not set.
+  - `private_dns_zone_group_name`             - (Optional) - The name of the private DNS zone group. One will be generated if not set.
+  - `private_dns_zone_resource_ids`           - (Optional) - A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
+  - `application_security_group_associations` - (Optional) - A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  - `private_service_connection_name`         - (Optional) - The name of the private service connection. One will be generated if not set.
+  - `network_interface_name`                  - (Optional) - The name of the network interface. One will be generated if not set.
+  - `location`                                - (Optional) - The Azure location where the resources will be deployed. Defaults to the location of the resource group.
+  - `resource_group_name`                     - (Optional) - The resource group where the resources will be deployed. Defaults to the resource group of the resource.
+
+  - `ip_configurations` - (Optional) - A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+    - `name`               - (Required) - The name of the IP configuration.
+    - `private_ip_address` - (Required) - The private IP address of the IP configuration.
+
+  - `role_assignments` - (Optional) - A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
+  - `lock`             - (Optional) - The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+  - `tags`             - (Optional) - A mapping of tags to assign to the private endpoint.
 
 Type:
 
 ```hcl
 map(object({
+    subnet_resource_id = string
+
+    name                                    = optional(string, null)
+    private_dns_zone_group_name             = optional(string, "default")
+    private_dns_zone_resource_ids           = optional(set(string), [])
+    application_security_group_associations = optional(map(string), {})
+    private_service_connection_name         = optional(string, null)
+    network_interface_name                  = optional(string, null)
+    location                                = optional(string, null)
+    resource_group_name                     = optional(string, null)
+
+    ip_configurations = optional(map(object({
+      name               = string
+      private_ip_address = string
+    })), {})
+
     tags = optional(map(string), null)
 
     lock = optional(object({
@@ -445,22 +463,6 @@ map(object({
 
       condition         = optional(string, null) # forced to be here by lint, not supported
       condition_version = optional(string, null) # forced to be here by lint, not supported
-    })), {})
-
-    subnet_resource_id = string
-
-    name                                    = optional(string, null)
-    private_dns_zone_group_name             = optional(string, "default")
-    private_dns_zone_resource_ids           = optional(set(string), [])
-    application_security_group_associations = optional(map(string), {})
-    private_service_connection_name         = optional(string, null)
-    network_interface_name                  = optional(string, null)
-    location                                = optional(string, null)
-    resource_group_name                     = optional(string, null)
-
-    ip_configurations = optional(map(object({
-      name               = string
-      private_ip_address = string
     })), {})
   }))
 ```
