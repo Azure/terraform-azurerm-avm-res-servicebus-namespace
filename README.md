@@ -849,6 +849,10 @@ Description: The service bus namespace authorization rules created. More info: h
 
 Description: The diagnostic settings created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting#attributes-reference
 
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the service bus namespace created.
+
 ### <a name="output_resource_locks"></a> [resource\_locks](#output\_resource\_locks)
 
 Description: The management locks created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock#attributes-reference

@@ -15,6 +15,11 @@ output "resource_diagnostic_settings" {
   value       = azurerm_monitor_diagnostic_setting.this
 }
 
+output "resource_id" {
+  description = "The resource ID of the service bus namespace created."
+  value       = azurerm_servicebus_namespace.this.id
+}
+
 output "resource_locks" {
   description = "The management locks created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock#attributes-reference"
   value       = azurerm_management_lock.this
