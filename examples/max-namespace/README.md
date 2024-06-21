@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
 # Max example
 
-This example deploys the module with all configurations of namespace that haven't been covered in other examples.
+This example deploys the module with all configurations of namespace which havent been already covered in other examples.
 
 ```hcl
 terraform {
@@ -53,8 +53,8 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
   location = "westeurope" # This test case in Premium SKU is not supported in some of the recommended regions. Pinned to an specific one to make the test more reliable. #module.regions.regions[random_integer.region_index.result].name
+  name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
 }
 
 module "servicebus" {
