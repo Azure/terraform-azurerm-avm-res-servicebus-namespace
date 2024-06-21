@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Public restricted access example
+# Private endpoint with managed dns records example
 
-This example deploys the module with public network access enabled, but restricted to specific IP addresses and subnets using service endpoints.
+This example deploys the module with public network access restricted and multiple private endpoint combinations. It also configures the auto management of dns records
 
 ```hcl
 terraform {
@@ -28,8 +28,10 @@ provider "azurerm" {
   }
 }
 
+data "azurerm_client_config" "current" {}
+
 locals {
-  prefix = "resPub"
+  prefix = "pe-mng"
 }
 
 module "regions" {
@@ -66,28 +68,94 @@ resource "azurerm_subnet" "example" {
   name                 = module.naming.subnet.name_unique
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
-  service_endpoints    = ["Microsoft.ServiceBus"]
+}
+
+resource "azurerm_private_dns_zone" "example" {
+  name                = "privatelink.servicebus.core.windows.net"
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
+  name                  = "vnet-link"
+  private_dns_zone_name = azurerm_private_dns_zone.example.name
+  resource_group_name   = azurerm_resource_group.example.name
+  virtual_network_id    = azurerm_virtual_network.example.id
+}
+
+resource "azurerm_application_security_group" "example" {
+  location            = azurerm_resource_group.example.location
+  name                = "tf-appsecuritygroup-${local.prefix}"
+  resource_group_name = azurerm_resource_group.example.name
 }
 
 module "servicebus" {
   source = "../../"
 
-  sku                           = "Premium"
-  resource_group_name           = azurerm_resource_group.example.name
-  location                      = azurerm_resource_group.example.location
-  name                          = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
-  public_network_access_enabled = true
+  sku                                     = "Premium"
+  resource_group_name                     = azurerm_resource_group.example.name
+  location                                = azurerm_resource_group.example.location
+  name                                    = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
+  public_network_access_enabled           = false
+  private_endpoints_manage_dns_zone_group = true
 
-  network_rule_config = {
-    trusted_services_allowed = true
-    default_action           = "Deny"
-    cidr_or_ip_rules         = ["168.125.123.255", "170.0.0.0/24"]
+  private_endpoints = {
+    max = {
+      name                            = "max"
+      network_interface_name          = "max_nic1"
+      private_dns_zone_group_name     = "max_dns_group"
+      private_service_connection_name = "max_connection"
+      subnet_resource_id              = azurerm_subnet.example.id
+      private_dns_zone_resource_ids   = [azurerm_private_dns_zone.example.id]
 
-    network_rules = [
-      {
-        subnet_id = azurerm_subnet.example.id
+      ip_configurations = {
+        maxIpConfig = {
+          name               = "maxIpConfig"
+          private_ip_address = "10.0.0.6"
+        }
       }
-    ]
+
+      role_assignments = {
+        key = {
+          role_definition_id_or_name = "Contributor"
+          description                = "This is a test role assignment"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
+      }
+
+      lock = {
+        kind = "CanNotDelete"
+        name = "Testing name CanNotDelete"
+      }
+
+      tags = {
+        environment = "testing"
+        department  = "engineering"
+      }
+
+      application_security_group_associations = {
+        asg1 = azurerm_application_security_group.example.id
+      }
+    }
+
+    staticIp = {
+      subnet_resource_id = azurerm_subnet.example.id
+
+      ip_configurations = {
+        staticIpConfig = {
+          name               = "staticIpConfig"
+          private_ip_address = "10.0.0.7"
+        }
+      }
+    }
+
+    noDnsGroup = {
+      subnet_resource_id = azurerm_subnet.example.id
+    }
+
+    withDnsGroup = {
+      subnet_resource_id            = azurerm_subnet.example.id
+      private_dns_zone_resource_ids = [azurerm_private_dns_zone.example.id]
+    }
   }
 }
 ```
@@ -115,10 +183,14 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
+- [azurerm_application_security_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_security_group) (resource)
+- [azurerm_private_dns_zone.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) (resource)
+- [azurerm_private_dns_zone_virtual_network_link.private_links](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) (resource)
 - [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_subnet.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
 - [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
