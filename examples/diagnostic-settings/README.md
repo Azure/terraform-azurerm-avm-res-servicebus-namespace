@@ -51,41 +51,37 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
   location = "westeurope" # This test case in Premium SKU is not supported in some of the recommended regions. Pinned to an specific one to make the test more reliable. #module.regions.regions[random_integer.region_index.result].name
+  name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
 }
 
 resource "azurerm_storage_account" "example" {
-  name = "${module.naming.storage_account.name_unique}${local.prefix}"
-
   account_replication_type = "ZRS"
   account_tier             = "Standard"
-  resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
+  name                     = "${module.naming.storage_account.name_unique}${local.prefix}"
+  resource_group_name      = azurerm_resource_group.example.name
 }
 
 resource "azurerm_log_analytics_workspace" "example" {
-  name = "${module.naming.log_analytics_workspace.name_unique}-${local.prefix}"
-
-  resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
+  name                = "${module.naming.log_analytics_workspace.name_unique}-${local.prefix}"
+  resource_group_name = azurerm_resource_group.example.name
 }
 
 resource "azurerm_eventhub_namespace" "example" {
-  name = "${module.naming.eventhub_namespace.name_unique}-${local.prefix}"
-
-  sku                 = "Basic"
-  resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
+  name                = "${module.naming.eventhub_namespace.name_unique}-${local.prefix}"
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "Basic"
 }
 
 resource "azurerm_eventhub" "example" {
-  name = "diagnosticshub"
-
-  partition_count     = 2
   message_retention   = 1
-  resource_group_name = azurerm_resource_group.example.name
+  name                = "diagnosticshub"
   namespace_name      = azurerm_eventhub_namespace.example.name
+  partition_count     = 2
+  resource_group_name = azurerm_resource_group.example.name
 }
 
 module "servicebus" {
