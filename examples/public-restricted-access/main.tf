@@ -24,6 +24,7 @@ provider "azurerm" {
 
 locals {
   prefix = "resPub"
+  skus   = ["Standard", "Premium"]
 }
 
 module "regions" {
@@ -66,10 +67,12 @@ resource "azurerm_subnet" "example" {
 module "servicebus" {
   source = "../../"
 
-  sku                           = "Premium"
+  for_each = toset(local.skus)
+
+  sku                           = each.value
   resource_group_name           = azurerm_resource_group.example.name
   location                      = azurerm_resource_group.example.location
-  name                          = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
+  name                          = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
   public_network_access_enabled = true
 
   network_rule_config = {
@@ -77,10 +80,10 @@ module "servicebus" {
     default_action           = "Deny"
     cidr_or_ip_rules         = ["168.125.123.255", "170.0.0.0/24"]
 
-    network_rules = [
+    network_rules = each.value == "Premium" ? [
       {
         subnet_id = azurerm_subnet.example.id
       }
-    ]
+    ] : null
   }
 }
