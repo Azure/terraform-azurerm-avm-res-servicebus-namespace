@@ -29,7 +29,7 @@ resource "azurerm_servicebus_namespace" "this" {
     }
   }
   dynamic "network_rule_set" {
-    for_each = var.sku == local.premium_sku_name ? [1] : []
+    for_each = var.network_rule_config != {} ? [1] : []
 
     content {
       default_action                = var.network_rule_config.default_action
@@ -38,7 +38,7 @@ resource "azurerm_servicebus_namespace" "this" {
       trusted_services_allowed      = var.network_rule_config.trusted_services_allowed
 
       dynamic "network_rules" {
-        for_each = var.network_rule_config.network_rules
+        for_each = var.sku == local.premium_sku_name ? var.network_rule_config.network_rules : []
 
         content {
           subnet_id                            = network_rules.value.subnet_id
