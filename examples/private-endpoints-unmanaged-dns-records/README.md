@@ -102,14 +102,12 @@ module "servicebus" {
     max = {
       name                            = "max"
       network_interface_name          = "max_nic1"
-      private_dns_zone_group_name     = "max_dns_group"
       private_service_connection_name = "max_connection"
       subnet_resource_id              = azurerm_subnet.example.id
-      private_dns_zone_resource_ids   = [azurerm_private_dns_zone.example.id]
 
       ip_configurations = {
-        maxIpConfig = {
-          name               = "maxIpConfig"
+        staticIpConfig = {
+          name               = "staticIpConfig"
           private_ip_address = "10.0.0.6"
         }
       }
@@ -137,24 +135,8 @@ module "servicebus" {
       }
     }
 
-    staticIp = {
+    min = {
       subnet_resource_id = azurerm_subnet.example.id
-
-      ip_configurations = {
-        staticIpConfig = {
-          name               = "staticIpConfig"
-          private_ip_address = "10.0.0.7"
-        }
-      }
-    }
-
-    noDnsGroup = {
-      subnet_resource_id = azurerm_subnet.example.id
-    }
-
-    withDnsGroup = {
-      subnet_resource_id            = azurerm_subnet.example.id
-      private_dns_zone_resource_ids = [azurerm_private_dns_zone.example.id]
     }
   }
 }
