@@ -65,12 +65,12 @@ resource "azurerm_servicebus_namespace" "this" {
   }
 
   dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
+    for_each = var.timeouts == null ? [] : [var.timeouts]
     content {
       create = timeouts.value.create
-      update = timeouts.value.update
       delete = timeouts.value.delete
       read   = timeouts.value.read
+      update = timeouts.value.update
     }
   }
 }
