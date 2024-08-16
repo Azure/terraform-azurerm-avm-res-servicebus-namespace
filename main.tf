@@ -63,6 +63,16 @@ resource "azurerm_servicebus_namespace" "this" {
       error_message = "Capacity parameter requires Premium SKU"
     }
   }
+
+  dynamic "timeouts" {
+    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
+    content {
+      create = timeouts.value.create
+      update = timeouts.value.update
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+    }
+  }
 }
 
 resource "azurerm_servicebus_namespace_authorization_rule" "this" {

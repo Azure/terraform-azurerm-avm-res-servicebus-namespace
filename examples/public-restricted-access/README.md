@@ -30,7 +30,7 @@ provider "azurerm" {
 
 locals {
   prefix = "resPub"
-  skus   = ["Standard", "Premium"]
+  skus   = ["Basic", "Standard", "Premium"]
 }
 
 module "regions" {

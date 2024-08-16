@@ -681,6 +681,26 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
+
+Description: - `create` - (Defaults to 30 minutes) Used when creating the ServiceBus Namespace.
+- `delete` - (Defaults to 30 minutes) Used when deleting the ServiceBus Namespace.
+- `read` - (Defaults to 5 minutes) Used when retrieving the ServiceBus Namespace.
+- `update` - (Defaults to 30 minutes) Used when updating the ServiceBus Namespace.
+
+Type:
+
+```hcl
+object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
+  })
+```
+
+Default: `null`
+
 ### <a name="input_topics"></a> [topics](#input\_topics)
 
 Description:   Defaults to `{}`. Ignored for Basic. A map of topics to create.  
