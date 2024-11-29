@@ -49,6 +49,7 @@ resource "azurerm_servicebus_namespace" "this" {
   }
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
+
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete
