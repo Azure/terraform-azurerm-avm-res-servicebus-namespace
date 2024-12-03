@@ -664,7 +664,7 @@ Description:   Defaults to `Standard`. Defines which tier to use. Options are Ba
 
 Type: `string`
 
-Default: `"Standard"`
+Default: `"Premium"`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 

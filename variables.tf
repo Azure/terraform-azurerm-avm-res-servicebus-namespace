@@ -145,7 +145,7 @@ variable "public_network_access_enabled" {
 
 variable "sku" {
   type        = string
-  default     = "Standard"
+  default     = "Premium"
   description = <<DESCRIPTION
   Defaults to `Standard`. Defines which tier to use. Options are Basic, Standard or Premium. 
   Please note that setting this field to Premium will force the creation of a new resource.
