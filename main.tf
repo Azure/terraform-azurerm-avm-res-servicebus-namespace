@@ -47,6 +47,16 @@ resource "azurerm_servicebus_namespace" "this" {
       }
     }
   }
+  dynamic "timeouts" {
+    for_each = var.timeouts == null ? [] : [var.timeouts]
+
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
 
   # These cases are handled in the normalized_xxx variables. Serves as unit testing in case of future changes to those variables
   lifecycle {

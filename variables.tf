@@ -158,6 +158,22 @@ variable "sku" {
   }
 }
 
+variable "timeouts" {
+  type = object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
+  })
+  default     = null
+  description = <<-EOT
+ - `create` - (Defaults to 30 minutes) Used when creating the ServiceBus Namespace.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the ServiceBus Namespace.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the ServiceBus Namespace.
+ - `update` - (Defaults to 30 minutes) Used when updating the ServiceBus Namespace.
+EOT  
+}
+
 variable "zone_redundant" {
   type        = bool
   default     = null

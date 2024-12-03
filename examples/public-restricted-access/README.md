@@ -12,7 +12,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.71"
     }
-
     random = {
       source  = "hashicorp/random"
       version = "~> 3.6"
@@ -30,7 +29,7 @@ provider "azurerm" {
 
 locals {
   prefix = "resPub"
-  skus   = ["Standard", "Premium"]
+  skus   = ["Basic", "Standard", "Premium"]
 }
 
 module "regions" {
