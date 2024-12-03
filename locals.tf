@@ -23,7 +23,7 @@ locals {
   }
   namespace_scope_type                           = "Namespace"
   normalized_capacity                            = var.sku != local.premium_sku_name ? 0 : coalesce(var.capacity, 1)
-  normalized_cmk_key_url                         = var.customer_managed_key != null ? "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}/${var.customer_managed_key.key_version != null ? var.customer_managed_key.key_version : ""}" : null
+  normalized_cmk_key_url                         = var.customer_managed_key != null ? "https://${local.customer_managed_key_keyvault_name}.vault.azure.net/keys/${var.customer_managed_key.key_name}${var.customer_managed_key.key_version != null ? "/${var.customer_managed_key.key_version}" : ""}" : null
   normalized_premium_messaging_partitions        = var.sku != local.premium_sku_name ? 0 : coalesce(var.premium_messaging_partitions, 1)
   normalized_zone_redundant                      = var.sku != local.premium_sku_name ? false : coalesce(var.zone_redundant, true)
   premium_sku_name                               = "Premium"

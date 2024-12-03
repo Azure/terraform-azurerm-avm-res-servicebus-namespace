@@ -659,12 +659,12 @@ Default: `{}`
 
 ### <a name="input_sku"></a> [sku](#input\_sku)
 
-Description:   Defaults to `Standard`. Defines which tier to use. Options are Basic, Standard or Premium.   
+Description:   Defaults to `Premium`. Defines which tier to use. Options are Basic, Standard or Premium.   
   Please note that setting this field to Premium will force the creation of a new resource.
 
 Type: `string`
 
-Default: `"Standard"`
+Default: `"Premium"`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
