@@ -136,13 +136,6 @@ variable "premium_messaging_partitions" {
   }
 }
 
-variable "public_network_access_enabled" {
-  type        = bool
-  default     = true
-  description = "Defaults to `true`. Is public network access enabled for the Service Bus Namespace?"
-  nullable    = false
-}
-
 variable "sku" {
   type        = string
   default     = "Premium"
@@ -172,13 +165,4 @@ variable "timeouts" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the ServiceBus Namespace.
  - `update` - (Defaults to 30 minutes) Used when updating the ServiceBus Namespace.
 EOT  
-}
-
-variable "zone_redundant" {
-  type        = bool
-  default     = null
-  description = <<DESCRIPTION
-  Always set to `false` for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant. 
-  Changing this forces a new resource to be created.
-  DESCRIPTION
 }

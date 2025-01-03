@@ -1,3 +1,10 @@
+variable "public_network_access_enabled" {
+  type        = bool
+  default     = true
+  description = "Defaults to `true`. Is public network access enabled for the Service Bus Namespace?"
+  nullable    = false
+}
+
 variable "network_rule_config" {
   type = object({
     trusted_services_allowed = optional(bool, false)
@@ -8,10 +15,15 @@ variable "network_rule_config" {
       subnet_id = string
     })), [])
   })
-  nullable    = false
-  default     = {}
+  nullable = false
+  default = {
+    cidr_or_ip_rules         = []
+    network_rules            = []
+    default_action           = "Allow"
+    trusted_services_allowed = false
+  }
   description = <<DESCRIPTION
-  Defaults to `{}`. IP rules only for Basic and Standard, virtual network or IP rules for Premium. Defines the network rules configuration for the resource.
+  IP rules only for Basic and Standard, virtual network or IP rules for Premium. Defines the network rules configuration for the resource.
 
   - `trusted_services_allowed` - (Optional) - Defaults to `false`. Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration? 
   - `cidr_or_ip_rules`         - (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
@@ -21,6 +33,16 @@ variable "network_rule_config" {
     - `subnet_id` - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
 
   > Note: Remember to enable Microsoft.ServiceBus service endpoint on the subnet.
+
+  Defaults to if no value is specified:
+  ```hcl
+  {
+    cidr_or_ip_rules         = []
+    network_rules            = []
+    default_action           = "Allow"
+    trusted_services_allowed = false
+  }
+  ```
 
   Example Inputs:
   ```hcl

@@ -27,22 +27,18 @@ resource "azurerm_servicebus_namespace" "this" {
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
-  dynamic "network_rule_set" {
-    for_each = var.network_rule_config != {} ? [1] : []
+  network_rule_set {
+    default_action                = var.network_rule_config.default_action
+    ip_rules                      = var.network_rule_config.cidr_or_ip_rules
+    public_network_access_enabled = var.public_network_access_enabled
+    trusted_services_allowed      = var.network_rule_config.trusted_services_allowed
 
-    content {
-      default_action                = var.network_rule_config.default_action
-      ip_rules                      = var.network_rule_config.cidr_or_ip_rules
-      public_network_access_enabled = var.public_network_access_enabled
-      trusted_services_allowed      = var.network_rule_config.trusted_services_allowed
+    dynamic "network_rules" {
+      for_each = var.sku == local.premium_sku_name ? var.network_rule_config.network_rules : []
 
-      dynamic "network_rules" {
-        for_each = var.sku == local.premium_sku_name ? var.network_rule_config.network_rules : []
-
-        content {
-          subnet_id                            = network_rules.value.subnet_id
-          ignore_missing_vnet_service_endpoint = false
-        }
+      content {
+        subnet_id                            = network_rules.value.subnet_id
+        ignore_missing_vnet_service_endpoint = false
       }
     }
   }
@@ -60,12 +56,12 @@ resource "azurerm_servicebus_namespace" "this" {
   # These cases are handled in the normalized_xxx variables. Serves as unit testing in case of future changes to those variables
   lifecycle {
     precondition {
-      condition     = var.sku != local.premium_sku_name ? local.normalized_zone_redundant == false : true
-      error_message = "Zone redundant requires Premium SKU"
-    }
-    precondition {
       condition     = var.sku != local.premium_sku_name ? local.normalized_premium_messaging_partitions == 0 : true
       error_message = "Premium messaging partitions requires Premium SKU"
+    }
+    precondition {
+      condition     = var.network_rule_config.default_action == "Deny" && length(var.network_rule_config.cidr_or_ip_rules) == 0 && (var.sku != local.premium_sku_name || length(var.network_rule_config.network_rules) == 0) ? false : true
+      error_message = "The 'network_rule_config.default_action' can only be set to 'Allow' if no 'network_rule_config.cidr_or_ip_rules' are set and no 'network_rule_config.network_rules' are set for Premium"
     }
     precondition {
       condition     = var.sku != local.premium_sku_name ? local.normalized_capacity == 0 : true
