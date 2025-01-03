@@ -9,7 +9,6 @@ resource "azurerm_servicebus_namespace" "this" {
   premium_messaging_partitions  = local.normalized_premium_messaging_partitions
   public_network_access_enabled = var.public_network_access_enabled
   tags                          = var.tags
-  zone_redundant                = local.normalized_zone_redundant
 
   dynamic "customer_managed_key" {
     for_each = var.sku == local.premium_sku_name && var.customer_managed_key != null ? [1] : []
