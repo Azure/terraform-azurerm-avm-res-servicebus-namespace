@@ -42,7 +42,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
@@ -52,7 +52,7 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.71)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
 
 - <a name="provider_modtm"></a> [modtm](#provider\_modtm) (~> 0.3)
 
@@ -359,7 +359,7 @@ Default: `"1.2"`
 
 ### <a name="input_network_rule_config"></a> [network\_rule\_config](#input\_network\_rule\_config)
 
-Description:   Defaults to `{}`. IP rules only for Basic and Standard, virtual network or IP rules for Premium. Defines the network rules configuration for the resource.
+Description:   IP rules only for Basic and Standard, virtual network or IP rules for Premium. Defines the network rules configuration for the resource.
 
   - `trusted_services_allowed` - (Optional) - Defaults to `false`. Are Azure Services that are known and trusted for this resource type are allowed to bypass firewall configuration?
   - `cidr_or_ip_rules`         - (Optional) - Defaults to `[]`. One or more IP Addresses, or CIDR Blocks which should be able to access the ServiceBus Namespace.
@@ -369,6 +369,16 @@ Description:   Defaults to `{}`. IP rules only for Basic and Standard, virtual n
     - `subnet_id` - (Required) - The Subnet ID which should be able to access this ServiceBus Namespace.
 
   > Note: Remember to enable Microsoft.ServiceBus service endpoint on the subnet.
+
+  Defaults to if no value is specified:
+  ```hcl
+  {
+    cidr_or_ip_rules         = []
+    network_rules            = []
+    default_action           = "Allow"
+    trusted_services_allowed = false
+  }
+```
 
   Example Inputs:
   ```hcl
@@ -399,7 +409,16 @@ object({
   })
 ```
 
-Default: `{}`
+Default:
+
+```json
+{
+  "cidr_or_ip_rules": [],
+  "default_action": "Allow",
+  "network_rules": [],
+  "trusted_services_allowed": false
+}
+```
 
 ### <a name="input_premium_messaging_partitions"></a> [premium\_messaging\_partitions](#input\_premium\_messaging\_partitions)
 
@@ -849,15 +868,6 @@ map(object({
 ```
 
 Default: `{}`
-
-### <a name="input_zone_redundant"></a> [zone\_redundant](#input\_zone\_redundant)
-
-Description:   Always set to `false` for Standard and Basic. Defaults to `true` for Premium. Whether or not this resource is zone redundant.   
-  Changing this forces a new resource to be created.
-
-Type: `bool`
-
-Default: `null`
 
 ## Outputs
 

@@ -4,18 +4,18 @@ resource "azurerm_servicebus_queue" "base_queues" {
   name                                    = each.key
   namespace_id                            = azurerm_servicebus_namespace.this.id
   auto_delete_on_idle                     = var.sku != local.basic_sku_name ? each.value.auto_delete_on_idle : null
+  batched_operations_enabled              = each.value.enable_batched_operations
   dead_lettering_on_message_expiration    = each.value.dead_lettering_on_message_expiration
   default_message_ttl                     = each.value.default_message_ttl
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
-  enable_batched_operations               = each.value.enable_batched_operations
-  enable_express                          = var.sku == local.standard_sku_name ? each.value.enable_express : null
-  enable_partitioning                     = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
+  express_enabled                         = var.sku == local.standard_sku_name ? each.value.enable_express : null
   forward_dead_lettered_messages_to       = each.value.forward_dead_lettered_messages_to
   forward_to                              = var.sku != local.basic_sku_name ? each.value.forward_to : null
   lock_duration                           = each.value.lock_duration
   max_delivery_count                      = each.value.max_delivery_count
   max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, local.smallest_premium_max_message_size_in_kilobytes) : null
   max_size_in_megabytes                   = each.value.max_size_in_megabytes
+  partitioning_enabled                    = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
   requires_duplicate_detection            = var.sku != local.basic_sku_name ? each.value.requires_duplicate_detection : null
   requires_session                        = var.sku != local.basic_sku_name ? each.value.requires_session : null
   status                                  = each.value.status
@@ -38,18 +38,18 @@ resource "azurerm_servicebus_queue" "forward_queues" {
   name                                    = each.key
   namespace_id                            = azurerm_servicebus_namespace.this.id
   auto_delete_on_idle                     = var.sku != local.basic_sku_name ? each.value.auto_delete_on_idle : null
+  batched_operations_enabled              = each.value.enable_batched_operations
   dead_lettering_on_message_expiration    = each.value.dead_lettering_on_message_expiration
   default_message_ttl                     = each.value.default_message_ttl
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
-  enable_batched_operations               = each.value.enable_batched_operations
-  enable_express                          = var.sku == local.standard_sku_name ? each.value.enable_express : null
-  enable_partitioning                     = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
+  express_enabled                         = var.sku == local.standard_sku_name ? each.value.enable_express : null
   forward_dead_lettered_messages_to       = each.value.forward_dead_lettered_messages_to
   forward_to                              = var.sku != local.basic_sku_name ? each.value.forward_to : null
   lock_duration                           = each.value.lock_duration
   max_delivery_count                      = each.value.max_delivery_count
   max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, local.smallest_premium_max_message_size_in_kilobytes) : null
   max_size_in_megabytes                   = each.value.max_size_in_megabytes
+  partitioning_enabled                    = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
   requires_duplicate_detection            = var.sku != local.basic_sku_name ? each.value.requires_duplicate_detection : null
   requires_session                        = var.sku != local.basic_sku_name ? each.value.requires_session : null
   status                                  = each.value.status

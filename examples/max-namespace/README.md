@@ -10,7 +10,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.71"
+      version = "~> 4.14"
     }
     random = {
       source  = "hashicorp/random"
@@ -52,7 +52,7 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "example" {
-  location = "westeurope" # This test case in Premium SKU is not supported in some of the recommended regions. Pinned to an specific one to make the test more reliable. #module.regions.regions[random_integer.region_index.result].name
+  location = "spaincentral" # This test case in Premium SKU is not supported in some of the recommended regions. Pinned to an specific one to make the test more reliable. #module.regions.regions[random_integer.region_index.result].name
   name     = "${module.naming.resource_group.name_unique}-${local.prefix}"
 }
 
@@ -70,7 +70,6 @@ module "servicebus" {
   minimum_tls_version                     = "1.2"
   public_network_access_enabled           = true
   premium_messaging_partitions            = 2
-  zone_redundant                          = true
   enable_telemetry                        = true
   private_endpoints_manage_dns_zone_group = true
 
@@ -110,7 +109,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
@@ -118,7 +117,7 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.71)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
 
 - <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 

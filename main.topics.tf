@@ -4,13 +4,13 @@ resource "azurerm_servicebus_topic" "this" {
   name                                    = each.key
   namespace_id                            = azurerm_servicebus_namespace.this.id
   auto_delete_on_idle                     = each.value.auto_delete_on_idle
+  batched_operations_enabled              = each.value.enable_batched_operations
   default_message_ttl                     = each.value.default_message_ttl
   duplicate_detection_history_time_window = each.value.duplicate_detection_history_time_window
-  enable_batched_operations               = each.value.enable_batched_operations
-  enable_express                          = var.sku == local.standard_sku_name ? each.value.enable_express : false
-  enable_partitioning                     = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
+  express_enabled                         = var.sku == local.standard_sku_name ? each.value.enable_express : false
   max_message_size_in_kilobytes           = var.sku == local.premium_sku_name ? coalesce(each.value.max_message_size_in_kilobytes, local.smallest_premium_max_message_size_in_kilobytes) : null
   max_size_in_megabytes                   = each.value.max_size_in_megabytes
+  partitioning_enabled                    = var.sku != local.premium_sku_name ? each.value.enable_partitioning : local.normalized_premium_messaging_partitions > 1
   requires_duplicate_detection            = each.value.requires_duplicate_detection
   status                                  = each.value.status
   support_ordering                        = each.value.support_ordering
@@ -44,10 +44,10 @@ resource "azurerm_servicebus_subscription" "base_topics" {
   name                                      = each.value.subscription_name
   topic_id                                  = azurerm_servicebus_topic.this[each.value.topic_name].id
   auto_delete_on_idle                       = each.value.subscription_params.auto_delete_on_idle
+  batched_operations_enabled                = each.value.subscription_params.enable_batched_operations
   dead_lettering_on_filter_evaluation_error = each.value.subscription_params.dead_lettering_on_filter_evaluation_error
   dead_lettering_on_message_expiration      = each.value.subscription_params.dead_lettering_on_message_expiration
   default_message_ttl                       = each.value.subscription_params.default_message_ttl
-  enable_batched_operations                 = each.value.subscription_params.enable_batched_operations
   forward_dead_lettered_messages_to         = each.value.subscription_params.forward_dead_lettered_messages_to
   forward_to                                = each.value.subscription_params.forward_to
   lock_duration                             = each.value.subscription_params.lock_duration
@@ -62,10 +62,10 @@ resource "azurerm_servicebus_subscription" "forward_topics" {
   name                                      = each.value.subscription_name
   topic_id                                  = azurerm_servicebus_topic.this[each.value.topic_name].id
   auto_delete_on_idle                       = each.value.subscription_params.auto_delete_on_idle
+  batched_operations_enabled                = each.value.subscription_params.enable_batched_operations
   dead_lettering_on_filter_evaluation_error = each.value.subscription_params.dead_lettering_on_filter_evaluation_error
   dead_lettering_on_message_expiration      = each.value.subscription_params.dead_lettering_on_message_expiration
   default_message_ttl                       = each.value.subscription_params.default_message_ttl
-  enable_batched_operations                 = each.value.subscription_params.enable_batched_operations
   forward_dead_lettered_messages_to         = each.value.subscription_params.forward_dead_lettered_messages_to
   forward_to                                = each.value.subscription_params.forward_to
   lock_duration                             = each.value.subscription_params.lock_duration

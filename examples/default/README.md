@@ -10,7 +10,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.71"
+      version = "~> 4.14"
     }
     random = {
       source  = "hashicorp/random"
@@ -59,6 +59,7 @@ module "servicebus" {
 
   for_each = toset(local.skus)
 
+  sku                 = each.value
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
@@ -72,7 +73,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
@@ -80,7 +81,7 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.71)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
 
 - <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
