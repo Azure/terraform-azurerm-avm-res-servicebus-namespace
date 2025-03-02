@@ -78,8 +78,8 @@ resource "azurerm_eventhub_namespace" "example" {
 resource "azurerm_eventhub" "example" {
   message_retention   = 1
   name                = "diagnosticshub"
-  namespace_name      = azurerm_eventhub_namespace.example.name
   partition_count     = 2
+  namespace_name      = azurerm_eventhub_namespace.example.name
   resource_group_name = azurerm_resource_group.example.name
 }
 
@@ -135,14 +135,6 @@ The following requirements are needed by this module:
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
-
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
 ## Resources
 
