@@ -55,17 +55,15 @@ resource "azurerm_user_assigned_identity" "example" {
 }
 
 module "servicebus" {
-  source = "../../"
-
+  source   = "../../"
   for_each = toset(local.skus)
 
-  sku                 = each.value
-  resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
-
+  resource_group_name = azurerm_resource_group.example.name
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
   }
+  sku = each.value
 }

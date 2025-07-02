@@ -78,21 +78,18 @@ resource "azurerm_eventhub_namespace" "example" {
 resource "azurerm_eventhub" "example" {
   message_retention   = 1
   name                = "diagnosticshub"
-  namespace_name      = azurerm_eventhub_namespace.example.name
   partition_count     = 2
+  namespace_name      = azurerm_eventhub_namespace.example.name
   resource_group_name = azurerm_resource_group.example.name
 }
 
 module "servicebus" {
-  source = "../../"
-
+  source   = "../../"
   for_each = toset(local.skus)
 
-  sku                 = each.value
-  resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
-
+  resource_group_name = azurerm_resource_group.example.name
   diagnostic_settings = {
     diagnostic1 = {
       log_groups    = ["allLogs"]
@@ -122,6 +119,7 @@ module "servicebus" {
       storage_account_resource_id    = azurerm_storage_account.example.id
     }
   }
+  sku = each.value
 }
 ```
 
@@ -135,14 +133,6 @@ The following requirements are needed by this module:
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
-
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
 ## Resources
 

@@ -56,10 +56,10 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_virtual_network" "example" {
-  address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   name                = "${module.naming.virtual_network.name_unique}-${local.prefix}"
   resource_group_name = azurerm_resource_group.example.name
+  address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "example" {
@@ -90,13 +90,9 @@ resource "azurerm_application_security_group" "example" {
 module "servicebus" {
   source = "../../"
 
-  sku                                     = "Premium"
-  resource_group_name                     = azurerm_resource_group.example.name
-  location                                = azurerm_resource_group.example.location
-  name                                    = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
-  public_network_access_enabled           = false
-  private_endpoints_manage_dns_zone_group = true
-
+  location            = azurerm_resource_group.example.location
+  name                = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
+  resource_group_name = azurerm_resource_group.example.name
   private_endpoints = {
     max = {
       name                            = "max"
@@ -140,6 +136,9 @@ module "servicebus" {
       subnet_resource_id = azurerm_subnet.example.id
     }
   }
+  private_endpoints_manage_dns_zone_group = true
+  public_network_access_enabled           = false
+  sku                                     = "Premium"
 }
 ```
 
@@ -153,14 +152,6 @@ The following requirements are needed by this module:
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
-
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
 ## Resources
 

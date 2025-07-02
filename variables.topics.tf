@@ -45,7 +45,6 @@ variable "topics" {
     })), {})
   }))
   default     = {}
-  nullable    = false
   description = <<DESCRIPTION
   Defaults to `{}`. Ignored for Basic. A map of topics to create.
   The name of the topic must be unique among topics and queues within the namespace.
@@ -142,6 +141,7 @@ variable "topics" {
   }
   ```
   DESCRIPTION
+  nullable    = false
 
   validation {
     condition = alltrue([
@@ -150,7 +150,6 @@ variable "topics" {
     ])
     error_message = "The 'status' parameter can only be 'Active', 'Creating', 'Deleting', 'Disabled', 'ReceiveDisabled', 'Renaming', 'SendDisabled', 'Unknown'."
   }
-
   validation {
     condition = alltrue([
       for _, v in var.topics :
@@ -158,7 +157,6 @@ variable "topics" {
     ])
     error_message = "The 'max_size_in_megabytes' parameter must be one of 1024, 2048, 3072, 4096, 5120, 10240, 20480, 40960, 81920."
   }
-
   validation {
     condition = alltrue(flatten([
       for topicName, topic in var.topics :
@@ -169,7 +167,6 @@ variable "topics" {
     ]))
     error_message = "value of 'max_delivery_count' of the topic subscription must be between 1 and 2147483647."
   }
-
   validation {
     condition = alltrue(flatten([
       for topicName, topic in var.topics :

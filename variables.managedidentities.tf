@@ -4,7 +4,6 @@ variable "managed_identities" {
     user_assigned_resource_ids = optional(set(string), [])
   })
   default     = {}
-  nullable    = false
   description = <<DESCRIPTION
   Defaults to `{}`. Controls the Managed Identity configuration on this resource. The following properties can be specified:
 
@@ -21,6 +20,7 @@ variable "managed_identities" {
   }
   ```
   DESCRIPTION
+  nullable    = false
 
   validation {
     condition = alltrue([

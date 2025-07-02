@@ -57,22 +57,12 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "servicebus" {
-  source = "../../"
-
+  source   = "../../"
   for_each = toset(local.skus)
 
-  sku                                     = each.value
-  resource_group_name                     = azurerm_resource_group.example.name
-  location                                = azurerm_resource_group.example.location
-  name                                    = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
-  capacity                                = 2
-  local_auth_enabled                      = true
-  minimum_tls_version                     = "1.2"
-  public_network_access_enabled           = true
-  premium_messaging_partitions            = 2
-  enable_telemetry                        = true
-  private_endpoints_manage_dns_zone_group = true
-
+  location            = azurerm_resource_group.example.location
+  name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
+  resource_group_name = azurerm_resource_group.example.name
   authorization_rules = {
     testRule = {
       send   = true
@@ -80,12 +70,17 @@ module "servicebus" {
       manage = true
     }
   }
-
-  tags = {
-    environment = "testing"
-    department  = "engineering"
+  capacity           = 2
+  enable_telemetry   = true
+  local_auth_enabled = true
+  lock = {
+    kind = "CanNotDelete"
+    name = "Testing name CanNotDelete"
   }
-
+  minimum_tls_version                     = "1.2"
+  premium_messaging_partitions            = 2
+  private_endpoints_manage_dns_zone_group = true
+  public_network_access_enabled           = true
   role_assignments = {
     key = {
       skip_service_principal_aad_check = false
@@ -94,10 +89,10 @@ module "servicebus" {
       principal_id                     = data.azurerm_client_config.current.object_id
     }
   }
-
-  lock = {
-    kind = "CanNotDelete"
-    name = "Testing name CanNotDelete"
+  sku = each.value
+  tags = {
+    environment = "testing"
+    department  = "engineering"
   }
 }
 ```
@@ -112,14 +107,6 @@ The following requirements are needed by this module:
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
-
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
 ## Resources
 

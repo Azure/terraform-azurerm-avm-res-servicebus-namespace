@@ -110,16 +110,9 @@ resource "time_sleep" "wait_for_rbac_before_key_operations" {
 module "servicebus" {
   source = "../../"
 
-  infrastructure_encryption_enabled = true
-  sku                               = "Premium"
-  resource_group_name               = azurerm_resource_group.example.name
-  location                          = azurerm_resource_group.example.location
-  name                              = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
-
-  managed_identities = {
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
-  }
-
+  location            = azurerm_resource_group.example.location
+  name                = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
+  resource_group_name = azurerm_resource_group.example.name
   customer_managed_key = {
     key_vault_resource_id = azurerm_key_vault.example.id
     key_name              = azurerm_key_vault_key.example.name
@@ -128,6 +121,11 @@ module "servicebus" {
       resource_id = azurerm_user_assigned_identity.example.id
     }
   }
+  infrastructure_encryption_enabled = true
+  managed_identities = {
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
+  }
+  sku = "Premium"
 
   depends_on = [time_sleep.wait_for_rbac_before_key_operations]
 }
@@ -145,16 +143,6 @@ The following requirements are needed by this module:
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
 - <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.11)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
-
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
-
-- <a name="provider_time"></a> [time](#provider\_time) (~> 0.11)
 
 ## Resources
 

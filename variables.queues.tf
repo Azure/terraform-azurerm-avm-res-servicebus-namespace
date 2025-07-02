@@ -35,7 +35,6 @@ variable "queues" {
     })), {})
   }))
   default     = {}
-  nullable    = false
   description = <<DESCRIPTION
   Defaults to `{}`. A map of queues to create.
   The name of the queue must be unique among topics and queues within the namespace.
@@ -112,6 +111,7 @@ variable "queues" {
   }
   ```
   DESCRIPTION
+  nullable    = false
 
   validation {
     condition = alltrue([
@@ -120,7 +120,6 @@ variable "queues" {
     ])
     error_message = "Forwarding to another queue ('forward_to' parameter) or topic is not supported when 'requires_session' is set to 'true'."
   }
-
   validation {
     condition = alltrue([
       for _, v in var.queues :
@@ -128,7 +127,6 @@ variable "queues" {
     ])
     error_message = "'status' can only be 'Active', 'Creating', 'Deleting', 'Disabled', 'ReceiveDisabled', 'Renaming', 'SendDisabled', 'Unknown'."
   }
-
   validation {
     condition = alltrue([
       for _, v in var.queues :
@@ -136,7 +134,6 @@ variable "queues" {
     ])
     error_message = "The 'max_size_in_megabytes' parameter must be one of 1024, 2048, 3072, 4096, 5120, 10240, 20480, 40960, 81920."
   }
-
   validation {
     condition = alltrue([
       for _, v in var.queues :
@@ -144,7 +141,6 @@ variable "queues" {
     ])
     error_message = "value of 'max_delivery_count' must be between 1 and 2147483647."
   }
-
   validation {
     condition = alltrue(flatten([
       for queue_name, queue_params in var.queues :
@@ -155,7 +151,6 @@ variable "queues" {
     ]))
     error_message = "'role_definition_id_or_name' or name must be set"
   }
-
   validation {
     condition = alltrue(flatten([
       for queue_name, queue_params in var.queues :
