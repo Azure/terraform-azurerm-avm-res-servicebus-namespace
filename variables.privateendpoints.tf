@@ -1,10 +1,3 @@
-variable "private_endpoints_manage_dns_zone_group" {
-  type        = bool
-  default     = true
-  nullable    = false
-  description = "Default to true. Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy."
-}
-
 variable "private_endpoints" {
   type = map(object({
     subnet_resource_id = string
@@ -44,7 +37,6 @@ variable "private_endpoints" {
     })), {})
   }))
   default     = {}
-  nullable    = false
   description = <<DESCRIPTION
   Default to `{}`. Ignored for Basic and Standard. A map of private endpoints to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
@@ -66,4 +58,12 @@ variable "private_endpoints" {
   - `lock`             - (Optional) - The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
   - `tags`             - (Optional) - A mapping of tags to assign to the private endpoint.
   DESCRIPTION
+  nullable    = false
+}
+
+variable "private_endpoints_manage_dns_zone_group" {
+  type        = bool
+  default     = true
+  description = "Default to true. Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy."
+  nullable    = false
 }
