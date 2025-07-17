@@ -57,15 +57,12 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "servicebus" {
-  source = "../../"
-
+  source   = "../../"
   for_each = toset(local.skus)
 
-  sku                 = each.value
-  resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
-
+  resource_group_name = azurerm_resource_group.example.name
   queues = {
     forwardQueue = {
 
@@ -116,6 +113,7 @@ module "servicebus" {
       }
     }
   }
+  sku = each.value
 }
 ```
 
@@ -129,14 +127,6 @@ The following requirements are needed by this module:
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.14)
-
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
 ## Resources
 

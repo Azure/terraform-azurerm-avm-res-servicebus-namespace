@@ -1,10 +1,3 @@
-variable "public_network_access_enabled" {
-  type        = bool
-  default     = true
-  description = "Defaults to `true`. Is public network access enabled for the Service Bus Namespace?"
-  nullable    = false
-}
-
 variable "network_rule_config" {
   type = object({
     trusted_services_allowed = optional(bool, false)
@@ -15,7 +8,6 @@ variable "network_rule_config" {
       subnet_id = string
     })), [])
   })
-  nullable = false
   default = {
     cidr_or_ip_rules         = []
     network_rules            = []
@@ -59,12 +51,12 @@ variable "network_rule_config" {
   }
   ```
   DESCRIPTION
+  nullable    = false
 
   validation {
     condition     = contains(["Allow", "Deny"], var.network_rule_config.default_action)
     error_message = "'default_action' can only be 'Allow' or 'Deny'"
   }
-
   validation {
     condition = alltrue([
       for value in var.network_rule_config.network_rules :
@@ -72,7 +64,6 @@ variable "network_rule_config" {
     ])
     error_message = "'network_rules' must be in the format '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}'"
   }
-
   validation {
     condition = alltrue([
       for value in var.network_rule_config.cidr_or_ip_rules :
@@ -80,7 +71,6 @@ variable "network_rule_config" {
     ])
     error_message = "Allowed Ips must be valid IPv4 CIDR."
   }
-
   validation {
     condition = alltrue([
       for value in var.network_rule_config.cidr_or_ip_rules :
@@ -88,4 +78,11 @@ variable "network_rule_config" {
     ])
     error_message = "Allowed IPs must be valid IPv4."
   }
+}
+
+variable "public_network_access_enabled" {
+  type        = bool
+  default     = true
+  description = "Defaults to `true`. Is public network access enabled for the Service Bus Namespace?"
+  nullable    = false
 }
