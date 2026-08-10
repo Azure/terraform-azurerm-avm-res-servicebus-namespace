@@ -19,6 +19,7 @@ resource "azurerm_servicebus_namespace" "this" {
       infrastructure_encryption_enabled = var.infrastructure_encryption_enabled
     }
   }
+
   dynamic "identity" {
     for_each = local.managed_identities.system_assigned_user_assigned
 
@@ -27,6 +28,7 @@ resource "azurerm_servicebus_namespace" "this" {
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
+
   network_rule_set {
     default_action                = var.network_rule_config.default_action
     ip_rules                      = var.network_rule_config.cidr_or_ip_rules
@@ -42,6 +44,7 @@ resource "azurerm_servicebus_namespace" "this" {
       }
     }
   }
+
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 
