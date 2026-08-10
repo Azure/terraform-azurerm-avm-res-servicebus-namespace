@@ -15,6 +15,7 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
     private_connection_resource_id = azurerm_servicebus_namespace.this.id
     subresource_names              = [local.service_name]
   }
+
   dynamic "ip_configuration" {
     for_each = each.value.ip_configurations
 
@@ -25,6 +26,7 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
       subresource_name   = local.service_name
     }
   }
+
   dynamic "private_dns_zone_group" {
     for_each = length(each.value.private_dns_zone_resource_ids) > 0 ? ["this"] : []
 
@@ -52,6 +54,7 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
     private_connection_resource_id = azurerm_servicebus_namespace.this.id
     subresource_names              = [local.service_name]
   }
+
   dynamic "ip_configuration" {
     for_each = each.value.ip_configurations
 

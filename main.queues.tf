@@ -54,8 +54,6 @@ resource "azurerm_servicebus_queue" "forward_queues" {
   requires_session                        = var.sku != local.basic_sku_name ? each.value.requires_session : null
   status                                  = each.value.status
 
-  depends_on = [azurerm_servicebus_queue.base_queues]
-
   lifecycle {
     precondition {
       condition     = var.sku != local.premium_sku_name || each.value.max_message_size_in_kilobytes == null ? true : var.sku == local.premium_sku_name && each.value.max_message_size_in_kilobytes >= local.smallest_premium_max_message_size_in_kilobytes && each.value.max_message_size_in_kilobytes <= local.biggest_premium_max_message_size_in_kilobytes
@@ -66,6 +64,7 @@ resource "azurerm_servicebus_queue" "forward_queues" {
       error_message = "The requires_duplicate_detection parameter must be false when enable_express is true for Standard"
     }
   }
+  depends_on = [azurerm_servicebus_queue.base_queues]
 }
 
 resource "azurerm_servicebus_queue_authorization_rule" "this" {
