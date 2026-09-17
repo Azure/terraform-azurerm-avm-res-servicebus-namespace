@@ -72,7 +72,7 @@ module "servicebus" {
     }
   }
   capacity           = 2
-  enable_telemetry   = true
+  enable_telemetry   = false
   local_auth_enabled = true
   lock = {
     kind = "CanNotDelete"
