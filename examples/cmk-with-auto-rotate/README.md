@@ -122,6 +122,7 @@ module "servicebus" {
       resource_id = azurerm_user_assigned_identity.example.id
     }
   }
+  enable_telemetry                  = false
   infrastructure_encryption_enabled = true
   managed_identities = {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]

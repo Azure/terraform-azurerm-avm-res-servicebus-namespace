@@ -94,6 +94,7 @@ module "servicebus" {
   location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${local.prefix}"
   resource_group_name = azurerm_resource_group.example.name
+  enable_telemetry    = false
   private_endpoints = {
     max = {
       name                            = "max"
