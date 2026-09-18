@@ -113,6 +113,6 @@ module "servicebus" {
       storage_account_resource_id    = azurerm_storage_account.example.id
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   sku              = each.value
 }
