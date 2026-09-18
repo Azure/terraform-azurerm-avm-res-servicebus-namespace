@@ -61,7 +61,7 @@ module "servicebus" {
   location            = azurerm_resource_group.example.location
   name                = "${module.naming.servicebus_namespace.name_unique}-${each.value}-${local.prefix}"
   resource_group_name = azurerm_resource_group.example.name
-  enable_telemetry    = false
+  enable_telemetry    = var.enable_telemetry
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example.id]
