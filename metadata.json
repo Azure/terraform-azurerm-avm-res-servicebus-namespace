@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Service Bus Namespace",
+  "moduleDescription": "AVM Resource Module for Service Bus Namespace",
+  "canonicalType": "Microsoft.ServiceBus/namespaces",
+  "owners": [
+    "iarik0440"
+  ],
+  "telemetryIdPrefix": "46d3xtrf.res.411facc"
+}
