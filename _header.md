@@ -22,6 +22,10 @@ This Terraform module is designed to create Azure Service bus namespaces and its
 * The module does not support configuring failover for premium tiers
 * The module does not support subscription filters when creating topics
 
+Private endpoints are created only for Premium namespaces; Basic and Standard continue to ignore endpoint creation. Service Bus supports the `namespace` subresource and IP configuration member, including static IP addresses. Omitted names and member names retain their existing defaults. Endpoint `resource_group_name` accepts a resource group name, not an ARM ID.
+
+Endpoint role assignment names, descriptions, conditions, principal types, and lock notes are now applied rather than discarded. Existing namespace, endpoint, role assignment, and lock addresses remain unchanged. Review the plan before applying previously ignored role assignment values, as these can replace the assignment. Reusing a role assignment map key across multiple endpoints remains unsupported.
+
 ## Examples
 * [Use only defaults values](examples/default/main.tf)
 * [Specifying all possible parameters at namespace level](examples/max-namespace/main.tf)

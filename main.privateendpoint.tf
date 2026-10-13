@@ -13,7 +13,7 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
     is_manual_connection           = false
     name                           = coalesce(each.value.private_service_connection_name, "pse-${var.name}")
     private_connection_resource_id = azurerm_servicebus_namespace.this.id
-    subresource_names              = [local.service_name]
+    subresource_names              = [coalesce(each.value.subresource_name, local.service_name)]
   }
 
   dynamic "ip_configuration" {
@@ -22,8 +22,8 @@ resource "azurerm_private_endpoint" "this_managed_dns_zone_groups" {
     content {
       name               = ip_configuration.value.name
       private_ip_address = ip_configuration.value.private_ip_address
-      member_name        = local.service_name
-      subresource_name   = local.service_name
+      member_name        = coalesce(ip_configuration.value.member_name, local.service_name)
+      subresource_name   = coalesce(each.value.subresource_name, local.service_name)
     }
   }
 
@@ -52,7 +52,7 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
     is_manual_connection           = false
     name                           = coalesce(each.value.private_service_connection_name, "pse-${var.name}")
     private_connection_resource_id = azurerm_servicebus_namespace.this.id
-    subresource_names              = [local.service_name]
+    subresource_names              = [coalesce(each.value.subresource_name, local.service_name)]
   }
 
   dynamic "ip_configuration" {
@@ -61,8 +61,8 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
     content {
       name               = ip_configuration.value.name
       private_ip_address = ip_configuration.value.private_ip_address
-      member_name        = local.service_name
-      subresource_name   = local.service_name
+      member_name        = coalesce(ip_configuration.value.member_name, local.service_name)
+      subresource_name   = coalesce(each.value.subresource_name, local.service_name)
     }
   }
 
