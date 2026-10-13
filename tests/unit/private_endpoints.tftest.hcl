@@ -90,6 +90,9 @@ run "managed_explicit_fields" {
     modtm   = modtm.mock
     random  = random.mock
   }
+  variables {
+    enable_telemetry = null
+  }
 
   assert {
     condition = (
