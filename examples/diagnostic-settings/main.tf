@@ -28,7 +28,7 @@ locals {
 
 module "regions" {
   source  = "Azure/regions/azurerm"
-  version = ">= 0.3.0"
+  version = "0.8.2"
 
   recommended_regions_only = true
 }
@@ -40,7 +40,7 @@ resource "random_integer" "region_index" {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = ">= 0.3.0"
+  version = "0.4.4"
 }
 
 resource "azurerm_resource_group" "example" {
@@ -63,10 +63,12 @@ resource "azurerm_log_analytics_workspace" "example" {
 }
 
 resource "azurerm_eventhub_namespace" "example" {
-  location            = azurerm_resource_group.example.location
-  name                = "${module.naming.eventhub_namespace.name_unique}-${local.prefix}"
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = "Basic"
+  location                 = azurerm_resource_group.example.location
+  name                     = "${module.naming.eventhub_namespace.name_unique}-${local.prefix}"
+  resource_group_name      = azurerm_resource_group.example.name
+  sku                      = "Standard"
+  auto_inflate_enabled     = true
+  maximum_throughput_units = 2
 }
 
 resource "azurerm_eventhub" "example" {

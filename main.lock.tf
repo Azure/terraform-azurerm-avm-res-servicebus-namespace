@@ -8,7 +8,7 @@ resource "azurerm_management_lock" "this" {
     each.value.scope_type == local.private_endpoint_scope_type && var.private_endpoints_manage_dns_zone_group == false ? azurerm_private_endpoint.this_unmanaged_dns_zone_groups[each.value.pe_name].id :
     azurerm_servicebus_namespace.this.id
   )
-  notes = each.value.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
+  notes = coalesce(try(each.value.lock.notes, null), each.value.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources.")
 
   depends_on = [
     azurerm_servicebus_namespace.this,
