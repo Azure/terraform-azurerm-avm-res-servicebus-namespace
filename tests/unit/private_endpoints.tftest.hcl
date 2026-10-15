@@ -25,14 +25,11 @@ mock_provider "azurerm" {
 
 mock_provider "azapi" {
   alias = "mock"
-}
-
-mock_provider "modtm" {
-  alias = "mock"
-}
-
-mock_provider "random" {
-  alias = "mock"
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
 }
 
 variables {
@@ -87,8 +84,8 @@ run "managed_explicit_fields" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     enable_telemetry = null
@@ -130,7 +127,7 @@ run "managed_explicit_fields" {
     error_message = "Existing endpoint role assignment, lock and association addresses and scope must be preserved with supplied fields applied."
   }
   assert {
-    condition     = var.enable_telemetry && length(modtm_telemetry.telemetry) == 1
+    condition     = var.enable_telemetry && length(azapi_resource.telemetry) == 1
     error_message = "Telemetry remains enabled by default and is exercised only through its mock."
   }
 }
@@ -140,8 +137,8 @@ run "unmanaged_explicit_fields" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     private_endpoints_manage_dns_zone_group = false
@@ -175,8 +172,8 @@ run "omitted_fields_and_inherited_lock" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     tags = { inherited = "true" }
@@ -214,8 +211,8 @@ run "basic_ignores_endpoints" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     sku = "Basic"
@@ -236,8 +233,8 @@ run "standard_ignores_endpoints_and_telemetry_opt_out" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     sku              = "Standard"
@@ -249,7 +246,7 @@ run "standard_ignores_endpoints_and_telemetry_opt_out" {
       length(azurerm_private_endpoint_application_security_group_association.this) == 0 &&
       length(azurerm_role_assignment.this) == 0 &&
       length(azurerm_management_lock.this) == 0 &&
-      length(modtm_telemetry.telemetry) == 0
+      length(azapi_resource.telemetry) == 0
     )
     error_message = "Standard namespaces must continue to ignore endpoints and retain the telemetry opt-out."
   }
@@ -260,8 +257,8 @@ run "invalid_subresource" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     private_endpoints = {
@@ -279,8 +276,8 @@ run "invalid_member" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     private_endpoints = {
@@ -304,8 +301,8 @@ run "invalid_subnet" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     private_endpoints = {
@@ -320,8 +317,8 @@ run "invalid_dns_zone" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     private_endpoints = {
@@ -339,8 +336,8 @@ run "invalid_application_security_group" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     private_endpoints = {
@@ -358,8 +355,8 @@ run "invalid_delegated_identity" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     private_endpoints = {
@@ -383,8 +380,8 @@ run "legacy_child_role_assignment_shapes" {
   providers = {
     azurerm = azurerm.mock
     azapi   = azapi.mock
-    modtm   = modtm.mock
-    random  = random.mock
+
+
   }
   variables {
     private_endpoints = {}
