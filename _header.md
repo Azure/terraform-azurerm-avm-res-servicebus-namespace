@@ -26,6 +26,35 @@ Private endpoints are created only for Premium namespaces; Basic and Standard co
 
 Endpoint role assignment names, descriptions, conditions, principal types, and lock notes are now applied rather than discarded. Existing namespace, endpoint, role assignment, and lock addresses remain unchanged. Review the plan before applying previously ignored role assignment values, as these can replace the assignment. Reusing a role assignment map key across multiple endpoints remains unsupported.
 
+## Upgrading to the AzAPI resources
+
+Resources move from AzureRM to AzAPI with `moved` blocks, so the plan after upgrading reports them as moved and Azure keeps them. These cases need extra steps:
+
+- **`ReadOnly` lock.** The upgrade updates resources in place, which a `ReadOnly` lock blocks. Before upgrading, apply your configuration without the lock using the old version, then upgrade and restore the lock.
+- **Cross-tenant role assignments** (those that set `delegated_managed_identity_resource_id`, for example with Azure Lighthouse). The AzureRM provider stored their ID with a `|<tenant-id>` suffix that a `moved` block cannot convert. Before planning, remove each one from the state, then import it at its new address with an `import` block in your root module. The key is the same as in the old address, for example `Namespace|<role key>` or `Queue|<role key>|<queue name>`:
+
+  ```shell
+  terraform state rm 'module.<module-name>.azurerm_role_assignment.this["<key>"]'
+  ```
+
+  ```hcl
+  import {
+    to = module.<module-name>.azapi_resource.role_assignments["<key>"]
+    id = "<role assignment resource ID, without the |<tenant-id> suffix>"
+  }
+  ```
+
+- **Private DNS zone groups managed by the module** (`private_endpoints_manage_dns_zone_group` is true, the default, and a private endpoint sets `private_dns_zone_resource_ids`). The AzureRM provider kept the zone group inside the private endpoint, so there is no separate address for a `moved` block to start from, and AzAPI does not take over an existing resource it did not create. Import each zone group once with an `import` block in your root module:
+
+  ```hcl
+  import {
+    to = module.<module-name>.azapi_resource.private_dns_zone_groups["<key>"]
+    id = "/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/privateEndpoints/<private-endpoint-name>/privateDnsZoneGroups/<zone-group-name>?api-version=2024-05-01"
+  }
+  ```
+
+  `<key>` is the key of the `private_endpoints` entry, `<private-endpoint-name>` is its `name` (`pep-<namespace name>` by default), and `<zone-group-name>` is its `private_dns_zone_group_name` (`default` by default). The import leaves the zone group and its DNS records unchanged. Without it, the apply stops with `Resource already exists`, and nothing in Azure is removed; add the block and apply again. Remove the block once the upgrade is applied.
+
 ## Examples
 * [Use only defaults values](examples/default/main.tf)
 * [Specifying all possible parameters at namespace level](examples/max-namespace/main.tf)
