@@ -12,7 +12,18 @@ output "resource_authorization_rules" {
 
 output "resource_diagnostic_settings" {
   description = "The diagnostic settings created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting#attributes-reference"
-  value       = azurerm_monitor_diagnostic_setting.this
+  # The AzureRM attribute names are kept so that existing references keep working.
+  value = { for key, setting in azapi_resource.diagnostic_settings : key => {
+    id                             = setting.id
+    name                           = setting.name
+    target_resource_id             = setting.parent_id
+    eventhub_authorization_rule_id = setting.body.properties.eventHubAuthorizationRuleId
+    eventhub_name                  = setting.body.properties.eventHubName
+    log_analytics_destination_type = setting.body.properties.logAnalyticsDestinationType
+    log_analytics_workspace_id     = setting.body.properties.workspaceId
+    partner_solution_id            = setting.body.properties.marketplacePartnerId
+    storage_account_id             = setting.body.properties.storageAccountId
+  } }
 }
 
 output "resource_id" {
@@ -22,7 +33,14 @@ output "resource_id" {
 
 output "resource_locks" {
   description = "The management locks created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock#attributes-reference"
-  value       = azurerm_management_lock.this
+  # The AzureRM attribute names are kept so that existing references keep working.
+  value = { for key, lock in azapi_resource.lock : key => {
+    id         = lock.id
+    name       = lock.name
+    scope      = lock.parent_id
+    lock_level = lock.body.properties.level
+    notes      = lock.body.properties.notes
+  } }
 }
 
 output "resource_private_endpoints" {
@@ -48,7 +66,20 @@ output "resource_queues_authorization_rules" {
 
 output "resource_role_assignments" {
   description = "The role assignments created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment#attributes-reference"
-  value       = azurerm_role_assignment.this
+  # The AzureRM attribute names are kept so that existing references keep working.
+  value = { for key, assignment in azapi_resource.role_assignments : key => {
+    id                                     = assignment.id
+    name                                   = assignment.name
+    scope                                  = assignment.parent_id
+    principal_id                           = assignment.body.properties.principalId
+    principal_type                         = try(assignment.body.properties.principalType, null)
+    role_definition_id                     = assignment.body.properties.roleDefinitionId
+    description                            = try(assignment.body.properties.description, null)
+    condition                              = try(assignment.body.properties.condition, null)
+    condition_version                      = try(assignment.body.properties.conditionVersion, null)
+    delegated_managed_identity_resource_id = try(assignment.body.properties.delegatedManagedIdentityResourceId, null)
+    skip_service_principal_aad_check       = local.total_role_assignments[key].role_params.skip_service_principal_aad_check
+  } }
 }
 
 output "resource_topics" {
