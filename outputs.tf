@@ -12,7 +12,18 @@ output "resource_authorization_rules" {
 
 output "resource_diagnostic_settings" {
   description = "The diagnostic settings created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting#attributes-reference"
-  value       = azurerm_monitor_diagnostic_setting.this
+  # The AzureRM attribute names are kept so that existing references keep working.
+  value = { for key, setting in azapi_resource.diagnostic_settings : key => {
+    id                             = setting.id
+    name                           = setting.name
+    target_resource_id             = setting.parent_id
+    eventhub_authorization_rule_id = setting.body.properties.eventHubAuthorizationRuleId
+    eventhub_name                  = setting.body.properties.eventHubName
+    log_analytics_destination_type = setting.body.properties.logAnalyticsDestinationType
+    log_analytics_workspace_id     = setting.body.properties.workspaceId
+    partner_solution_id            = setting.body.properties.marketplacePartnerId
+    storage_account_id             = setting.body.properties.storageAccountId
+  } }
 }
 
 output "resource_id" {
@@ -22,17 +33,80 @@ output "resource_id" {
 
 output "resource_locks" {
   description = "The management locks created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock#attributes-reference"
-  value       = azurerm_management_lock.this
+  # The AzureRM attribute names are kept so that existing references keep working.
+  value = { for key, lock in azapi_resource.lock : key => {
+    id         = lock.id
+    name       = lock.name
+    scope      = lock.parent_id
+    lock_level = lock.body.properties.level
+    notes      = lock.body.properties.notes
+  } }
 }
 
 output "resource_private_endpoints" {
   description = "A map of the private endpoints created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint#attributes-reference"
-  value       = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this_managed_dns_zone_groups : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
+  # The AzureRM attribute names and shapes are kept so that references such as
+  # `private_service_connection[0].private_ip_address` keep working.
+  value = {
+    for key, endpoint in local.private_endpoint_resources : key => {
+      custom_dns_configs = [
+        for config in try(endpoint.output.properties.customDnsConfigs, []) : {
+          fqdn         = config.fqdn
+          ip_addresses = config.ipAddresses
+        }
+      ]
+      custom_network_interface_name = var.private_endpoints[key].network_interface_name
+      id                            = endpoint.id
+      ip_configuration = [
+        for ip_configuration in values(var.private_endpoints[key].ip_configurations) : {
+          member_name        = coalesce(ip_configuration.member_name, local.service_name)
+          name               = ip_configuration.name
+          private_ip_address = ip_configuration.private_ip_address
+          subresource_name   = coalesce(var.private_endpoints[key].subresource_name, local.service_name)
+        }
+      ]
+      location = endpoint.location
+      name     = endpoint.name
+      network_interface = [
+        for nic in try(endpoint.output.properties.networkInterfaces, []) : {
+          id   = nic.id
+          name = provider::azapi::parse_resource_id("Microsoft.Network/networkInterfaces", nic.id).name
+        }
+      ]
+      private_dns_zone_group = [
+        for group in try([azapi_resource.private_dns_zone_groups[key]], []) : {
+          id                   = group.id
+          name                 = group.name
+          private_dns_zone_ids = tolist(var.private_endpoints[key].private_dns_zone_resource_ids)
+        }
+      ]
+      private_service_connection = [
+        {
+          is_manual_connection           = false
+          name                           = local.private_endpoints[key].body.properties.privateLinkServiceConnections[0].name
+          private_connection_resource_id = azurerm_servicebus_namespace.this.id
+          private_ip_address             = data.azapi_resource.private_endpoint_network_interfaces[key].output.private_ip_address
+          subresource_names              = tolist(local.private_endpoints[key].body.properties.privateLinkServiceConnections[0].properties.groupIds)
+        }
+      ]
+      resource_group_name = coalesce(var.private_endpoints[key].resource_group_name, var.resource_group_name)
+      subnet_id           = var.private_endpoints[key].subnet_resource_id
+      tags                = endpoint.tags
+    }
+  }
 }
 
 output "resource_private_endpoints_application_security_group_association" {
   description = "The private endpoint application security group associations created"
-  value       = azurerm_private_endpoint_application_security_group_association.this
+  # The application security groups are part of each private endpoint's body. The AzureRM attribute names
+  # and ID format are kept so that existing references keep working.
+  value = {
+    for key, association in local.private_endpoint_application_security_group_associations : key => {
+      application_security_group_id = association.asg_resource_id
+      id                            = "${local.private_endpoint_resources[association.pe_key].id}|${association.asg_resource_id}"
+      private_endpoint_id           = local.private_endpoint_resources[association.pe_key].id
+    }
+  }
 }
 
 output "resource_queues" {
@@ -48,7 +122,20 @@ output "resource_queues_authorization_rules" {
 
 output "resource_role_assignments" {
   description = "The role assignments created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment#attributes-reference"
-  value       = azurerm_role_assignment.this
+  # The AzureRM attribute names are kept so that existing references keep working.
+  value = { for key, assignment in azapi_resource.role_assignments : key => {
+    id                                     = assignment.id
+    name                                   = assignment.name
+    scope                                  = assignment.parent_id
+    principal_id                           = assignment.body.properties.principalId
+    principal_type                         = try(assignment.body.properties.principalType, null)
+    role_definition_id                     = assignment.body.properties.roleDefinitionId
+    description                            = try(assignment.body.properties.description, null)
+    condition                              = try(assignment.body.properties.condition, null)
+    condition_version                      = try(assignment.body.properties.conditionVersion, null)
+    delegated_managed_identity_resource_id = try(assignment.body.properties.delegatedManagedIdentityResourceId, null)
+    skip_service_principal_aad_check       = local.total_role_assignments[key].role_params.skip_service_principal_aad_check
+  } }
 }
 
 output "resource_topics" {
