@@ -2,7 +2,7 @@ resource "azurerm_servicebus_queue" "base_queues" {
   for_each = local.base_queues
 
   name                                    = each.key
-  namespace_id                            = azurerm_servicebus_namespace.this.id
+  namespace_id                            = azapi_resource.this.id
   auto_delete_on_idle                     = var.sku != local.basic_sku_name ? each.value.auto_delete_on_idle : null
   batched_operations_enabled              = each.value.enable_batched_operations
   dead_lettering_on_message_expiration    = each.value.dead_lettering_on_message_expiration
@@ -36,7 +36,7 @@ resource "azurerm_servicebus_queue" "forward_queues" {
   for_each = local.forward_queues
 
   name                                    = each.key
-  namespace_id                            = azurerm_servicebus_namespace.this.id
+  namespace_id                            = azapi_resource.this.id
   auto_delete_on_idle                     = var.sku != local.basic_sku_name ? each.value.auto_delete_on_idle : null
   batched_operations_enabled              = each.value.enable_batched_operations
   dead_lettering_on_message_expiration    = each.value.dead_lettering_on_message_expiration
