@@ -10,7 +10,7 @@ locals {
     ]
   ])
   flatten_queue_role_assignments = flatten([
-    for queue_name, queue_params in var.queues : [
+    for queue_name, queue_params in local.normalized_queues : [
       for role_key, role_params in queue_params.role_assignments : {
         role_key    = role_key
         queue_name  = queue_name
