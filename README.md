@@ -28,6 +28,35 @@ Private endpoints are created only for Premium namespaces; Basic and Standard co
 
 Endpoint role assignment names, descriptions, conditions, principal types, and lock notes are now applied rather than discarded. Existing namespace, endpoint, role assignment, and lock addresses remain unchanged. Review the plan before applying previously ignored role assignment values, as these can replace the assignment. Reusing a role assignment map key across multiple endpoints remains unsupported.
 
+## Upgrading to the AzAPI resources
+
+Resources move from AzureRM to AzAPI with `moved` blocks, so the plan after upgrading reports them as moved and Azure keeps them. These cases need extra steps:
+
+- **`ReadOnly` lock.** The upgrade updates resources in place, which a `ReadOnly` lock blocks. Before upgrading, apply your configuration without the lock using the old version, then upgrade and restore the lock.
+- **Cross-tenant role assignments** (those that set `delegated_managed_identity_resource_id`, for example with Azure Lighthouse). The AzureRM provider stored their ID with a `|<tenant-id>` suffix that a `moved` block cannot convert. Before planning, remove each one from the state, then import it at its new address with an `import` block in your root module. The key is the same as in the old address, for example `Namespace|<role key>` or `Queue|<role key>|<queue name>`:
+
+  ```shell
+  terraform state rm 'module.<module-name>.azurerm_role_assignment.this["<key>"]'
+  ```
+
+  ```hcl
+  import {
+    to = module.<module-name>.azapi_resource.role_assignments["<key>"]
+    id = "<role assignment resource ID, without the |<tenant-id> suffix>"
+  }
+  ```
+
+- **Private DNS zone groups managed by the module** (`private_endpoints_manage_dns_zone_group` is true, the default, and a private endpoint sets `private_dns_zone_resource_ids`). The AzureRM provider kept the zone group inside the private endpoint, so there is no separate address for a `moved` block to start from, and AzAPI does not take over an existing resource it did not create. Import each zone group once with an `import` block in your root module:
+
+  ```hcl
+  import {
+    to = module.<module-name>.azapi_resource.private_dns_zone_groups["<key>"]
+    id = "/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/privateEndpoints/<private-endpoint-name>/privateDnsZoneGroups/<zone-group-name>?api-version=2024-05-01"
+  }
+  ```
+
+  `<key>` is the key of the `private_endpoints` entry, `<private-endpoint-name>` is its `name` (`pep-<namespace name>` by default), and `<zone-group-name>` is its `private_dns_zone_group_name` (`default` by default). The import leaves the zone group and its DNS records unchanged. Without it, the apply stops with `Resource already exists`, and nothing in Azure is removed; add the block and apply again. Remove the block once the upgrade is applied.
+
 ## Examples
 * [Use only defaults values](examples/default/main.tf)
 * [Specifying all possible parameters at namespace level](examples/max-namespace/main.tf)
@@ -45,34 +74,46 @@ Endpoint role assignment names, descriptions, conditions, principal types, and l
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.11, < 2.0)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.14)
 
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.13)
+
 ## Resources
 
 The following resources are used by this module:
 
+- [azapi_resource.authorization_rules](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.base_queues](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.base_topics](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.diagnostic_settings](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.forward_queues](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.forward_topics](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.lock](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_dns_zone_groups](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_endpoints](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_endpoints_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.queue_authorization_rules](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.role_assignments](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_private_endpoint.this_managed_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_servicebus_namespace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace) (resource)
-- [azurerm_servicebus_namespace_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace_authorization_rule) (resource)
-- [azurerm_servicebus_queue.base_queues](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue) (resource)
-- [azurerm_servicebus_queue.forward_queues](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue) (resource)
-- [azurerm_servicebus_queue_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue_authorization_rule) (resource)
-- [azurerm_servicebus_subscription.base_topics](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_subscription) (resource)
-- [azurerm_servicebus_subscription.forward_topics](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_subscription) (resource)
-- [azurerm_servicebus_topic.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_topic) (resource)
-- [azurerm_servicebus_topic_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_topic_authorization_rule) (resource)
+- [azapi_resource.this](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.topic_authorization_rules](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.topics](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_update_resource.network_rule_set](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/update_resource) (resource)
 - [terraform_data.telemetry](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
+- [time_sleep.lock_removal](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
+- [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource.private_endpoint_network_interfaces](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
+- [azapi_resource_action.authorization_rule_keys](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) (data source)
+- [azapi_resource_action.default_keys](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) (data source)
+- [azapi_resource_action.queue_authorization_rule_keys](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) (data source)
+- [azapi_resource_action.topic_authorization_rule_keys](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) (data source)
+- [azapi_resource_list.diagnostic_categories](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
+- [azapi_resource_list.role_definitions](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -929,7 +970,13 @@ Description: The service bus topic subscriptions created. More info: https://reg
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_avm_interfaces"></a> [avm\_interfaces](#module\_avm\_interfaces)
+
+Source: Azure/avm-utl-interfaces/azure
+
+Version: 0.9.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
