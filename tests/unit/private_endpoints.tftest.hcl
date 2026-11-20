@@ -111,17 +111,17 @@ run "managed_explicit_fields" {
   }
   assert {
     condition = (
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].name == "00000000-0000-0000-0000-000000000001" &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].principal_id == "00000000-0000-0000-0000-000000000002" &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].description == "Endpoint permission" &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].principal_type == "ServicePrincipal" &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].condition_version == "2.0" &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].condition == var.private_endpoints["endpoint"].role_assignments["contributor"].condition &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].role_definition_id == var.private_endpoints["endpoint"].role_assignments["contributor"].role_definition_id_or_name &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].skip_service_principal_aad_check &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].scope == azurerm_private_endpoint.this_managed_dns_zone_groups["endpoint"].id &&
-      azurerm_management_lock.this["PrivateEndpoint|endpoint"].notes == "Endpoint protection" &&
-      azurerm_management_lock.this["PrivateEndpoint|endpoint"].scope == azurerm_private_endpoint.this_managed_dns_zone_groups["endpoint"].id &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].name == "00000000-0000-0000-0000-000000000001" &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].principal_id == "00000000-0000-0000-0000-000000000002" &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].description == "Endpoint permission" &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].principal_type == "ServicePrincipal" &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].condition_version == "2.0" &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].condition == var.private_endpoints["endpoint"].role_assignments["contributor"].condition &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].role_definition_id == var.private_endpoints["endpoint"].role_assignments["contributor"].role_definition_id_or_name &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].skip_service_principal_aad_check &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].scope == azurerm_private_endpoint.this_managed_dns_zone_groups["endpoint"].id &&
+      output.resource_locks["PrivateEndpoint|endpoint"].notes == "Endpoint protection" &&
+      output.resource_locks["PrivateEndpoint|endpoint"].scope == azurerm_private_endpoint.this_managed_dns_zone_groups["endpoint"].id &&
       azurerm_private_endpoint_application_security_group_association.this["endpoint-asg"].private_endpoint_id == azurerm_private_endpoint.this_managed_dns_zone_groups["endpoint"].id
     )
     error_message = "Existing endpoint role assignment, lock and association addresses and scope must be preserved with supplied fields applied."
@@ -157,10 +157,10 @@ run "unmanaged_explicit_fields" {
       one(azurerm_private_endpoint.this_unmanaged_dns_zone_groups["endpoint"].ip_configuration).member_name == "namespace" &&
       one(azurerm_private_endpoint.this_unmanaged_dns_zone_groups["endpoint"].ip_configuration).private_ip_address == "10.0.0.6" &&
       length(azurerm_private_endpoint.this_unmanaged_dns_zone_groups["endpoint"].private_dns_zone_group) == 0 &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].scope == azurerm_private_endpoint.this_unmanaged_dns_zone_groups["endpoint"].id &&
-      azurerm_role_assignment.this["PrivateEndpoint|contributor"].condition_version == "2.0" &&
-      azurerm_management_lock.this["PrivateEndpoint|endpoint"].scope == azurerm_private_endpoint.this_unmanaged_dns_zone_groups["endpoint"].id &&
-      azurerm_management_lock.this["PrivateEndpoint|endpoint"].notes == "Endpoint protection" &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].scope == azurerm_private_endpoint.this_unmanaged_dns_zone_groups["endpoint"].id &&
+      output.resource_role_assignments["PrivateEndpoint|contributor"].condition_version == "2.0" &&
+      output.resource_locks["PrivateEndpoint|endpoint"].scope == azurerm_private_endpoint.this_unmanaged_dns_zone_groups["endpoint"].id &&
+      output.resource_locks["PrivateEndpoint|endpoint"].notes == "Endpoint protection" &&
       azurerm_private_endpoint_application_security_group_association.this["endpoint-asg"].private_endpoint_id == azurerm_private_endpoint.this_unmanaged_dns_zone_groups["endpoint"].id
     )
     error_message = "DNS-off mode must use only the existing unmanaged endpoint address and preserve extension scope and IP settings."
@@ -199,8 +199,8 @@ run "omitted_fields_and_inherited_lock" {
       one(azurerm_private_endpoint.this_managed_dns_zone_groups["endpoint"].private_service_connection).name == "pse-test-namespace" &&
       one(azurerm_private_endpoint.this_managed_dns_zone_groups["endpoint"].ip_configuration).member_name == "namespace" &&
       length(azurerm_private_endpoint.this_managed_dns_zone_groups["endpoint"].private_dns_zone_group) == 0 &&
-      azurerm_management_lock.this["PrivateEndpoint|endpoint"].notes == "Cannot delete the resource or its child resources." &&
-      length(azurerm_role_assignment.this) == 0
+      output.resource_locks["PrivateEndpoint|endpoint"].notes == "Cannot delete the resource or its child resources." &&
+      length(output.resource_role_assignments) == 0
     )
     error_message = "Existing endpoint defaults, tag and lock inheritance must remain unchanged."
   }
@@ -221,8 +221,8 @@ run "basic_ignores_endpoints" {
     condition = (
       length(output.resource_private_endpoints) == 0 &&
       length(azurerm_private_endpoint_application_security_group_association.this) == 0 &&
-      length(azurerm_role_assignment.this) == 0 &&
-      length(azurerm_management_lock.this) == 0
+      length(output.resource_role_assignments) == 0 &&
+      length(output.resource_locks) == 0
     )
     error_message = "Basic namespaces must continue to ignore endpoints and their extensions."
   }
@@ -244,8 +244,8 @@ run "standard_ignores_endpoints_and_telemetry_opt_out" {
     condition = (
       length(output.resource_private_endpoints) == 0 &&
       length(azurerm_private_endpoint_application_security_group_association.this) == 0 &&
-      length(azurerm_role_assignment.this) == 0 &&
-      length(azurerm_management_lock.this) == 0 &&
+      length(output.resource_role_assignments) == 0 &&
+      length(output.resource_locks) == 0 &&
       length(azapi_resource.telemetry) == 0
     )
     error_message = "Standard namespaces must continue to ignore endpoints and retain the telemetry opt-out."
@@ -408,11 +408,11 @@ run "legacy_child_role_assignment_shapes" {
   }
   assert {
     condition = (
-      length(azurerm_role_assignment.this) == 2 &&
-      azurerm_role_assignment.this["Queue|contributor|queue"].scope == azurerm_servicebus_queue.base_queues["queue"].id &&
-      azurerm_role_assignment.this["Topic|contributor|topic"].scope == azurerm_servicebus_topic.this["topic"].id &&
-      azurerm_role_assignment.this["Queue|contributor|queue"].principal_id == "00000000-0000-0000-0000-000000000002" &&
-      azurerm_role_assignment.this["Topic|contributor|topic"].principal_id == "00000000-0000-0000-0000-000000000002"
+      length(output.resource_role_assignments) == 2 &&
+      output.resource_role_assignments["Queue|contributor|queue"].scope == azurerm_servicebus_queue.base_queues["queue"].id &&
+      output.resource_role_assignments["Topic|contributor|topic"].scope == azurerm_servicebus_topic.this["topic"].id &&
+      output.resource_role_assignments["Queue|contributor|queue"].principal_id == "00000000-0000-0000-0000-000000000002" &&
+      output.resource_role_assignments["Topic|contributor|topic"].principal_id == "00000000-0000-0000-0000-000000000002"
     )
     error_message = "Queue and topic role assignments must retain their existing input shapes, addresses and scope."
   }
