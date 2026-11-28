@@ -2,7 +2,7 @@ resource "azurerm_servicebus_topic" "this" {
   for_each = local.normalized_topics
 
   name                                    = each.key
-  namespace_id                            = azurerm_servicebus_namespace.this.id
+  namespace_id                            = azapi_resource.this.id
   auto_delete_on_idle                     = each.value.auto_delete_on_idle
   batched_operations_enabled              = each.value.enable_batched_operations
   default_message_ttl                     = each.value.default_message_ttl
